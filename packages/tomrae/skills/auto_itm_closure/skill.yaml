@@ -1,0 +1,59 @@
+name: auto_itm_closure
+author: tomrae
+version: 0.1.0
+description: The scaffold skill is a scaffold for your own skill implementation.
+license: Apache-2.0
+aea_version: '>=0.5.0, <0.6.0'
+fingerprint:
+  __init__.py: QmNkZAetyctaZCUf6ACxP5onGWsSxu2hjSNoFmJ3ta6Lta
+  behaviours.py: QmNjTnKYqNWQGBbmyui542nS6YbnE9oPHHdeZbsAvKeBGK
+  data_store.py: QmYWsb2wRKYDSwhCkFXEnbD9MvSn4RbUKAYv3iEKK9xdV4
+  db_communication.py: QmbVHaxKHz3S5hmfVppx78sBGkKcRFyCybUoVYb4n2STJk
+  dex_wrapper.py: QmaPpUySQvS6Kovgg9GgQ8Je2PRc6vDGNBvRpJ6fWrRYTf
+  dialogues.py: QmSLREVYUgkiCvRTPsfuMtcKgeng7QXnSynxzrG4MzkNVW
+  dummy_hegic_option.db: QmZwGcEmGyjgyq141aEHjXD5DmBj586pnsuZk4yGiyxkbV
+  dummy_hegic_option_data.db: QmNYUqjm91pDEmDsffMR5K44srKFZvUPtSDh353NEzmJMa
+  handlers.py: QmVJyMYUSA621DH77L9nMjpXHWfmSNZPb8Kc1gknYXQPaV
+  strategy.py: QmYupjkN4pXnotc2hVPJKQzYF7mQY7sgRYgV8ppn6VYhuu
+fingerprint_ignore_patterns: []
+contracts:
+- tomrae/HegicCallOption:0.1.0
+protocols:
+- fetchai/contract_api:0.3.0
+- fetchai/default:0.4.0
+- fetchai/ledger_api:0.3.0
+- fetchai/signing:0.2.0
+skills: []
+behaviours:
+  scaffold:
+    args: {}
+    class_name: OptionMonitor
+handlers:
+  contract_api:
+    args: {}
+    class_name: ContractApiHandler
+  ledger_api:
+    args: {}
+    class_name: LedgerApiHandler
+  signing:
+    args: {}
+    class_name: SigningHandler
+models:
+  contract_api_dialogues:
+    args: {}
+    class_name: ContractApiDialogues
+  default_dialogues:
+    args: {}
+    class_name: DefaultDialogues
+  ledger_api_dialogues:
+    args: {}
+    class_name: LedgerApiDialogues
+  signing_dialogues:
+    args: {}
+    class_name: SigningDialogues
+  strategy:
+    args:
+      ledger_id: ethereum
+    class_name: Strategy
+dependencies: {}
+type: skill
