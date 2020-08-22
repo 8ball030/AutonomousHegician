@@ -21,6 +21,7 @@
 
 import random  # nosec
 from typing import List
+from datetime import datetime, timedelta
 
 from aea.configurations.constants import DEFAULT_LEDGER
 from aea.helpers.search.generic import (
@@ -35,6 +36,8 @@ from aea.skills.base import Model
 
 from packages.fetchai.contracts.erc1155.contract import ERC1155Contract
 
+from packages.tomrae.skills.option_monitoring.db_communication import DBCommunication
+
 DEFAULT_IS_LEDGER_TX = True
 DEFAULT_NFT = 1
 DEFAULT_FT = 2
@@ -47,13 +50,53 @@ DEFAULT_VALUE = 0
 DEFAULT_LOCATION = {"longitude": 51.5194, "latitude": 0.1270}
 DEFAULT_SERVICE_DATA = {"key": "seller_service", "value": "erc1155_contract"}
 DEFAULT_LEDGER_ID = DEFAULT_LEDGER
-
+DEFAULT_TIME_BEFORE_EXECUTION = 300
 
 class Strategy(Model):
     """This class defines a strategy for the agent."""
 
+    def gather_pending_orders(self) -> list:
+        """Here we retrieve all non-executed contracts."""
+        return self._database.get_orders()
+
+    def get_contracts_to_execute(self) -> list:
+        orders = self.gather_pending_orders()
+        results = []
+        self.context.logger.info(f"Monitoring {len(orders)} orders for execution.")
+        self.context.logger.info(f"{dir(self.context)}")
+        for order in orders:
+            if self.check_contract_should_execute(order):
+                results.append(order)
+        return results
+
+    def check_contract_should_execute(self, contract: dict) -> bool:
+        """Check if the contract is in the money, 
+           and that the expiration date is near
+        """
+        deadline = datetime.fromisoformat(
+            contract["expiration_date"]) - timedelta(
+                seconds=DEFAULT_TIME_BEFORE_EXECUTION)
+
+
+        # price = self.context.price_ticker.current_price
+        price = 1000
+
+        if contract["status"] == "pending" and datetime.now() > deadline:
+            if any([(contract["type_of_option"] == "put"
+                     and contract["strike_price"] > price),
+                    (contract["type_of_option"] == "call"
+                     and contract["strike_price"] < price)]):
+                self.context.logger.info(f"Order is ready to execute!")
+                return True
+        return False
+
+    def retrieve_actions(self) -> list:
+        self.get_contracts_to_execute()
+        return []
+
     def __init__(self, **kwargs) -> None:
         """Initialize the strategy of the agent."""
+        self._database = DBCommunication()
         self._ledger_id = kwargs.pop("ledger_id", DEFAULT_LEDGER_ID)
         self._token_type = kwargs.pop("token_type", DEFAULT_TOKEN_TYPE)
         assert self._token_type in [1, 2], "Token type must be 1 (NFT) or 2 (FT)"

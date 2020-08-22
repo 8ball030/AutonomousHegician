@@ -7,14 +7,14 @@ license: Apache-2.0
 aea_version: '>=0.5.0, <0.6.0'
 fingerprint:
   __init__.py: Qmbm3ZtGpfdvvzqykfRqbaReAK9a16mcyK7qweSfeN5pq1
-  behaviours.py: QmZ7aQHnUgfJ3aCeSr1fCu3cyq1do5fdsumYxH1TwGTaPh
-  data_store.py: QmYWsb2wRKYDSwhCkFXEnbD9MvSn4RbUKAYv3iEKK9xdV4
-  db_communication.py: QmbVHaxKHz3S5hmfVppx78sBGkKcRFyCybUoVYb4n2STJk
+  behaviours.py: QmUP7p9kQe1oppXEPjCvgLrfLWRf3PVS6SiMjKZeAK6y9z
+  data_store.py: QmXZgmAk4sDjSac3yD6XHDgrJjE4kNBvjyUjzf81j9623Y
+  db_communication.py: QmPh8Y3rSB24vtxXVexVT7BdQf3EMPKcAGwfJdRnKMTK6E
   dex_wrapper.py: QmaPpUySQvS6Kovgg9GgQ8Je2PRc6vDGNBvRpJ6fWrRYTf
   dialogues.py: QmR6qb8PdmUozHANKMuLaKfLGKxgnx2zFzbkmcgqXq8wgg
   handlers.py: Qme2L5jyLTnNmsXbYG8B4oQyDo7tJqmTzVkL748nP6hQ4D
-  my_model.py: QmPaZ6G37Juk63mJj88nParaEp71XyURts8AmmX1axs24V
-  strategy.py: QmYvu2yH9fh2reqPXuTLFcX82fjeFA5Wm5K9DrTrDduJ49
+  hegic_option_data.db: QmNYUqjm91pDEmDsffMR5K44srKFZvUPtSDh353NEzmJMa
+  strategy.py: QmV1JCaAnSXh9ckr4pAd8y7UtYuPPT7nQGRhXXRcDvpyqW
 fingerprint_ignore_patterns: []
 contracts:
 - fetchai/erc1155:0.8.0
@@ -26,6 +26,10 @@ protocols:
 - fetchai/signing:0.2.0
 skills: []
 behaviours:
+  options_monitor:
+    args:
+      services_interval: 1
+    class_name: OptionMonitoring
   price_ticker:
     args:
       services_interval: 10

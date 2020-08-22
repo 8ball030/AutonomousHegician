@@ -5,7 +5,7 @@ from typing import Dict, cast
 
 my_path = os.path.dirname(__file__)
 
-DB_SOURCE = os.path.join(my_path, "dummy_hegic_option_data.db")
+DB_SOURCE = os.path.join(my_path, "hegic_option_data.db")
 
 
 class DBCommunication:

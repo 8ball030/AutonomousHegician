@@ -19,7 +19,7 @@ logger = logging.getLogger(
 
 logger.setLevel(logging.INFO)
 my_path = os.path.dirname(__file__)
-DB_SOURCE = os.path.join(my_path, "dummy_hegic_option_data.db")
+DB_SOURCE = os.path.join(my_path, "hegic_option_data.db")
 
 
 # Checking if the database exists
