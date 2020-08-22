@@ -21,7 +21,7 @@
 
 from typing import Optional, cast
 
-from aea.skills.behaviours import TickerBehaviour
+from aea.skills.behaviours import TickerBehaviour, Behaviour
 
 from packages.fetchai.protocols.contract_api.message import ContractApiMessage
 from packages.fetchai.protocols.ledger_api.message import LedgerApiMessage
@@ -33,10 +33,146 @@ from packages.tomrae.skills.option_monitoring.dialogues import (
     OefSearchDialogues,
 )
 from packages.tomrae.skills.option_monitoring.strategy import Strategy
+from packages.tomrae.skills.option_monitoring.dex_wrapper import DexWrapper
 
 DEFAULT_SERVICES_INTERVAL = 30.0
 LEDGER_API_ADDRESS = "fetchai/ledger:0.3.0"
 
+
+class PriceTicker(TickerBehaviour):
+    """This class monitors the price"""
+
+    @property
+    def current_price(self) -> str:
+        """Get the last recorded price from Uniswap."""
+        return self._current_price
+
+    def __init__(self, **kwargs):
+        """Initialise the behaviour."""
+        services_interval = kwargs.pop(
+            "services_interval", DEFAULT_SERVICES_INTERVAL
+        )  # type: int
+        super().__init__(tick_interval=services_interval, **kwargs)
+
+    def setup(self) -> None:
+        """
+        Implement the setup.
+
+        :return: None
+        """
+        self.dex = DexWrapper()
+        self._set_current_price()
+
+
+    def _set_current_price(self) -> None:
+        """Retrieve the current Eth dai price from the Dex."""
+        self._current_price = self.dex.get_ticker("DAI", "ETH")
+        self.context.logger.info(f"Current Rate : {round(self.current_price, 2)}")
+
+    def act(self) -> None:
+        """
+        Implement the act.
+
+        :return: None
+        """
+        self._set_current_price()
+
+
+
+
+class OptionMonitoringBehaviour(Behaviour):
+    """This class scaffolds a behaviour."""
+
+    def setup(self) -> None:
+        """
+        Implement the setup.
+
+        :return: None
+        """
+        self._request_balance()
+
+    def _request_balance(self) -> None:
+        """
+        Request ledger balance.
+        :return: None
+        """
+        strategy = cast(Strategy, self.context.strategy)
+        ledger_api_dialogues = cast(
+            LedgerApiDialogues, self.context.ledger_api_dialogues
+        )
+        ledger_api_msg = LedgerApiMessage(
+            performative=LedgerApiMessage.Performative.GET_BALANCE,
+            dialogue_reference=ledger_api_dialogues.new_self_initiated_dialogue_reference(),
+            ledger_id=strategy.ledger_id,
+            address=cast(str, self.context.agent_addresses.get(strategy.ledger_id)),
+        )
+        ledger_api_msg.counterparty = LEDGER_API_ADDRESS
+        ledger_api_dialogues.update(ledger_api_msg)
+        logger.info(f"Balance Requested {ledger_api_msg}")
+        self.context.outbox.put_message(message=ledger_api_msg)
+
+    def act(self) -> None:
+        """
+        Implement the act.
+
+        :return: None
+        """
+        self._request_balance()
+
+        msg = DefaultMessage(
+           performative=DefaultMessage.Performative.ERROR,
+           error_code=DefaultMessage.ErrorCode.UNSUPPORTED_PROTOCOL,
+           error_msg="This protocol is not supported by this AEA.",
+           error_data={"unsupported_msg": b"serialized unsupported protocol message"},
+        )
+
+
+        msg_dialogues = cast(
+            DefaultDialogues, self.context.default_dialogues
+        )
+#         msg.counterparty = LEDGER_API_ADDRESS
+#         msg_dialogues.update(msg)
+        # logger.info(f"Message {msg}")
+
+#         self.context.outbox.put_message(message=msg)
+
+
+        strategy = cast(Strategy, self.context.strategy)
+        orders_to_execute = strategy.retrieve_actions()
+
+
+        contract_api_dialogues = cast(
+            ContractApiDialogues, self.context.contract_api_dialogues
+        )
+        contract_api_msg = ContractApiMessage(
+            performative=ContractApiMessage.Performative.GET_STATE,
+            dialogue_reference=contract_api_dialogues.new_self_initiated_dialogue_reference(),
+            ledger_id="ethereum",
+            contract_id="tomrae/HegicCallOption:0.1.0",
+            contract_address="0x2990C030dcf370920Ed0cCa80bF32Af9503F4bB5",#strategy.contract_address,
+            callable="",
+            kwargs=ContractApiMessage.Kwargs(
+                {
+                    "deployer_address": self.context.agent_address, 
+                    "token_id": "TESTE"
+                }
+            ),
+        )
+        # logger.info("Sending Tx To out_box")
+#         contract_api_msg.counterparty = LEDGER_API_ADDRESS
+ #        contract_api_dialogues.update(contract_api_msg)
+        # self.context.outbox.put_message(message=contract_api_msg)
+
+        for order in orders_to_execute:
+            self.logger.info(f"Order to Execute -> {order}")
+
+    def teardown(self) -> None:
+        """
+        Implement the task teardown.
+
+        :return: None
+        """
+        pass
 
 class ServiceRegistrationBehaviour(TickerBehaviour):
     """This class implements a behaviour."""

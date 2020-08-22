@@ -128,3 +128,117 @@ MULTIADDRS_LIST_END
 [90m12:28:33.189[0m [32mINF[0m node stopped
 [90m12:28:33.189[0m [32mINF[0m Stopping DHTPeer... [36mpackage=[0mDHTPeer [36mpeerid=[0m16Uiu2HAmVHt5ZMqWWkJzipBzvfiWMhzHwD7CMamwxrm7ddPcWPkN
 [90m12:28:33.189[0m [32mINF[0m DelegateService Stopped. [36mpackage=[0mDHTPeer [36mpeerid=[0m16Uiu2HAmVHt5ZMqWWkJzipBzvfiWMhzHwD7CMamwxrm7ddPcWPkN
+[90m12:30:24.210[0m [33mDBG[0m env_file: /home/tom/Desktop/Medium/fetch_playground/AutonomousHegician/.env.libp2p [36mpackage=[0mAeaApi
+[90m12:30:24.211[0m [33mDBG[0m msgin_path: /tmp/tmpoisy3mrm/aea_to_process [36mpackage=[0mAeaApi
+[90m12:30:24.211[0m [33mDBG[0m msgout_path: /tmp/tmpoisy3mrm/process_to_aea [36mpackage=[0mAeaApi
+[90m12:30:24.211[0m [33mDBG[0m id: 91c726a017bf20c20913cc6b0dc081f259177fa6d022ebbc6a61b2e5003cd2c8 [36mpackage=[0mAeaApi
+[90m12:30:24.211[0m [33mDBG[0m addr: 0xf268e2664f0B4CE495561a38e3252eDf73927784 [36mpackage=[0mAeaApi
+[90m12:30:24.212[0m [33mDBG[0m entry_peers:  [36mpackage=[0mAeaApi
+[90m12:30:24.212[0m [33mDBG[0m uri: 127.0.0.1:9000 [36mpackage=[0mAeaApi
+[90m12:30:24.212[0m [33mDBG[0m uri public: 127.0.0.1:9000 [36mpackage=[0mAeaApi
+[90m12:30:24.212[0m [33mDBG[0m uri delegate service: 127.0.0.1:11000 [36mpackage=[0mAeaApi
+2020/08/22 12:30:24 successfully initialized API to AEA!
+[90m12:30:24.338[0m [32mINF[0m INFO My ID is  [36mpackage=[0mDHTPeer [36mpeerid=[0m16Uiu2HAmQ1RH6gziD4b3CCs8A89LbehjhsFEZMDU5BHy3bVHiFjG
+[90m12:30:24.339[0m [32mINF[0m successfully created libp2p node! [36mpackage=[0mDHTPeer [36mpeerid=[0m16Uiu2HAmQ1RH6gziD4b3CCs8A89LbehjhsFEZMDU5BHy3bVHiFjG
+[90m12:30:24.339[0m [33mDBG[0m Setting /aea-register/0.1.0 stream... [36mpackage=[0mDHTPeer [36mpeerid=[0m16Uiu2HAmQ1RH6gziD4b3CCs8A89LbehjhsFEZMDU5BHy3bVHiFjG
+[90m12:30:24.339[0m [33mDBG[0m Setting /aea-address/0.1.0 stream... [36mpackage=[0mDHTPeer [36mpeerid=[0m16Uiu2HAmQ1RH6gziD4b3CCs8A89LbehjhsFEZMDU5BHy3bVHiFjG
+[90m12:30:24.339[0m [33mDBG[0m Setting /aea/0.1.0 stream... [36mpackage=[0mDHTPeer [36mpeerid=[0m16Uiu2HAmQ1RH6gziD4b3CCs8A89LbehjhsFEZMDU5BHy3bVHiFjG
+[90m12:30:24.339[0m [32mINF[0m DelegateService listening for new connections... [36mpackage=[0mDHTPeer [36mpeerid=[0m16Uiu2HAmQ1RH6gziD4b3CCs8A89LbehjhsFEZMDU5BHy3bVHiFjG
+MULTIADDRS_LIST_START
+/dns4/127.0.0.1/tcp/9000/p2p/16Uiu2HAmQ1RH6gziD4b3CCs8A89LbehjhsFEZMDU5BHy3bVHiFjG
+MULTIADDRS_LIST_END
+[90m12:30:25.199[0m [32mINF[0m connected to agent [36mpackage=[0mAeaApi
+[90m12:30:25.199[0m [32mINF[0m successfully connected to AEA!
+[90m12:31:21.062[0m [32mINF[0m node stopped
+[90m12:31:21.062[0m [32mINF[0m Stopping DHTPeer... [36mpackage=[0mDHTPeer [36mpeerid=[0m16Uiu2HAmQ1RH6gziD4b3CCs8A89LbehjhsFEZMDU5BHy3bVHiFjG
+[90m12:31:21.062[0m [32mINF[0m DelegateService Stopped. [36mpackage=[0mDHTPeer [36mpeerid=[0m16Uiu2HAmQ1RH6gziD4b3CCs8A89LbehjhsFEZMDU5BHy3bVHiFjG
+[90m12:31:41.217[0m [33mDBG[0m env_file: /home/tom/Desktop/Medium/fetch_playground/AutonomousHegician/.env.libp2p [36mpackage=[0mAeaApi
+[90m12:31:41.219[0m [33mDBG[0m msgin_path: /tmp/tmpd7nd309j/aea_to_process [36mpackage=[0mAeaApi
+[90m12:31:41.219[0m [33mDBG[0m msgout_path: /tmp/tmpd7nd309j/process_to_aea [36mpackage=[0mAeaApi
+[90m12:31:41.219[0m [33mDBG[0m id: 39fdcc514b76048d4c691e9c77b2160a678afacf2c0ccd3c41a6cfb2cc265e64 [36mpackage=[0mAeaApi
+[90m12:31:41.219[0m [33mDBG[0m addr: 0xf268e2664f0B4CE495561a38e3252eDf73927784 [36mpackage=[0mAeaApi
+[90m12:31:41.219[0m [33mDBG[0m entry_peers:  [36mpackage=[0mAeaApi
+[90m12:31:41.219[0m [33mDBG[0m uri: 127.0.0.1:9000 [36mpackage=[0mAeaApi
+[90m12:31:41.219[0m [33mDBG[0m uri public: 127.0.0.1:9000 [36mpackage=[0mAeaApi
+[90m12:31:41.219[0m [33mDBG[0m uri delegate service: 127.0.0.1:11000 [36mpackage=[0mAeaApi
+2020/08/22 12:31:41 successfully initialized API to AEA!
+[90m12:31:41.339[0m [32mINF[0m INFO My ID is  [36mpackage=[0mDHTPeer [36mpeerid=[0m16Uiu2HAm4RXXTgZ6bWtqdDfZnzRhkZNb1LBxZXZpJkjPMUsm9Bu3
+[90m12:31:41.339[0m [32mINF[0m successfully created libp2p node! [36mpackage=[0mDHTPeer [36mpeerid=[0m16Uiu2HAm4RXXTgZ6bWtqdDfZnzRhkZNb1LBxZXZpJkjPMUsm9Bu3
+[90m12:31:41.339[0m [33mDBG[0m Setting /aea-register/0.1.0 stream... [36mpackage=[0mDHTPeer [36mpeerid=[0m16Uiu2HAm4RXXTgZ6bWtqdDfZnzRhkZNb1LBxZXZpJkjPMUsm9Bu3
+[90m12:31:41.339[0m [33mDBG[0m Setting /aea-address/0.1.0 stream... [36mpackage=[0mDHTPeer [36mpeerid=[0m16Uiu2HAm4RXXTgZ6bWtqdDfZnzRhkZNb1LBxZXZpJkjPMUsm9Bu3
+[90m12:31:41.339[0m [33mDBG[0m Setting /aea/0.1.0 stream... [36mpackage=[0mDHTPeer [36mpeerid=[0m16Uiu2HAm4RXXTgZ6bWtqdDfZnzRhkZNb1LBxZXZpJkjPMUsm9Bu3
+[90m12:31:41.339[0m [32mINF[0m DelegateService listening for new connections... [36mpackage=[0mDHTPeer [36mpeerid=[0m16Uiu2HAm4RXXTgZ6bWtqdDfZnzRhkZNb1LBxZXZpJkjPMUsm9Bu3
+MULTIADDRS_LIST_START
+/dns4/127.0.0.1/tcp/9000/p2p/16Uiu2HAm4RXXTgZ6bWtqdDfZnzRhkZNb1LBxZXZpJkjPMUsm9Bu3
+MULTIADDRS_LIST_END
+[90m12:31:42.208[0m [32mINF[0m connected to agent [36mpackage=[0mAeaApi
+[90m12:31:42.208[0m [32mINF[0m successfully connected to AEA!
+[90m12:32:00.990[0m [32mINF[0m node stopped
+[90m12:32:00.990[0m [32mINF[0m Stopping DHTPeer... [36mpackage=[0mDHTPeer [36mpeerid=[0m16Uiu2HAm4RXXTgZ6bWtqdDfZnzRhkZNb1LBxZXZpJkjPMUsm9Bu3
+[90m12:32:00.990[0m [32mINF[0m DelegateService Stopped. [36mpackage=[0mDHTPeer [36mpeerid=[0m16Uiu2HAm4RXXTgZ6bWtqdDfZnzRhkZNb1LBxZXZpJkjPMUsm9Bu3
+[90m12:44:04.703[0m [33mDBG[0m env_file: /home/tom/Desktop/Medium/fetch_playground/AutonomousHegician/.env.libp2p [36mpackage=[0mAeaApi
+[90m12:44:04.704[0m [33mDBG[0m msgin_path: /tmp/tmpq11q7lmm/aea_to_process [36mpackage=[0mAeaApi
+[90m12:44:04.704[0m [33mDBG[0m msgout_path: /tmp/tmpq11q7lmm/process_to_aea [36mpackage=[0mAeaApi
+[90m12:44:04.704[0m [33mDBG[0m id: d37779212f0fa02afe225433f0c8e4584b1e9d16f1a4bf50c7e336caf08d8712 [36mpackage=[0mAeaApi
+[90m12:44:04.704[0m [33mDBG[0m addr: 0xf268e2664f0B4CE495561a38e3252eDf73927784 [36mpackage=[0mAeaApi
+[90m12:44:04.704[0m [33mDBG[0m entry_peers:  [36mpackage=[0mAeaApi
+[90m12:44:04.704[0m [33mDBG[0m uri: 127.0.0.1:9000 [36mpackage=[0mAeaApi
+[90m12:44:04.704[0m [33mDBG[0m uri public: 127.0.0.1:9000 [36mpackage=[0mAeaApi
+[90m12:44:04.704[0m [33mDBG[0m uri delegate service: 127.0.0.1:11000 [36mpackage=[0mAeaApi
+2020/08/22 12:44:04 successfully initialized API to AEA!
+[90m12:44:04.822[0m [32mINF[0m INFO My ID is  [36mpackage=[0mDHTPeer [36mpeerid=[0m16Uiu2HAm4kuMqwZa8fDZiL4odjDUnmmBC7vz2qS8xQU9Pm9tUW9o
+[90m12:44:04.822[0m [32mINF[0m successfully created libp2p node! [36mpackage=[0mDHTPeer [36mpeerid=[0m16Uiu2HAm4kuMqwZa8fDZiL4odjDUnmmBC7vz2qS8xQU9Pm9tUW9o
+[90m12:44:04.822[0m [33mDBG[0m Setting /aea-register/0.1.0 stream... [36mpackage=[0mDHTPeer [36mpeerid=[0m16Uiu2HAm4kuMqwZa8fDZiL4odjDUnmmBC7vz2qS8xQU9Pm9tUW9o
+[90m12:44:04.822[0m [33mDBG[0m Setting /aea-address/0.1.0 stream... [36mpackage=[0mDHTPeer [36mpeerid=[0m16Uiu2HAm4kuMqwZa8fDZiL4odjDUnmmBC7vz2qS8xQU9Pm9tUW9o
+[90m12:44:04.822[0m [33mDBG[0m Setting /aea/0.1.0 stream... [36mpackage=[0mDHTPeer [36mpeerid=[0m16Uiu2HAm4kuMqwZa8fDZiL4odjDUnmmBC7vz2qS8xQU9Pm9tUW9o
+[90m12:44:04.822[0m [32mINF[0m DelegateService listening for new connections... [36mpackage=[0mDHTPeer [36mpeerid=[0m16Uiu2HAm4kuMqwZa8fDZiL4odjDUnmmBC7vz2qS8xQU9Pm9tUW9o
+MULTIADDRS_LIST_START
+/dns4/127.0.0.1/tcp/9000/p2p/16Uiu2HAm4kuMqwZa8fDZiL4odjDUnmmBC7vz2qS8xQU9Pm9tUW9o
+MULTIADDRS_LIST_END
+[90m12:44:05.693[0m [32mINF[0m connected to agent [36mpackage=[0mAeaApi
+[90m12:44:05.693[0m [32mINF[0m successfully connected to AEA!
+[90m12:45:04.079[0m [33mDBG[0m env_file: /home/tom/Desktop/Medium/fetch_playground/AutonomousHegician/.env.libp2p [36mpackage=[0mAeaApi
+[90m12:45:04.080[0m [33mDBG[0m msgin_path: /tmp/tmpafvfvvhe/aea_to_process [36mpackage=[0mAeaApi
+[90m12:45:04.081[0m [33mDBG[0m msgout_path: /tmp/tmpafvfvvhe/process_to_aea [36mpackage=[0mAeaApi
+[90m12:45:04.081[0m [33mDBG[0m id: bd63bcd7aa8817141d561d914a7efcdfec3d66d653402abff58788db26748e17 [36mpackage=[0mAeaApi
+[90m12:45:04.081[0m [33mDBG[0m addr: 0xf268e2664f0B4CE495561a38e3252eDf73927784 [36mpackage=[0mAeaApi
+[90m12:45:04.081[0m [33mDBG[0m entry_peers:  [36mpackage=[0mAeaApi
+[90m12:45:04.081[0m [33mDBG[0m uri: 127.0.0.1:9000 [36mpackage=[0mAeaApi
+[90m12:45:04.081[0m [33mDBG[0m uri public: 127.0.0.1:9000 [36mpackage=[0mAeaApi
+[90m12:45:04.081[0m [33mDBG[0m uri delegate service: 127.0.0.1:11000 [36mpackage=[0mAeaApi
+2020/08/22 12:45:04 successfully initialized API to AEA!
+[90m12:45:04.200[0m [32mINF[0m INFO My ID is  [36mpackage=[0mDHTPeer [36mpeerid=[0m16Uiu2HAmCmihcfAoZnCkEFTDd8kK1ZkTK3Yi7CzJNgkDsFX6k4M9
+[90m12:45:04.200[0m [32mINF[0m successfully created libp2p node! [36mpackage=[0mDHTPeer [36mpeerid=[0m16Uiu2HAmCmihcfAoZnCkEFTDd8kK1ZkTK3Yi7CzJNgkDsFX6k4M9
+[90m12:45:04.200[0m [33mDBG[0m Setting /aea-register/0.1.0 stream... [36mpackage=[0mDHTPeer [36mpeerid=[0m16Uiu2HAmCmihcfAoZnCkEFTDd8kK1ZkTK3Yi7CzJNgkDsFX6k4M9
+[90m12:45:04.200[0m [33mDBG[0m Setting /aea-address/0.1.0 stream... [36mpackage=[0mDHTPeer [36mpeerid=[0m16Uiu2HAmCmihcfAoZnCkEFTDd8kK1ZkTK3Yi7CzJNgkDsFX6k4M9
+[90m12:45:04.200[0m [33mDBG[0m Setting /aea/0.1.0 stream... [36mpackage=[0mDHTPeer [36mpeerid=[0m16Uiu2HAmCmihcfAoZnCkEFTDd8kK1ZkTK3Yi7CzJNgkDsFX6k4M9
+[90m12:45:04.201[0m [32mINF[0m DelegateService listening for new connections... [36mpackage=[0mDHTPeer [36mpeerid=[0m16Uiu2HAmCmihcfAoZnCkEFTDd8kK1ZkTK3Yi7CzJNgkDsFX6k4M9
+MULTIADDRS_LIST_START
+/dns4/127.0.0.1/tcp/9000/p2p/16Uiu2HAmCmihcfAoZnCkEFTDd8kK1ZkTK3Yi7CzJNgkDsFX6k4M9
+MULTIADDRS_LIST_END
+[90m12:45:05.069[0m [32mINF[0m connected to agent [36mpackage=[0mAeaApi
+[90m12:45:05.069[0m [32mINF[0m successfully connected to AEA!
+[90m12:45:49.055[0m [33mDBG[0m env_file: /home/tom/Desktop/Medium/fetch_playground/AutonomousHegician/.env.libp2p [36mpackage=[0mAeaApi
+[90m12:45:49.057[0m [33mDBG[0m msgin_path: /tmp/tmptxn6wdk9/aea_to_process [36mpackage=[0mAeaApi
+[90m12:45:49.057[0m [33mDBG[0m msgout_path: /tmp/tmptxn6wdk9/process_to_aea [36mpackage=[0mAeaApi
+[90m12:45:49.057[0m [33mDBG[0m id: 0b5284ecb5cbf5401e76f458dfacf7d45171be1faf2177f1e69a55c814a576c2 [36mpackage=[0mAeaApi
+[90m12:45:49.057[0m [33mDBG[0m addr: 0xf268e2664f0B4CE495561a38e3252eDf73927784 [36mpackage=[0mAeaApi
+[90m12:45:49.057[0m [33mDBG[0m entry_peers:  [36mpackage=[0mAeaApi
+[90m12:45:49.057[0m [33mDBG[0m uri: 127.0.0.1:9000 [36mpackage=[0mAeaApi
+[90m12:45:49.057[0m [33mDBG[0m uri public: 127.0.0.1:9000 [36mpackage=[0mAeaApi
+[90m12:45:49.057[0m [33mDBG[0m uri delegate service: 127.0.0.1:11000 [36mpackage=[0mAeaApi
+2020/08/22 12:45:49 successfully initialized API to AEA!
+[90m12:45:49.179[0m [32mINF[0m INFO My ID is  [36mpackage=[0mDHTPeer [36mpeerid=[0m16Uiu2HAmPbFwCA6AXEPTv1jcTXPE6fqN9Ko4gfwJUB7BfEqYjpuZ
+[90m12:45:49.179[0m [32mINF[0m successfully created libp2p node! [36mpackage=[0mDHTPeer [36mpeerid=[0m16Uiu2HAmPbFwCA6AXEPTv1jcTXPE6fqN9Ko4gfwJUB7BfEqYjpuZ
+[90m12:45:49.179[0m [33mDBG[0m Setting /aea-register/0.1.0 stream... [36mpackage=[0mDHTPeer [36mpeerid=[0m16Uiu2HAmPbFwCA6AXEPTv1jcTXPE6fqN9Ko4gfwJUB7BfEqYjpuZ
+[90m12:45:49.180[0m [33mDBG[0m Setting /aea-address/0.1.0 stream... [36mpackage=[0mDHTPeer [36mpeerid=[0m16Uiu2HAmPbFwCA6AXEPTv1jcTXPE6fqN9Ko4gfwJUB7BfEqYjpuZ
+[90m12:45:49.180[0m [33mDBG[0m Setting /aea/0.1.0 stream... [36mpackage=[0mDHTPeer [36mpeerid=[0m16Uiu2HAmPbFwCA6AXEPTv1jcTXPE6fqN9Ko4gfwJUB7BfEqYjpuZ
+[90m12:45:49.180[0m [32mINF[0m DelegateService listening for new connections... [36mpackage=[0mDHTPeer [36mpeerid=[0m16Uiu2HAmPbFwCA6AXEPTv1jcTXPE6fqN9Ko4gfwJUB7BfEqYjpuZ
+MULTIADDRS_LIST_START
+/dns4/127.0.0.1/tcp/9000/p2p/16Uiu2HAmPbFwCA6AXEPTv1jcTXPE6fqN9Ko4gfwJUB7BfEqYjpuZ
+MULTIADDRS_LIST_END
+[90m12:45:50.044[0m [32mINF[0m connected to agent [36mpackage=[0mAeaApi
+[90m12:45:50.045[0m [32mINF[0m successfully connected to AEA!
+[90m12:49:41.897[0m [32mINF[0m node stopped
+[90m12:49:41.897[0m [32mINF[0m Stopping DHTPeer... [36mpackage=[0mDHTPeer [36mpeerid=[0m16Uiu2HAmPbFwCA6AXEPTv1jcTXPE6fqN9Ko4gfwJUB7BfEqYjpuZ
+[90m12:49:41.897[0m [32mINF[0m DelegateService Stopped. [36mpackage=[0mDHTPeer [36mpeerid=[0m16Uiu2HAmPbFwCA6AXEPTv1jcTXPE6fqN9Ko4gfwJUB7BfEqYjpuZ
