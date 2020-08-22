@@ -25,12 +25,10 @@ from aea.skills.behaviours import TickerBehaviour, Behaviour
 
 from packages.fetchai.protocols.contract_api.message import ContractApiMessage
 from packages.fetchai.protocols.ledger_api.message import LedgerApiMessage
-from packages.fetchai.protocols.oef_search.message import OefSearchMessage
 from packages.tomrae.skills.option_monitoring.dialogues import (
     ContractApiDialogue,
     ContractApiDialogues,
     LedgerApiDialogues,
-    OefSearchDialogues,
 )
 from packages.tomrae.skills.option_monitoring.strategy import Strategy
 from packages.tomrae.skills.option_monitoring.dex_wrapper import DexWrapper
@@ -123,7 +121,7 @@ class OptionMonitoring(TickerBehaviour):
 
         :return: None
         """
-        self._request_balance()
+        #self._request_balance()
 
         strategy = cast(Strategy, self.context.strategy)
         orders_to_execute = strategy.retrieve_actions()
@@ -233,7 +231,8 @@ class ServiceRegistrationBehaviour(TickerBehaviour):
             performative=ContractApiMessage.Performative.GET_DEPLOY_TRANSACTION,
             dialogue_reference=contract_api_dialogues.new_self_initiated_dialogue_reference(),
             ledger_id=strategy.ledger_id,
-            contract_id="fetchai/erc1155:0.8.0",
+#            contract_id="fetchai/erc1155:0.8.0",
+            contract_id="tomrae/hegic_call_option:0.1.0",
             callable="get_deploy_transaction",
             kwargs=ContractApiMessage.Kwargs(
                 {"deployer_address": self.context.agent_address}

@@ -63,7 +63,6 @@ class Strategy(Model):
         orders = self.gather_pending_orders()
         results = []
         self.context.logger.info(f"Monitoring {len(orders)} orders for execution.")
-        self.context.logger.info(f"{dir(self.context)}")
         for order in orders:
             if self.check_contract_should_execute(order):
                 results.append(order)
@@ -78,7 +77,7 @@ class Strategy(Model):
                 seconds=DEFAULT_TIME_BEFORE_EXECUTION)
 
 
-        # price = self.context.price_ticker.current_price
+        price = self.context.behaviours.price_ticker.current_price
         price = 1000
 
         if contract["status"] == "pending" and datetime.now() > deadline:
