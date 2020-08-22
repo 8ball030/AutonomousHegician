@@ -7,7 +7,7 @@ license: Apache-2.0
 aea_version: '>=0.5.0, <0.6.0'
 fingerprint:
   __init__.py: Qmbm3ZtGpfdvvzqykfRqbaReAK9a16mcyK7qweSfeN5pq1
-  behaviours.py: QmW1BHRH5MMnhD8Skmd6CHagqB82EpXN3Emq5WsGw2NXJL
+  behaviours.py: QmaLRhbzTsGYhqm7GQeLDNwV7pxhaoKVD9t7u6QM7ef5CM
   data_store.py: QmXZgmAk4sDjSac3yD6XHDgrJjE4kNBvjyUjzf81j9623Y
   db_communication.py: QmPh8Y3rSB24vtxXVexVT7BdQf3EMPKcAGwfJdRnKMTK6E
   dex_wrapper.py: QmaPpUySQvS6Kovgg9GgQ8Je2PRc6vDGNBvRpJ6fWrRYTf
@@ -18,6 +18,7 @@ fingerprint:
 fingerprint_ignore_patterns: []
 contracts:
 - fetchai/erc1155:0.8.0
+- tomrae/stablecoin:0.1.0
 protocols:
 - fetchai/contract_api:0.2.0
 - fetchai/default:0.4.0

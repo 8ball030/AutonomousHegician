@@ -11,7 +11,13 @@ connections:
 - fetchai/stub:0.8.0
 contracts:
 - fetchai/erc1155:0.8.0
-- tomrae/hegic_call_option:0.1.0
+- tomrae/calloptions:0.1.0
+- tomrae/ercpool:0.1.0
+- tomrae/ethpool:0.1.0
+- tomrae/exchange:0.1.0
+- tomrae/pricefeed:0.1.0
+- tomrae/putoptions:0.1.0
+- tomrae/stablecoin:0.1.0
 protocols:
 - fetchai/contract_api:0.2.0
 - fetchai/default:0.4.0

@@ -232,7 +232,7 @@ class ServiceRegistrationBehaviour(TickerBehaviour):
             dialogue_reference=contract_api_dialogues.new_self_initiated_dialogue_reference(),
             ledger_id=strategy.ledger_id,
 #            contract_id="fetchai/erc1155:0.8.0",
-            contract_id="tomrae/hegic_call_option:0.1.0",
+            contract_id="tomrae/stablecoin:0.1.0",
             callable="get_deploy_transaction",
             kwargs=ContractApiMessage.Kwargs(
                 {"deployer_address": self.context.agent_address}

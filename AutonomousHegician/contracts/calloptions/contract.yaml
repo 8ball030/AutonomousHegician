@@ -1,4 +1,4 @@
-name: hegic_call_option 
+name: calloptions
 author: tomrae
 version: 0.1.0
 description: The scaffold contract scaffolds a contract to be implemented by the developer.
@@ -32,5 +32,5 @@ fingerprint:
 fingerprint_ignore_patterns: []
 class_name: MyScaffoldContract
 contract_interface_paths:
-  ethereum: build/contracts/FakeUSD.json
+  ethereum: build/contracts/HegicCallOptions.json
 dependencies: {}
