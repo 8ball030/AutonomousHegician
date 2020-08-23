@@ -189,21 +189,26 @@ class ContractDeployer(TickerBehaviour):
         :return: None
         """
         if self.deployed: return
+        if self.context.strategy.deploying: return
         self.context.logger.info("Contract Deployment!")
         strategy = cast(Strategy, self.context.strategy)
         
         if strategy.deployment_status["stablecoin"] is None:
             self._request_deploy_stablecoin()
+            # self._request_deploy_pricefeed()
+            self.context.strategy.deploying = True
 
         elif strategy.deployment_status["stablecoin"][0] == "deployed" and \
             strategy.deployment_status["pricefeed"] is None:
             self.stablecoin = strategy.deployment_status["stablecoin"][1]
             self._request_deploy_pricefeed()
+            self.context.strategy.deploying = True
             
         elif strategy.deployment_status["pricefeed"][0] == "deployed" and \
             strategy.deployment_status["exchange"] is None:
             self.pricefeed = strategy.deployment_status["pricefeed"][1]
             self._request_deploy_exchange()
+            self.context.strategy.deploying = True
 
         elif strategy.deployment_status["exchange"][0] == "deployed" and \
             strategy.deployment_status["ethpool"] is None:
@@ -241,6 +246,42 @@ class ContractDeployer(TickerBehaviour):
             self.context.logger.info("Deployment complete!")
 
 
+    def _request_deploy_exchange(self) -> None:
+        """
+        Request contract deploy transaction
+
+        :return: None
+        """
+        self.context.logger.info("exchange Contract Deployment!")
+        strategy = cast(Strategy, self.context.strategy)
+        strategy.is_behaviour_active = False
+        contract_api_dialogues = cast(
+            ContractApiDialogues, self.context.contract_api_dialogues
+        )
+        deployment_ref = contract_api_dialogues.new_self_initiated_dialogue_reference()
+        contract_api_msg = ContractApiMessage(
+            performative=ContractApiMessage.Performative.GET_DEPLOY_TRANSACTION,
+            dialogue_reference=deployment_ref,
+            ledger_id=strategy.ledger_id,
+            contract_id="tomrae/exchange:0.1.0",
+            callable="get_deploy_transaction",
+            kwargs=ContractApiMessage.Kwargs(
+                {"deployer_address": self.context.agent_address,
+                 "args": [self.pricefeed, self.stablecoin]
+                 }
+            ),
+        )
+        contract_api_msg.counterparty = LEDGER_API_ADDRESS
+        contract_api_dialogue = cast(
+            Optional[ContractApiDialogue],
+            contract_api_dialogues.update(contract_api_msg),
+        )
+        self.context.strategy.deployment_status["exchange"] = ("pending", deployment_ref[0])
+        assert contract_api_dialogue is not None, "ContractApiDialogue not generated"
+        contract_api_dialogue.terms = strategy.get_deploy_terms()
+        self.context.outbox.put_message(message=contract_api_msg)
+        self.context.logger.info("requesting exchange contract deployment transaction...")
+
     def _request_deploy_pricefeed(self) -> None:
         """
         Request contract deploy transaction
@@ -265,19 +306,6 @@ class ContractDeployer(TickerBehaviour):
                  "price": 10000}
             ),
         )
-#       contract_api_msg = ContractApiMessage(
-#           performative=ContractApiMessage.Performative.GET_RAW_TRANSACTION,
-#           dialogue_reference=deployment_ref,
-#           ledger_id=strategy.ledger_id,
-#           contract_id="tomrae/pricefeed:0.1.0",
-#           callable="get_custom_deploy_transaction",
-#           kwargs=ContractApiMessage.Kwargs(
-#               {"deployer_address": self.context.agent_address,
-#                "price": [10000]
-#                }
-#           ),
-#       )
-
         contract_api_msg.counterparty = LEDGER_API_ADDRESS
         contract_api_dialogue = cast(
             Optional[ContractApiDialogue],

@@ -107,6 +107,7 @@ class Strategy(Model):
             "ercpool": None,
             "ethpool": None,
         }
+        self.deploying = False
 
 
 

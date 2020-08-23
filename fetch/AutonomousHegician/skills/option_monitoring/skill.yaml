@@ -7,15 +7,15 @@ license: Apache-2.0
 aea_version: '>=0.5.0, <0.6.0'
 fingerprint:
   __init__.py: Qmbm3ZtGpfdvvzqykfRqbaReAK9a16mcyK7qweSfeN5pq1
-  behaviours.py: QmTrdppq5SDyLUrRWsJTa4iTEec3pJ9xziRfcK9wSqRnNw
+  behaviours.py: QmZPVuq4u8BNk1wA37CtHq6SP2nzKzH18US4xTAgX8xUjT
   data_store.py: QmPSExMf88KqBxh9NKPDzwPv3tEy2oCf893broJgrw99Dc
   db_communication.py: QmPh8Y3rSB24vtxXVexVT7BdQf3EMPKcAGwfJdRnKMTK6E
   dex_wrapper.py: QmaPpUySQvS6Kovgg9GgQ8Je2PRc6vDGNBvRpJ6fWrRYTf
   dialogues.py: QmXeMZdN2fTesDrJ3fpAMj1YT6Z6aGsunXMo6g4DPboMge
-  handlers.py: QmNaD6DJJR6WkmadtHputvWa6d1KPgaFJHU41Y2QiBjPTS
-  hegic_option_data.db: QmVqCdDkJyYk866xc5X74cgKDDj4s81VrXwsF47xzuDbyt
-  strategy.py: Qmag1eK1pZqrtauBWG5q7xPhBn8o44zsBCDhmBv75EeXAW
-  web_server.py: QmYTdXn51LLxitxNAob24Q6vmqcmDFTfmi38mjXHo1cztG
+  handlers.py: QmWFSvXUhioRHugEarVzRJ2R1dqAPycqAKJefyuwgh5JJ9
+  hegic_option_data.db: QmQVbQx8TCAGHmPEfQSybT518LRNekD9gQ5Fk712FHx3pr
+  strategy.py: QmTjbHjDqDSPuidADC1sCQEH15Y9t8rxKg679mc9AfokUp
+  web_server.py: QmShxQawRvBYCLKFocTyAex4mGFXt4wqA9m1xn7DfPwLwq
 fingerprint_ignore_patterns: []
 contracts:
 - fetchai/erc1155:0.8.0

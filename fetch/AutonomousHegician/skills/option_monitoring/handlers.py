@@ -359,10 +359,11 @@ class LedgerApiHandler(Handler):
             elif status[1] == ledger_api_dialogue.associated_signing_dialogue.associated_contract_api_dialogue.dialogue_label.dialogue_reference[0]:
                 self.context.logger.info("Successfully retried Deployment {contract}".format(contract=contract))
                 self.context.strategy.deployment_status[contract] = ("deployed", ledger_api_msg.transaction_receipt.receipt["contractAddress"])
+                self.context.strategy.deploying = False
         if is_transaction_successful:
             self.context.logger.info(
                 "transaction was successfully settled. Transaction receipt={}".format(
-                 ledger_api_msg.transaction_receipt
+                 ""#ledger_api_msg.transaction_receipt
                 )
             )
            #if not strategy.is_contract_deployed:
@@ -495,7 +496,7 @@ class ContractApiHandler(Handler):
         :param contract_api_message: the ledger api message
         :param contract_api_dialogue: the ledger api dialogue
         """
-        self.context.logger.info("received raw transaction={}".format(contract_api_msg))
+        self.context.logger.info("received raw transaction={}".format(contract_api_msg.dialogue_reference))
         signing_dialogues = cast(SigningDialogues, self.context.signing_dialogues)
         signing_msg = SigningMessage(
             performative=SigningMessage.Performative.SIGN_TRANSACTION,

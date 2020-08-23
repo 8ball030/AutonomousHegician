@@ -1,6 +1,6 @@
-agent_name: erc1155_deployer
-author: fetchai
-version: 0.11.0
+agent_name: autonomous_hegician
+author: 8baller
+version: 0.1.0
 description: An AEA to deploy and interact with an ERC1155
 license: Apache-2.0
 aea_version: '>=0.5.0, <0.6.0'
