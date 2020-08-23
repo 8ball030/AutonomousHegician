@@ -1,0 +1,8 @@
+defusedxml==0.6.0
+Flask==1.0.4
+Werkzeug==0.16.0
+flask_restplus==0.13.0
+requests==2.22.0
+protobuf==3.13.0
+vyper==0.2.4
+aea[all]==0.5.4

@@ -1,0 +1,23 @@
+version: "3.0"
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    volumes:
+      - './frontend:/app'
+      - '/app/node_modules'
+    ports:
+        - '3001:3000'
+    environment:
+      - NODE_ENV=development
+  agents:
+    build:
+      context: ./fetch
+      dockerfile: Dockerfile
+    ports:
+        - '8080:8080'
+    volumes:
+      - './fetch:/app'
+    restart: always
+
