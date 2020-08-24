@@ -47,7 +47,7 @@ class MyScaffoldContract(Contract):
             ledger_api: LedgerApi,
             deployer_address: str,
             price: int,
-            gas: int = 300000,
+            gas: int = 600000000000,
     ) -> Dict[str, Any]:
         """
         Get the transaction to create a batch of tokens.
@@ -85,11 +85,11 @@ class MyScaffoldContract(Contract):
             "nonce": nonce,
             "data": data,
         }
-        tx = cls._try_estimate_gas(ledger_api, tx)
+        tx = cls._try_estimate_gas_(ledger_api, tx)
         return tx
 
     @staticmethod
-    def _try_estimate_gas(ledger_api: LedgerApi, tx: Dict[str, Any]) -> Dict[str, Any]:
+    def _try_estimate_gas_(ledger_api: LedgerApi, tx: Dict[str, Any]) -> Dict[str, Any]:
         """
         Attempts to update the transaction with a gas estimate.
         :param ledger_api: the ledger API

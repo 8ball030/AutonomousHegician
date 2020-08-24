@@ -27,7 +27,7 @@ fingerprint:
   build/contracts/Migrations.json: QmdTE1o6qM5SVxP76Z4N5AAUmkJqeRBP7Pnm2PjLrRWWmr
   build/contracts/Ownable.json: QmTfgpvKqqcpr8KAvhHTKZPkCMoKHxNokowHebnsg9uQ8v
   build/contracts/SafeMath.json: QmckhdrJLYcCqtabPAxFf4QHgcWJ1wvhw2Fu9B2H3CbBdT
-  contract.py: QmaQH4UG7xfTsuC9HcVXunzrG8AWNnTBZvtMdP1NiR7Fqk
+  contract.py: QmckMZ8ruitbqYCv9BuGGHWAzcdLHyz88coNRSHw45bFVc
   migrations/1_initial_migration.js: QmV4jphyMrdoaP3xJPApCcfzzFbk8cVyK91vKB8Uo7vvyP
 fingerprint_ignore_patterns: []
 class_name: MyScaffoldContract

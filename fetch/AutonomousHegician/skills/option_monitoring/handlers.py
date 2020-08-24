@@ -357,7 +357,7 @@ class LedgerApiHandler(Handler):
         for contract, status in strategy.deployment_status.items():
             if status is None: continue
             elif status[1] == ledger_api_dialogue.associated_signing_dialogue.associated_contract_api_dialogue.dialogue_label.dialogue_reference[0]:
-                self.context.logger.info("Successfully retried Deployment {contract}".format(contract=contract))
+                self.context.logger.info("Successfully retrieved deployment {contract}".format(contract=contract))
                 self.context.strategy.deployment_status[contract] = ("deployed", ledger_api_msg.transaction_receipt.receipt["contractAddress"])
                 self.context.strategy.deploying = False
         if is_transaction_successful:

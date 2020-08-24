@@ -38,7 +38,7 @@ class MyScaffoldContract(Contract):
 
     @classmethod
     def _get_abi(cls, configuration):
-        with open(os.getcwd() + "/contracts/exchange/" + configuration["ethereum"]["contract_interface_paths"], "r") as f:
+        with open(os.getcwd() + "/contracts/exchange/" + configuration["contract_interface_paths"]["ethereum"], "r") as f:
             return json.loads(f.read())
 
     @classmethod
@@ -47,7 +47,7 @@ class MyScaffoldContract(Contract):
             ledger_api: LedgerApi,
             deployer_address: str,
             args: list,
-            gas: int = 300000,
+            gas: int = 60000000,
     ) -> Dict[str, Any]:
         """
         Get the transaction to create a batch of tokens.
@@ -55,7 +55,6 @@ class MyScaffoldContract(Contract):
         :param ledger_api: the ledger API
         :param deployer_address: the address of the deployer
         :param args: the price
-        :param data: the data to include in the transaction
         :param gas: the gas to be used
         :return: the transaction object
         """
@@ -99,12 +98,12 @@ class MyScaffoldContract(Contract):
         try:
             # try estimate the gas and update the transaction dict
             gas_estimate = ledger_api.api.eth.estimateGas(transaction=tx)
-            logger.debug(
-                "[ERC1155Contract]: gas estimate: {}".format(gas_estimate))
-            tx["gas"] = gas_estimate
+            logger.info(
+                "[exchange_contract]: gas estimate: {}".format(gas_estimate))
+            tx["gas"] = gas_estimate * 2
         except Exception as e:  # pylint: disable=broad-except
-            logger.debug(
-                "[ERC1155Contract]: Error when trying to estimate gas: {}".format(
+            logger.info(
+                "[exchange_contract]: Error when trying to estimate gas: {}".format(
                     e)
             )
         return tx
