@@ -37,12 +37,7 @@ pipenv shell
 cd agent/HegicHelper/
 aea run
 ```
-## Temporaily running the db as a webserver
-```
-pipenv shell
-cd agent/HegicHelper/
-aea run
-```
+
 ## Temporaily running the db as a webserver
 ```
 pipenv shell
@@ -50,17 +45,17 @@ cd fetch/AutonomousHegician/skills/option_monitoring
 python web_server.py
 aea run
 ```
-## Running the Agent
+## Running the Frontend
 ```
-pipenv shell
-cd fetch/AutonomousHegician/
-aea run
+cd frontend/
+npm install
+npm start
 ```
 
+Navigate to localhost:3000 to see the front end
 
 ##TODO
-
-- Complete contract - Excersise and cerate pending.
+- Complete contract - Excersise and create pending.
 - Create pleasent way to add new contracts to the sqllite db
 
 
