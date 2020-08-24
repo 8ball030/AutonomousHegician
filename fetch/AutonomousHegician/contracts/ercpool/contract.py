@@ -65,7 +65,7 @@ class MyScaffoldContract(Contract):
                     license_="Apache-2.0",
                     aea_version='>=0.5.0, <0.6.0',
                     contract_interface_paths={
-                        'ethereum': 'build/contracts/FakeExchange.json'}
+                        'ethereum': 'build/contracts/HegicERCPool.json'}
                     )
 
         # ContractConfig(**conf).contract_interfaces

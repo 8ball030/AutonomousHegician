@@ -205,15 +205,18 @@ class ContractDeployer(TickerBehaviour):
             self.stablecoin = strategy.deployment_status["stablecoin"][1]
             self._request_deploy_pricefeed()
             self.context.strategy.deploying = True
+            self.context.logger.info(f"stablecoin contract address: {self.stablecoin}")
 
         elif strategy.deployment_status["pricefeed"][0] == "deployed" and \
                 strategy.deployment_status["exchange"] is None:
             self.pricefeed = strategy.deployment_status["pricefeed"][1]
             self._request_deploy_exchange()
             self.context.strategy.deploying = True
+            self.context.logger.info(f"pricefeed contract address: {self.pricefeed}")
 
         elif strategy.deployment_status["exchange"][0] == "deployed" and \
                 strategy.deployment_status["ethpool"] is None:
+            self.context.logger.info(f"exchange contract address: {self.exchange}")
             self.exchange = strategy.deployment_status["exchange"][1]
             self._request_deploy_ethpool()
             self.context.strategy.deploying = True

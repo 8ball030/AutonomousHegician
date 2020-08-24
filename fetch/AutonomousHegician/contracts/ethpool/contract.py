@@ -35,10 +35,19 @@ class MyScaffoldContract(Contract):
 
     For non-ethereum based contracts import `from aea.contracts.base import Contract` and extend accordingly.
     """
+    conf = dict(name="ethpool",
+                    author="tomrae",
+                    version="0.1.0",
+                    license_="Apache-2.0",
+                    aea_version='>=0.5.0, <0.6.0',
+                    contract_interface_paths={
+                        'ethereum': 'build/contracts/HegicETHPool.json'}
+                    )
 
     @classmethod
-    def _get_abi(cls, configuration):
-        with open(os.getcwd() + "/contracts/ethpool/" + configuration["contract_interface_paths"]["ethereum"], "r") as f:
+    def _get_abi(cls):
+        with open(os.getcwd() + "/contracts/ethpool/" + \
+            cls.conf["contract_interface_paths"]["ethereum"], "r") as f:
             return json.loads(f.read())
 
     @classmethod
@@ -58,14 +67,6 @@ class MyScaffoldContract(Contract):
         :param gas: the gas to be used
         :return: the transaction object
         """
-        conf = dict(name="ethpool",
-                    author="tomrae",
-                    version="0.1.0",
-                    license_="Apache-2.0",
-                    aea_version='>=0.5.0, <0.6.0',
-                    contract_interface_paths={
-                        'ethereum': 'build/contracts/FakeExchange.json'}
-                    )
 
         # ContractConfig(**conf).contract_interfaces
         contract_specs = cls._get_abi(conf)
@@ -110,7 +111,7 @@ class MyScaffoldContract(Contract):
                     license_="Apache-2.0",
                     aea_version='>=0.5.0, <0.6.0',
                     contract_interface_paths={
-                        'ethereum': 'build/contracts/FakeExchange.json'}
+                        'ethereum': 'build/contracts/HegicETHPool.json'}
                     )
 
         # ContractConfig(**conf).contract_interfaces

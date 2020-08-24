@@ -35,10 +35,19 @@ class MyScaffoldContract(Contract):
 
     For non-ethereum based contracts import `from aea.contracts.base import Contract` and extend accordingly.
     """
+    conf = dict(name="exchange",
+                    author="tomrae",
+                    version="0.1.0",
+                    license_="Apache-2.0",
+                    aea_version='>=0.5.0, <0.6.0',
+                    contract_interface_paths={
+                        'ethereum': 'build/contracts/FakeExchange.json'}
+                    )
 
     @classmethod
-    def _get_abi(cls, configuration):
-        with open(os.getcwd() + "/contracts/exchange/" + configuration["contract_interface_paths"]["ethereum"], "r") as f:
+    def _get_abi(cls):
+        with open(os.getcwd() + "/contracts/exchange/" + \
+             cls.conf["contract_interface_paths"]["ethereum"], "r") as f:
             return json.loads(f.read())
 
     @classmethod
@@ -58,17 +67,9 @@ class MyScaffoldContract(Contract):
         :param gas: the gas to be used
         :return: the transaction object
         """
-        conf = dict(name="exchange",
-                    author="tomrae",
-                    version="0.1.0",
-                    license_="Apache-2.0",
-                    aea_version='>=0.5.0, <0.6.0',
-                    contract_interface_paths={
-                        'ethereum': 'build/contracts/FakeExchange.json'}
-                    )
 
         # ContractConfig(**conf).contract_interfaces
-        contract_specs = cls._get_abi(conf)
+        contract_specs = cls._get_abi()
         nonce = ledger_api.api.eth.getTransactionCount(deployer_address)
         instance = ledger_api.api.eth.contract(
             abi=contract_specs["abi"], bytecode=contract_specs["bytecode"],
@@ -99,8 +100,8 @@ class MyScaffoldContract(Contract):
             # try estimate the gas and update the transaction dict
             gas_estimate = ledger_api.api.eth.estimateGas(transaction=tx)
             logger.info(
-                "[exchange_contract]: gas estimate: {}".format(gas_estimate))
-            tx["gas"] = gas_estimate * 2
+                "[exchange_contract]: gas estimate: {}".format(gas_estimate * 10 ))
+            tx["gas"] = gas_estimate * 10
         except Exception as e:  # pylint: disable=broad-except
             logger.info(
                 "[exchange_contract]: Error when trying to estimate gas: {}".format(

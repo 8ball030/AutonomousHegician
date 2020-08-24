@@ -107,3 +107,50 @@ class MyScaffoldContract(Contract):
                     e)
             )
         return tx
+
+
+    @classmethod
+    def create_call_option(
+            cls,
+            ledger_api: LedgerApi,
+            deployer_address: str,
+            args: list,
+            gas: int = 60000000,
+    ) -> Dict[str, Any]:
+        """
+        Get the transaction to create a batch of tokens.
+
+        :param ledger_api: the ledger API
+        :param deployer_address: the address of the deployer
+        :param args: the price
+        :param gas: the gas to be used
+        :return: the transaction object
+        """
+        conf = dict(name="ethpool",
+                    author="tomrae",
+                    version="0.1.0",
+                    license_="Apache-2.0",
+                    aea_version='>=0.5.0, <0.6.0',
+                    contract_interface_paths={
+                        'ethereum': 'build/contracts/HegicCallOptions.json'}
+                    )
+
+        # ContractConfig(**conf).contract_interfaces
+        contract_specs = cls._get_abi(conf)
+        nonce = ledger_api.api.eth.getTransactionCount(deployer_address)
+        instance = ledger_api.api.eth.contract(
+            abi=contract_specs["abi"], bytecode=contract_specs["bytecode"],
+        )
+        constructed = instance.functions.provide(*args)
+        data = constructed.buildTransaction()['data']
+
+        tx = {
+            "from": deployer_address,  # only 'from' address, don't insert 'to' address!
+            "value":  0,  # transfer as part of deployment
+            "gas": gas,
+            "gasPrice": gas,  # TODO: refine
+            "nonce": nonce,
+            "data": data,
+        }
+        tx = cls._try_estimate_gas(ledger_api, tx)
+        return tx
