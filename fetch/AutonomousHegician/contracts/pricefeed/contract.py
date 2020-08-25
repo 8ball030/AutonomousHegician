@@ -99,11 +99,11 @@ class MyScaffoldContract(Contract):
         try:
             # try estimate the gas and update the transaction dict
             gas_estimate = ledger_api.api.eth.estimateGas(transaction=tx)
-            logger.debug(
+            logger.info(
                 "[ERC1155Contract]: gas estimate: {}".format(gas_estimate))
             tx["gas"] = gas_estimate
         except Exception as e:  # pylint: disable=broad-except
-            logger.debug(
+            logger.info(
                 "[ERC1155Contract]: Error when trying to estimate gas: {}".format(
                     e)
             )

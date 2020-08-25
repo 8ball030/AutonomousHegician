@@ -359,7 +359,7 @@ class LedgerApiHandler(Handler):
             elif status[1] == ledger_api_dialogue.associated_signing_dialogue.associated_contract_api_dialogue.dialogue_label.dialogue_reference[0]:
                 self.context.logger.info("Successfully retrieved deployment {contract}".format(contract=contract))
                 self.context.strategy.deployment_status[contract] = ("deployed", ledger_api_msg.transaction_receipt.receipt["contractAddress"])
-                self.context.strategy.deploying = False
+                self.context.strategy.deployment_status["status"] = "pending"
         if is_transaction_successful:
             self.context.logger.info(
                 "transaction was successfully settled. Transaction receipt={}".format(

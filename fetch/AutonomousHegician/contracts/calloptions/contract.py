@@ -64,7 +64,7 @@ class MyScaffoldContract(Contract):
                     license_="Apache-2.0",
                     aea_version='>=0.5.0, <0.6.0',
                     contract_interface_paths={
-                        'ethereum': 'build/contracts/FakeExchange.json'}
+                        'ethereum': 'build/contracts/HegicCallOptions.json'}
                     )
 
         # ContractConfig(**conf).contract_interfaces
@@ -126,7 +126,7 @@ class MyScaffoldContract(Contract):
         :param gas: the gas to be used
         :return: the transaction object
         """
-        conf = dict(name="ethpool",
+        conf = dict(name="calloptions",
                     author="tomrae",
                     version="0.1.0",
                     license_="Apache-2.0",

@@ -52,6 +52,7 @@ DEFAULT_SERVICE_DATA = {"key": "seller_service", "value": "erc1155_contract"}
 DEFAULT_LEDGER_ID = DEFAULT_LEDGER
 DEFAULT_TIME_BEFORE_EXECUTION = 300
 
+
 class Strategy(Model):
     """This class defines a strategy for the agent."""
 
@@ -62,7 +63,8 @@ class Strategy(Model):
     def get_contracts_to_execute(self) -> list:
         orders = self.gather_pending_orders()
         results = []
-        self.context.logger.info(f"Monitoring {len(orders)} orders for execution.")
+        self.context.logger.info(
+            f"Monitoring {len(orders)} orders for execution.")
         for order in orders:
             if self.check_contract_should_execute(order):
                 results.append(order)
@@ -75,7 +77,6 @@ class Strategy(Model):
         deadline = datetime.fromisoformat(
             contract["expiration_date"]) - timedelta(
                 seconds=DEFAULT_TIME_BEFORE_EXECUTION)
-
 
         price = self.context.behaviours.price_ticker.current_price
         price = 1000
@@ -99,23 +100,33 @@ class Strategy(Model):
         self._ledger_id = kwargs.pop("ledger_id", DEFAULT_LEDGER_ID)
 
         self.deployment_status = {
-            "stablecoin": None,
-            "pricefeed": None,
-            "exchange": None,
-            "calloptions": None,
-            "putoptions": None,
-            "ercpool": None,
-            "ethpool": None,
         }
-        self.deploying = False
+        not_deployed = 0
+        for contract in ["stablecoin", "pricefeed",
+                         "exchange",
+                         "calloptions",
+                         "putoptions",
+                         "ercpool",
+                         "ethpool",
+                         "liquidity",
+                         "options"]: # post test remove
+            param = kwargs.pop(contract, None)
+            if param is "" or param is None:
+                not_deployed += 1
+                self.deployment_status[contract] = (None, None)
+            else:
+                self.deployment_status[contract] = ("deployed", param)
 
-
+        if not_deployed >= 0:
+            self.deployment_status["status"] = "pending"
 
         self._token_type = kwargs.pop("token_type", DEFAULT_TOKEN_TYPE)
-        assert self._token_type in [1, 2], "Token type must be 1 (NFT) or 2 (FT)"
+        assert self._token_type in [
+            1, 2], "Token type must be 1 (NFT) or 2 (FT)"
         self._nb_tokens = kwargs.pop("nb_tokens", DEFAULT_NB_TOKENS)
         self._token_ids = kwargs.pop("token_ids", None)
-        self._mint_quantities = kwargs.pop("mint_quantities", DEFAULT_MINT_QUANTITIES)
+        self._mint_quantities = kwargs.pop(
+            "mint_quantities", DEFAULT_MINT_QUANTITIES)
         assert (
             len(self._mint_quantities) == self._nb_tokens
         ), "Number of tokens must match mint quantities array size."
@@ -136,7 +147,8 @@ class Strategy(Model):
         self._agent_location = {
             "location": Location(location["longitude"], location["latitude"])
         }
-        self._set_service_data = kwargs.pop("service_data", DEFAULT_SERVICE_DATA)
+        self._set_service_data = kwargs.pop(
+            "service_data", DEFAULT_SERVICE_DATA)
         assert (
             len(self._set_service_data) == 2
             and "key" in self._set_service_data

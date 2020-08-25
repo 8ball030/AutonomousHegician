@@ -7,14 +7,14 @@ license: Apache-2.0
 aea_version: '>=0.5.0, <0.6.0'
 fingerprint:
   __init__.py: Qmbm3ZtGpfdvvzqykfRqbaReAK9a16mcyK7qweSfeN5pq1
-  behaviours.py: QmUA4nECKgDdnGCLJM1utqTJMdFB3a3BSVWKSUz6WbmSo8
+  behaviours.py: QmTjU9rxMsQVr9UTqorCM32LMTY7UNLamJG4NvekFzpMQz
   data_store.py: QmPSExMf88KqBxh9NKPDzwPv3tEy2oCf893broJgrw99Dc
   db_communication.py: QmPh8Y3rSB24vtxXVexVT7BdQf3EMPKcAGwfJdRnKMTK6E
   dex_wrapper.py: QmaPpUySQvS6Kovgg9GgQ8Je2PRc6vDGNBvRpJ6fWrRYTf
   dialogues.py: QmXeMZdN2fTesDrJ3fpAMj1YT6Z6aGsunXMo6g4DPboMge
-  handlers.py: QmNogJ35Wkn3RD8isVmZKdU1nTWd6g1jqipTcYusZRhbTQ
+  handlers.py: QmcBHgXEmUDsf63EVd3Qfeqkz1aiB1VAZmMak3xvcYM8Kz
   hegic_option_data.db: QmNU6VWmnFjHFLLJfFicZ6Mpzj7SaTsg7EuD92CkVjvC48
-  strategy.py: QmTjbHjDqDSPuidADC1sCQEH15Y9t8rxKg679mc9AfokUp
+  strategy.py: QmdNhodC2rMYxHPX6YStGbDPGRtfcoaA3KK5BXGUGeYxzr
   web_server.py: QmShxQawRvBYCLKFocTyAex4mGFXt4wqA9m1xn7DfPwLwq
 fingerprint_ignore_patterns: []
 contracts:
@@ -29,14 +29,7 @@ protocols:
 skills: []
 behaviours:
   contract_deployment:
-    args:
-      calloptions: ''
-      ercpool: ''
-      ethpool: ''
-      exchange: ''
-      pricefeed: ''
-      putoptions: ''
-      stablecoin: ''
+    args: {}
     class_name: ContractDeployer
   options_monitor:
     args:
@@ -77,6 +70,10 @@ models:
     class_name: SigningDialogues
   strategy:
     args:
+      calloptions: '0xf8f72e5007b91f60b1f7f6ac08d378bbaace617c'
+      ercpool: '0x134ed4a8c1bad437a8e8219daeb83308944578c4'
+      ethpool: '0x1b027efaabf20c82886f988da9e3595bed37687e'
+      exchange: '0x4c221386AFB0D25144ae4Ff31cbd817d46cdEe4f'
       from_supply: 10
       ledger_id: ethereum
       location:
@@ -94,9 +91,12 @@ models:
       - 100
       - 100
       nb_tokens: 10
+      pricefeed: '0xb27Ea54eB8e27ff840Ea73A15f59d2C5058067F8'
+      putoptions: '0x9fb82b8d09fe22230d64e5fd4d88d4a144c0acb6'
       service_data:
         key: seller_service
         value: erc1155_contract
+      stablecoin: '0xF486e756D9239Ed9cEBda3338A4fCc949550e609'
       to_supply: 0
       token_type: 2
       value: 0
