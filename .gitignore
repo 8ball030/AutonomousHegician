@@ -100,3 +100,6 @@ venv.bak/
 
 # mkdocs documentation
 /site
+
+*input_file
+*output_file
