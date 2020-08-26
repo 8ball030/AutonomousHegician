@@ -16,7 +16,6 @@
 #   limitations under the License.
 #
 # ------------------------------------------------------------------------------
-
 """This package contains the behaviour of a erc1155 deploy skill AEA."""
 
 from typing import Optional, cast
@@ -39,7 +38,6 @@ LEDGER_API_ADDRESS = "fetchai/ledger:0.3.0"
 
 class PriceTicker(TickerBehaviour):
     """This class monitors the price"""
-
     @property
     def current_price(self) -> str:
         """Get the last recorded price from Uniswap."""
@@ -47,9 +45,8 @@ class PriceTicker(TickerBehaviour):
 
     def __init__(self, **kwargs):
         """Initialise the behaviour."""
-        services_interval = kwargs.pop(
-            "services_interval", DEFAULT_SERVICES_INTERVAL
-        )  # type: int
+        services_interval = kwargs.pop("services_interval",
+                                       DEFAULT_SERVICES_INTERVAL)  # type: int
         super().__init__(tick_interval=services_interval, **kwargs)
 
     def setup(self) -> None:
@@ -78,12 +75,10 @@ class PriceTicker(TickerBehaviour):
 
 class OptionMonitoring(TickerBehaviour):
     """This class scaffolds a behaviour."""
-
     def __init__(self, **kwargs):
         """Initialise the behaviour."""
-        services_interval = kwargs.pop(
-            "services_interval", DEFAULT_SERVICES_INTERVAL
-        )  # type: int
+        services_interval = kwargs.pop("services_interval",
+                                       DEFAULT_SERVICES_INTERVAL)  # type: int
         super().__init__(tick_interval=services_interval, **kwargs)
 
     def setup(self) -> None:
@@ -100,15 +95,15 @@ class OptionMonitoring(TickerBehaviour):
         :return: None
         """
         strategy = cast(Strategy, self.context.strategy)
-        ledger_api_dialogues = cast(
-            LedgerApiDialogues, self.context.ledger_api_dialogues
-        )
+        ledger_api_dialogues = cast(LedgerApiDialogues,
+                                    self.context.ledger_api_dialogues)
         ledger_api_msg = LedgerApiMessage(
             performative=LedgerApiMessage.Performative.GET_BALANCE,
-            dialogue_reference=ledger_api_dialogues.new_self_initiated_dialogue_reference(),
+            dialogue_reference=ledger_api_dialogues.
+            new_self_initiated_dialogue_reference(),
             ledger_id=strategy.ledger_id,
-            address=cast(str, self.context.agent_addresses.get(
-                strategy.ledger_id)),
+            address=cast(str,
+                         self.context.agent_addresses.get(strategy.ledger_id)),
         )
         ledger_api_msg.counterparty = LEDGER_API_ADDRESS
         ledger_api_dialogues.update(ledger_api_msg)
@@ -146,14 +141,13 @@ class OptionMonitoring(TickerBehaviour):
 
         contract_api_msg = ContractApiMessage(
             performative=ContractApiMessage.Performative.GET_RAW_TRANSACTION,
-            dialogue_reference=contract_api_dialogues.new_self_initiated_dialogue_reference(),
+            dialogue_reference=contract_api_dialogues.
+            new_self_initiated_dialogue_reference(),
             ledger_id=strategy.ledger_id,
             contract_id=contract_id,
             contract_address=contract_address,
             callable="exercise",
-            kwargs=ContractApiMessage.Kwargs(
-                {"option_id": order["optionID"]}
-            ),
+            kwargs=ContractApiMessage.Kwargs({"option_id": order["optionID"]}),
         )
 
     def teardown(self) -> None:
@@ -167,7 +161,6 @@ class OptionMonitoring(TickerBehaviour):
 
 class ContractDeployer(TickerBehaviour):
     """This class implements a behaviour."""
-
     def __init__(self, **kwargs):
         """Initialise the behaviour."""
         self.__dict__.update(kwargs)
@@ -189,8 +182,11 @@ class ContractDeployer(TickerBehaviour):
         :return: None
         """
         self.context.logger.info(
-            f"Contract Deployment status : {self.context.strategy.deployment_status}")
-        if self.context.strategy.deployment_status["status"] in ["complete", "deploying"]:
+            f"Contract Deployment status : {self.context.strategy.deployment_status}"
+        )
+        if self.context.strategy.deployment_status["status"] in [
+                "complete", "deploying"
+        ]:
             return
         strategy = cast(Strategy, self.context.strategy)
 
@@ -258,24 +254,22 @@ class ContractDeployer(TickerBehaviour):
         self.context.logger.info("options Contract Deployment!")
         strategy = cast(Strategy, self.context.strategy)
         strategy.is_behaviour_active = False
-        contract_api_dialogues = cast(
-            ContractApiDialogues, self.context.contract_api_dialogues
+        contract_api_dialogues = cast(ContractApiDialogues,
+                                      self.context.contract_api_dialogues)
+        deployment_ref = contract_api_dialogues.new_self_initiated_dialogue_reference(
         )
-        deployment_ref = contract_api_dialogues.new_self_initiated_dialogue_reference()
         contract_api_msg = ContractApiMessage(
             performative=ContractApiMessage.Performative.GET_RAW_TRANSACTION,
-            dialogue_reference=contract_api_dialogues.new_self_initiated_dialogue_reference(),
+            dialogue_reference=contract_api_dialogues.
+            new_self_initiated_dialogue_reference(),
             ledger_id=strategy.ledger_id,
             contract_id="tomrae/ethpool:0.8.0",
             contract_address=self.ethpool,
             callable="provide_liquidity",
-            kwargs=ContractApiMessage.Kwargs(
-                {
-                    "deployer_address": self.context.agent_address,
-                    "args": [200000]
-                }
-            )
-        )
+            kwargs=ContractApiMessage.Kwargs({
+                "deployer_address": self.context.agent_address,
+                "args": [200000]
+            }))
         contract_api_msg.counterparty = LEDGER_API_ADDRESS
         contract_api_dialogue = cast(
             Optional[ContractApiDialogue],
@@ -298,21 +292,21 @@ class ContractDeployer(TickerBehaviour):
         self.context.logger.info("ethpool Contract Deployment!")
         strategy = cast(Strategy, self.context.strategy)
         strategy.is_behaviour_active = False
-        contract_api_dialogues = cast(
-            ContractApiDialogues, self.context.contract_api_dialogues
+        contract_api_dialogues = cast(ContractApiDialogues,
+                                      self.context.contract_api_dialogues)
+        deployment_ref = contract_api_dialogues.new_self_initiated_dialogue_reference(
         )
-        deployment_ref = contract_api_dialogues.new_self_initiated_dialogue_reference()
         contract_api_msg = ContractApiMessage(
-            performative=ContractApiMessage.Performative.GET_DEPLOY_TRANSACTION,
+            performative=ContractApiMessage.Performative.
+            GET_DEPLOY_TRANSACTION,
             dialogue_reference=deployment_ref,
             ledger_id=strategy.ledger_id,
             contract_id="tomrae/ethpool:0.1.0",
             callable="get_deploy_transaction",
-            kwargs=ContractApiMessage.Kwargs(
-                {"deployer_address": self.context.agent_address,
-                 "args": [self.stablecoin]
-                 }
-            ),
+            kwargs=ContractApiMessage.Kwargs({
+                "deployer_address": self.context.agent_address,
+                "args": [self.stablecoin]
+            }),
         )
         contract_api_msg.counterparty = LEDGER_API_ADDRESS
         contract_api_dialogue = cast(
@@ -326,6 +320,7 @@ class ContractDeployer(TickerBehaviour):
         self.context.outbox.put_message(message=contract_api_msg)
         self.context.logger.info(
             "requesting ethpool contract deployment transaction...")
+
 
 #   def _request_deploy_ercpool(self) -> None:
 #       """
@@ -374,23 +369,26 @@ class ContractDeployer(TickerBehaviour):
         self.context.logger.info("putoptions Contract Deployment!")
         strategy = cast(Strategy, self.context.strategy)
         strategy.is_behaviour_active = False
-        contract_api_dialogues = cast(
-            ContractApiDialogues, self.context.contract_api_dialogues
+        contract_api_dialogues = cast(ContractApiDialogues,
+                                      self.context.contract_api_dialogues)
+        deployment_ref = contract_api_dialogues.new_self_initiated_dialogue_reference(
         )
-        deployment_ref = contract_api_dialogues.new_self_initiated_dialogue_reference()
         contract_api_msg = ContractApiMessage(
-            performative=ContractApiMessage.Performative.GET_DEPLOY_TRANSACTION,
+            performative=ContractApiMessage.Performative.
+            GET_DEPLOY_TRANSACTION,
             dialogue_reference=deployment_ref,
             ledger_id=strategy.ledger_id,
             contract_id="tomrae/putoptions:0.1.0",
             callable="get_deploy_transaction",
-            kwargs=ContractApiMessage.Kwargs(
-                {"deployer_address": self.context.agent_address,
-                 "args": [self.context.strategy.deployment_status["stablecoin"][1], 
-                          self.context.strategy.deployment_status["pricefeed"][1],
-                          self.context.strategy.deployment_status["exchange"][1]]
-                 }
-            ),
+            kwargs=ContractApiMessage.Kwargs({
+                "deployer_address":
+                self.context.agent_address,
+                "args": [
+                    self.context.strategy.deployment_status["stablecoin"][1],
+                    self.context.strategy.deployment_status["pricefeed"][1],
+                    self.context.strategy.deployment_status["exchange"][1]
+                ]
+            }),
         )
         contract_api_msg.counterparty = LEDGER_API_ADDRESS
         contract_api_dialogue = cast(
@@ -414,21 +412,23 @@ class ContractDeployer(TickerBehaviour):
         self.context.logger.info("calloptions Contract Deployment!")
         strategy = cast(Strategy, self.context.strategy)
         strategy.is_behaviour_active = False
-        contract_api_dialogues = cast(
-            ContractApiDialogues, self.context.contract_api_dialogues
+        contract_api_dialogues = cast(ContractApiDialogues,
+                                      self.context.contract_api_dialogues)
+        deployment_ref = contract_api_dialogues.new_self_initiated_dialogue_reference(
         )
-        deployment_ref = contract_api_dialogues.new_self_initiated_dialogue_reference()
         contract_api_msg = ContractApiMessage(
-            performative=ContractApiMessage.Performative.GET_DEPLOY_TRANSACTION,
+            performative=ContractApiMessage.Performative.
+            GET_DEPLOY_TRANSACTION,
             dialogue_reference=deployment_ref,
             ledger_id=strategy.ledger_id,
             contract_id="tomrae/calloptions:0.1.0",
             callable="get_deploy_transaction",
-            kwargs=ContractApiMessage.Kwargs(
-                {"deployer_address": self.context.agent_address,
-                 "args": [self.context.strategy.deployment_status["pricefeed"][1]]
-                 }
-            ),
+            kwargs=ContractApiMessage.Kwargs({
+                "deployer_address":
+                self.context.agent_address,
+                "args":
+                [self.context.strategy.deployment_status["pricefeed"][1]]
+            }),
         )
         contract_api_msg.counterparty = LEDGER_API_ADDRESS
         contract_api_dialogue = cast(
@@ -452,25 +452,29 @@ class ContractDeployer(TickerBehaviour):
         self.context.logger.info("ercpool Contract Deployment!")
         strategy = cast(Strategy, self.context.strategy)
         strategy.is_behaviour_active = False
-        contract_api_dialogues = cast(
-            ContractApiDialogues, self.context.contract_api_dialogues
+        contract_api_dialogues = cast(ContractApiDialogues,
+                                      self.context.contract_api_dialogues)
+        deployment_ref = contract_api_dialogues.new_self_initiated_dialogue_reference(
         )
-        deployment_ref = contract_api_dialogues.new_self_initiated_dialogue_reference()
         contract_api_msg = ContractApiMessage(
-            performative=ContractApiMessage.Performative.GET_DEPLOY_TRANSACTION,
+            performative=ContractApiMessage.Performative.
+            GET_DEPLOY_TRANSACTION,
             dialogue_reference=deployment_ref,
             ledger_id=strategy.ledger_id,
             contract_id="tomrae/ercpool:0.1.0",
             callable="get_deploy_transaction",
-            kwargs=ContractApiMessage.Kwargs(
-                {"deployer_address": self.context.agent_address,
-                 "args": [self.context.strategy.deployment_status["stablecoin"][1]]
-                 }
-            ),
+            kwargs=ContractApiMessage.Kwargs({
+                "deployer_address":
+                self.context.agent_address,
+                "args":
+                [self.context.strategy.deployment_status["stablecoin"][1]]
+            }),
         )
-        self.context.logger.info({"deployer_address": self.context.agent_address,
-                 "args": [self.context.strategy.deployment_status["stablecoin"][1]]
-                 })
+        self.context.logger.info({
+            "deployer_address":
+            self.context.agent_address,
+            "args": [self.context.strategy.deployment_status["stablecoin"][1]]
+        })
 
         contract_api_msg.counterparty = LEDGER_API_ADDRESS
         contract_api_dialogue = cast(
@@ -494,21 +498,23 @@ class ContractDeployer(TickerBehaviour):
         self.context.logger.info("ethpool Contract Deployment!")
         strategy = cast(Strategy, self.context.strategy)
         strategy.is_behaviour_active = False
-        contract_api_dialogues = cast(
-            ContractApiDialogues, self.context.contract_api_dialogues
+        contract_api_dialogues = cast(ContractApiDialogues,
+                                      self.context.contract_api_dialogues)
+        deployment_ref = contract_api_dialogues.new_self_initiated_dialogue_reference(
         )
-        deployment_ref = contract_api_dialogues.new_self_initiated_dialogue_reference()
         contract_api_msg = ContractApiMessage(
-            performative=ContractApiMessage.Performative.GET_DEPLOY_TRANSACTION,
+            performative=ContractApiMessage.Performative.
+            GET_DEPLOY_TRANSACTION,
             dialogue_reference=deployment_ref,
             ledger_id=strategy.ledger_id,
             contract_id="tomrae/ethpool:0.1.0",
             callable="get_deploy_transaction",
-            kwargs=ContractApiMessage.Kwargs(
-                {"deployer_address": self.context.agent_address,
-                 "args": [self.context.strategy.deployment_status["stablecoin"]]
-                 }
-            ),
+            kwargs=ContractApiMessage.Kwargs({
+                "deployer_address":
+                self.context.agent_address,
+                "args":
+                [self.context.strategy.deployment_status["stablecoin"]]
+            }),
         )
         contract_api_msg.counterparty = LEDGER_API_ADDRESS
         contract_api_dialogue = cast(
@@ -532,22 +538,25 @@ class ContractDeployer(TickerBehaviour):
         self.context.logger.info("exchange Contract Deployment!")
         strategy = cast(Strategy, self.context.strategy)
         strategy.is_behaviour_active = False
-        contract_api_dialogues = cast(
-            ContractApiDialogues, self.context.contract_api_dialogues
+        contract_api_dialogues = cast(ContractApiDialogues,
+                                      self.context.contract_api_dialogues)
+        deployment_ref = contract_api_dialogues.new_self_initiated_dialogue_reference(
         )
-        deployment_ref = contract_api_dialogues.new_self_initiated_dialogue_reference()
         contract_api_msg = ContractApiMessage(
-            performative=ContractApiMessage.Performative.GET_DEPLOY_TRANSACTION,
+            performative=ContractApiMessage.Performative.
+            GET_DEPLOY_TRANSACTION,
             dialogue_reference=deployment_ref,
             ledger_id=strategy.ledger_id,
             contract_id="tomrae/exchange:0.1.0",
             callable="get_deploy_transaction",
-            kwargs=ContractApiMessage.Kwargs(
-                {"deployer_address": self.context.agent_address,
-                 "args": [self.context.strategy.deployment_status["pricefeed"][1],
-                          self.context.strategy.deployment_status["stablecoin"][1]]
-                 }
-            ),
+            kwargs=ContractApiMessage.Kwargs({
+                "deployer_address":
+                self.context.agent_address,
+                "args": [
+                    self.context.strategy.deployment_status["pricefeed"][1],
+                    self.context.strategy.deployment_status["stablecoin"][1]
+                ]
+            }),
         )
         contract_api_msg.counterparty = LEDGER_API_ADDRESS
         contract_api_dialogue = cast(
@@ -571,20 +580,21 @@ class ContractDeployer(TickerBehaviour):
         self.context.logger.info("Pricefeed Contract Deployment!")
         strategy = cast(Strategy, self.context.strategy)
         strategy.is_behaviour_active = False
-        contract_api_dialogues = cast(
-            ContractApiDialogues, self.context.contract_api_dialogues
+        contract_api_dialogues = cast(ContractApiDialogues,
+                                      self.context.contract_api_dialogues)
+        deployment_ref = contract_api_dialogues.new_self_initiated_dialogue_reference(
         )
-        deployment_ref = contract_api_dialogues.new_self_initiated_dialogue_reference()
         contract_api_msg = ContractApiMessage(
-            performative=ContractApiMessage.Performative.GET_DEPLOY_TRANSACTION,
+            performative=ContractApiMessage.Performative.
+            GET_DEPLOY_TRANSACTION,
             dialogue_reference=deployment_ref,
             ledger_id=strategy.ledger_id,
             contract_id="tomrae/pricefeed:0.1.0",
             callable="get_deploy_transaction",
-            kwargs=ContractApiMessage.Kwargs(
-                {"deployer_address": self.context.agent_address,
-                 "price": 10000}
-            ),
+            kwargs=ContractApiMessage.Kwargs({
+                "deployer_address": self.context.agent_address,
+                "price": 10000
+            }),
         )
         contract_api_msg.counterparty = LEDGER_API_ADDRESS
         contract_api_dialogue = cast(
@@ -608,19 +618,19 @@ class ContractDeployer(TickerBehaviour):
         self.context.logger.info("Stablecoin Contract Deployment!")
         strategy = cast(Strategy, self.context.strategy)
         strategy.is_behaviour_active = False
-        contract_api_dialogues = cast(
-            ContractApiDialogues, self.context.contract_api_dialogues
+        contract_api_dialogues = cast(ContractApiDialogues,
+                                      self.context.contract_api_dialogues)
+        deployment_ref = contract_api_dialogues.new_self_initiated_dialogue_reference(
         )
-        deployment_ref = contract_api_dialogues.new_self_initiated_dialogue_reference()
         contract_api_msg = ContractApiMessage(
-            performative=ContractApiMessage.Performative.GET_DEPLOY_TRANSACTION,
+            performative=ContractApiMessage.Performative.
+            GET_DEPLOY_TRANSACTION,
             dialogue_reference=deployment_ref,
             ledger_id=strategy.ledger_id,
             contract_id="tomrae/stablecoin:0.1.0",
             callable="get_deploy_transaction",
             kwargs=ContractApiMessage.Kwargs(
-                {"deployer_address": self.context.agent_address}
-            ),
+                {"deployer_address": self.context.agent_address}),
         )
         contract_api_msg.counterparty = LEDGER_API_ADDRESS
         contract_api_dialogue = cast(
@@ -651,15 +661,15 @@ class ContractDeployer(TickerBehaviour):
         :return: None
         """
         strategy = cast(Strategy, self.context.strategy)
-        ledger_api_dialogues = cast(
-            LedgerApiDialogues, self.context.ledger_api_dialogues
-        )
+        ledger_api_dialogues = cast(LedgerApiDialogues,
+                                    self.context.ledger_api_dialogues)
         ledger_api_msg = LedgerApiMessage(
             performative=LedgerApiMessage.Performative.GET_BALANCE,
-            dialogue_reference=ledger_api_dialogues.new_self_initiated_dialogue_reference(),
+            dialogue_reference=ledger_api_dialogues.
+            new_self_initiated_dialogue_reference(),
             ledger_id=strategy.ledger_id,
-            address=cast(str, self.context.agent_addresses.get(
-                strategy.ledger_id)),
+            address=cast(str,
+                         self.context.agent_addresses.get(strategy.ledger_id)),
         )
         ledger_api_msg.counterparty = LEDGER_API_ADDRESS
         ledger_api_dialogues.update(ledger_api_msg)
@@ -673,19 +683,19 @@ class ContractDeployer(TickerBehaviour):
         """
         strategy = cast(Strategy, self.context.strategy)
         strategy.is_behaviour_active = False
-        contract_api_dialogues = cast(
-            ContractApiDialogues, self.context.contract_api_dialogues
-        )
+        contract_api_dialogues = cast(ContractApiDialogues,
+                                      self.context.contract_api_dialogues)
         contract_api_msg = ContractApiMessage(
-            performative=ContractApiMessage.Performative.GET_DEPLOY_TRANSACTION,
-            dialogue_reference=contract_api_dialogues.new_self_initiated_dialogue_reference(),
+            performative=ContractApiMessage.Performative.
+            GET_DEPLOY_TRANSACTION,
+            dialogue_reference=contract_api_dialogues.
+            new_self_initiated_dialogue_reference(),
             ledger_id=strategy.ledger_id,
             #            contract_id="fetchai/erc1155:0.8.0",
             contract_id="tomrae/stablecoin:0.1.0",
             callable="get_deploy_transaction",
             kwargs=ContractApiMessage.Kwargs(
-                {"deployer_address": self.context.agent_address}
-            ),
+                {"deployer_address": self.context.agent_address}),
         )
         contract_api_msg.counterparty = LEDGER_API_ADDRESS
         contract_api_dialogue = cast(
@@ -706,21 +716,36 @@ class ContractDeployer(TickerBehaviour):
         """
         strategy = cast(Strategy, self.context.strategy)
         strategy.is_behaviour_active = False
-        contract_api_dialogues = cast(
-            ContractApiDialogues, self.context.contract_api_dialogues
+        contract_api_dialogues = cast(ContractApiDialogues,
+                                      self.context.contract_api_dialogues)
+        contract_api_msg = ContractApiMessage(
+            performative=ContractApiMessage.Performative.GET_RAW_TRANSACTION,
+            dialogue_reference=contract_api_dialogues.
+            new_self_initiated_dialogue_reference(),
+            ledger_id=strategy.ledger_id,
+            contract_id="tomrae/ethpool:0.1.0",
+            callable="provide_liquidity",
+            kwargs=ContractApiMessage.Kwargs({
+                "deployer_address":
+                self.context.agent_address,
+                "args": [
+                    1000000,
+                    self.context.strategy.deployment_status["ethpool"][1],
+                    self.context.agent_address
+                ],
+            }),
         )
         contract_api_msg = ContractApiMessage(
             performative=ContractApiMessage.Performative.GET_RAW_TRANSACTION,
             dialogue_reference=contract_api_dialogues.new_self_initiated_dialogue_reference(),
             ledger_id=strategy.ledger_id,
             contract_id="tomrae/ethpool:0.1.0",
-            contract_address=self.context.strategy.deployment_status["ethpool"][1],
+            contract_address=strategy.deployment_status["ethpool"][1],
             callable="provide_liquidity",
             kwargs=ContractApiMessage.Kwargs(
                 {
-                    "args": [1000000, 
-                             self.context.strategy.deployment_status["ethpool"][1]
-                             ],
+                    "deployer_address": self.context.agent_address,
+                    "amount": 100,
                 }
             ),
         )
@@ -742,24 +767,26 @@ class ContractDeployer(TickerBehaviour):
         """
         strategy = cast(Strategy, self.context.strategy)
         strategy.is_behaviour_active = False
-        contract_api_dialogues = cast(
-            ContractApiDialogues, self.context.contract_api_dialogues
-        )
+        contract_api_dialogues = cast(ContractApiDialogues,
+                                      self.context.contract_api_dialogues)
         contract_api_msg = ContractApiMessage(
             performative=ContractApiMessage.Performative.GET_RAW_TRANSACTION,
-            dialogue_reference=contract_api_dialogues.new_self_initiated_dialogue_reference(),
+            dialogue_reference=contract_api_dialogues.
+            new_self_initiated_dialogue_reference(),
             ledger_id=strategy.ledger_id,
             contract_id="fetchai/erc1155:0.8.0",
             contract_address=strategy.contract_address,
             callable="get_mint_batch_transaction",
-            kwargs=ContractApiMessage.Kwargs(
-                {
-                    "deployer_address": self.context.agent_address,
-                    "recipient_address": self.context.agent_address,
-                    "token_ids": strategy.token_ids,
-                    "mint_quantities": strategy.mint_quantities,
-                }
-            ),
+            kwargs=ContractApiMessage.Kwargs({
+                "deployer_address":
+                self.context.agent_address,
+                "recipient_address":
+                self.context.agent_address,
+                "token_ids":
+                strategy.token_ids,
+                "mint_quantities":
+                strategy.mint_quantities,
+            }),
         )
         contract_api_msg.counterparty = LEDGER_API_ADDRESS
         contract_api_dialogue = cast(
@@ -779,12 +806,12 @@ class ContractDeployer(TickerBehaviour):
         """
         strategy = cast(Strategy, self.context.strategy)
         description = strategy.get_location_description()
-        oef_search_dialogues = cast(
-            OefSearchDialogues, self.context.oef_search_dialogues
-        )
+        oef_search_dialogues = cast(OefSearchDialogues,
+                                    self.context.oef_search_dialogues)
         oef_search_msg = OefSearchMessage(
             performative=OefSearchMessage.Performative.REGISTER_SERVICE,
-            dialogue_reference=oef_search_dialogues.new_self_initiated_dialogue_reference(),
+            dialogue_reference=oef_search_dialogues.
+            new_self_initiated_dialogue_reference(),
             service_description=description,
         )
         oef_search_msg.counterparty = self.context.search_service_address
@@ -800,12 +827,12 @@ class ContractDeployer(TickerBehaviour):
         """
         strategy = cast(Strategy, self.context.strategy)
         description = strategy.get_register_service_description()
-        oef_search_dialogues = cast(
-            OefSearchDialogues, self.context.oef_search_dialogues
-        )
+        oef_search_dialogues = cast(OefSearchDialogues,
+                                    self.context.oef_search_dialogues)
         oef_search_msg = OefSearchMessage(
             performative=OefSearchMessage.Performative.REGISTER_SERVICE,
-            dialogue_reference=oef_search_dialogues.new_self_initiated_dialogue_reference(),
+            dialogue_reference=oef_search_dialogues.
+            new_self_initiated_dialogue_reference(),
             service_description=description,
         )
         oef_search_msg.counterparty = self.context.search_service_address
@@ -821,12 +848,12 @@ class ContractDeployer(TickerBehaviour):
         """
         strategy = cast(Strategy, self.context.strategy)
         description = strategy.get_unregister_service_description()
-        oef_search_dialogues = cast(
-            OefSearchDialogues, self.context.oef_search_dialogues
-        )
+        oef_search_dialogues = cast(OefSearchDialogues,
+                                    self.context.oef_search_dialogues)
         oef_search_msg = OefSearchMessage(
             performative=OefSearchMessage.Performative.UNREGISTER_SERVICE,
-            dialogue_reference=oef_search_dialogues.new_self_initiated_dialogue_reference(),
+            dialogue_reference=oef_search_dialogues.
+            new_self_initiated_dialogue_reference(),
             service_description=description,
         )
         oef_search_msg.counterparty = self.context.search_service_address
@@ -842,12 +869,12 @@ class ContractDeployer(TickerBehaviour):
         """
         strategy = cast(Strategy, self.context.strategy)
         description = strategy.get_location_description()
-        oef_search_dialogues = cast(
-            OefSearchDialogues, self.context.oef_search_dialogues
-        )
+        oef_search_dialogues = cast(OefSearchDialogues,
+                                    self.context.oef_search_dialogues)
         oef_search_msg = OefSearchMessage(
             performative=OefSearchMessage.Performative.UNREGISTER_SERVICE,
-            dialogue_reference=oef_search_dialogues.new_self_initiated_dialogue_reference(),
+            dialogue_reference=oef_search_dialogues.
+            new_self_initiated_dialogue_reference(),
             service_description=description,
         )
         oef_search_msg.counterparty = self.context.search_service_address
@@ -858,12 +885,10 @@ class ContractDeployer(TickerBehaviour):
 
 class ServiceRegistrationBehaviour(TickerBehaviour):
     """This class implements a behaviour."""
-
     def __init__(self, **kwargs):
         """Initialise the behaviour."""
-        services_interval = kwargs.pop(
-            "services_interval", DEFAULT_SERVICES_INTERVAL
-        )  # type: int
+        services_interval = kwargs.pop("services_interval",
+                                       DEFAULT_SERVICES_INTERVAL)  # type: int
         super().__init__(tick_interval=services_interval, **kwargs)
         self.is_service_registered = False
 
@@ -892,18 +917,12 @@ class ServiceRegistrationBehaviour(TickerBehaviour):
 
         if strategy.is_contract_deployed and not strategy.is_tokens_created:
             self._request_token_create_transaction()
-        elif (
-            strategy.is_contract_deployed
-            and strategy.is_tokens_created
-            and not strategy.is_tokens_minted
-        ):
+        elif (strategy.is_contract_deployed and strategy.is_tokens_created
+              and not strategy.is_tokens_minted):
             self._request_token_mint_transaction()
-        elif (
-            strategy.is_contract_deployed
-            and strategy.is_tokens_created
-            and strategy.is_tokens_minted
-            and not self.is_service_registered
-        ):
+        elif (strategy.is_contract_deployed and strategy.is_tokens_created
+              and strategy.is_tokens_minted
+              and not self.is_service_registered):
             self._register_agent()
             self._register_service()
             self.is_service_registered = True
@@ -924,15 +943,15 @@ class ServiceRegistrationBehaviour(TickerBehaviour):
         :return: None
         """
         strategy = cast(Strategy, self.context.strategy)
-        ledger_api_dialogues = cast(
-            LedgerApiDialogues, self.context.ledger_api_dialogues
-        )
+        ledger_api_dialogues = cast(LedgerApiDialogues,
+                                    self.context.ledger_api_dialogues)
         ledger_api_msg = LedgerApiMessage(
             performative=LedgerApiMessage.Performative.GET_BALANCE,
-            dialogue_reference=ledger_api_dialogues.new_self_initiated_dialogue_reference(),
+            dialogue_reference=ledger_api_dialogues.
+            new_self_initiated_dialogue_reference(),
             ledger_id=strategy.ledger_id,
-            address=cast(str, self.context.agent_addresses.get(
-                strategy.ledger_id)),
+            address=cast(str,
+                         self.context.agent_addresses.get(strategy.ledger_id)),
         )
         ledger_api_msg.counterparty = LEDGER_API_ADDRESS
         ledger_api_dialogues.update(ledger_api_msg)
@@ -946,19 +965,19 @@ class ServiceRegistrationBehaviour(TickerBehaviour):
         """
         strategy = cast(Strategy, self.context.strategy)
         strategy.is_behaviour_active = False
-        contract_api_dialogues = cast(
-            ContractApiDialogues, self.context.contract_api_dialogues
-        )
+        contract_api_dialogues = cast(ContractApiDialogues,
+                                      self.context.contract_api_dialogues)
         contract_api_msg = ContractApiMessage(
-            performative=ContractApiMessage.Performative.GET_DEPLOY_TRANSACTION,
-            dialogue_reference=contract_api_dialogues.new_self_initiated_dialogue_reference(),
+            performative=ContractApiMessage.Performative.
+            GET_DEPLOY_TRANSACTION,
+            dialogue_reference=contract_api_dialogues.
+            new_self_initiated_dialogue_reference(),
             ledger_id=strategy.ledger_id,
             #            contract_id="fetchai/erc1155:0.8.0",
             contract_id="tomrae/stablecoin:0.1.0",
             callable="get_deploy_transaction",
             kwargs=ContractApiMessage.Kwargs(
-                {"deployer_address": self.context.agent_address}
-            ),
+                {"deployer_address": self.context.agent_address}),
         )
         contract_api_msg.counterparty = LEDGER_API_ADDRESS
         contract_api_dialogue = cast(
@@ -979,22 +998,20 @@ class ServiceRegistrationBehaviour(TickerBehaviour):
         """
         strategy = cast(Strategy, self.context.strategy)
         strategy.is_behaviour_active = False
-        contract_api_dialogues = cast(
-            ContractApiDialogues, self.context.contract_api_dialogues
-        )
+        contract_api_dialogues = cast(ContractApiDialogues,
+                                      self.context.contract_api_dialogues)
         contract_api_msg = ContractApiMessage(
             performative=ContractApiMessage.Performative.GET_RAW_TRANSACTION,
-            dialogue_reference=contract_api_dialogues.new_self_initiated_dialogue_reference(),
+            dialogue_reference=contract_api_dialogues.
+            new_self_initiated_dialogue_reference(),
             ledger_id=strategy.ledger_id,
             contract_id="fetchai/erc1155:0.8.0",
             contract_address=strategy.contract_address,
             callable="get_create_batch_transaction",
-            kwargs=ContractApiMessage.Kwargs(
-                {
-                    "deployer_address": self.context.agent_address,
-                    "token_ids": strategy.token_ids,
-                }
-            ),
+            kwargs=ContractApiMessage.Kwargs({
+                "deployer_address": self.context.agent_address,
+                "token_ids": strategy.token_ids,
+            }),
         )
         contract_api_msg.counterparty = LEDGER_API_ADDRESS
         contract_api_dialogue = cast(
@@ -1014,24 +1031,26 @@ class ServiceRegistrationBehaviour(TickerBehaviour):
         """
         strategy = cast(Strategy, self.context.strategy)
         strategy.is_behaviour_active = False
-        contract_api_dialogues = cast(
-            ContractApiDialogues, self.context.contract_api_dialogues
-        )
+        contract_api_dialogues = cast(ContractApiDialogues,
+                                      self.context.contract_api_dialogues)
         contract_api_msg = ContractApiMessage(
             performative=ContractApiMessage.Performative.GET_RAW_TRANSACTION,
-            dialogue_reference=contract_api_dialogues.new_self_initiated_dialogue_reference(),
+            dialogue_reference=contract_api_dialogues.
+            new_self_initiated_dialogue_reference(),
             ledger_id=strategy.ledger_id,
             contract_id="fetchai/erc1155:0.8.0",
             contract_address=strategy.contract_address,
             callable="get_mint_batch_transaction",
-            kwargs=ContractApiMessage.Kwargs(
-                {
-                    "deployer_address": self.context.agent_address,
-                    "recipient_address": self.context.agent_address,
-                    "token_ids": strategy.token_ids,
-                    "mint_quantities": strategy.mint_quantities,
-                }
-            ),
+            kwargs=ContractApiMessage.Kwargs({
+                "deployer_address":
+                self.context.agent_address,
+                "recipient_address":
+                self.context.agent_address,
+                "token_ids":
+                strategy.token_ids,
+                "mint_quantities":
+                strategy.mint_quantities,
+            }),
         )
         contract_api_msg.counterparty = LEDGER_API_ADDRESS
         contract_api_dialogue = cast(
@@ -1051,12 +1070,12 @@ class ServiceRegistrationBehaviour(TickerBehaviour):
         """
         strategy = cast(Strategy, self.context.strategy)
         description = strategy.get_location_description()
-        oef_search_dialogues = cast(
-            OefSearchDialogues, self.context.oef_search_dialogues
-        )
+        oef_search_dialogues = cast(OefSearchDialogues,
+                                    self.context.oef_search_dialogues)
         oef_search_msg = OefSearchMessage(
             performative=OefSearchMessage.Performative.REGISTER_SERVICE,
-            dialogue_reference=oef_search_dialogues.new_self_initiated_dialogue_reference(),
+            dialogue_reference=oef_search_dialogues.
+            new_self_initiated_dialogue_reference(),
             service_description=description,
         )
         oef_search_msg.counterparty = self.context.search_service_address
@@ -1072,12 +1091,12 @@ class ServiceRegistrationBehaviour(TickerBehaviour):
         """
         strategy = cast(Strategy, self.context.strategy)
         description = strategy.get_register_service_description()
-        oef_search_dialogues = cast(
-            OefSearchDialogues, self.context.oef_search_dialogues
-        )
+        oef_search_dialogues = cast(OefSearchDialogues,
+                                    self.context.oef_search_dialogues)
         oef_search_msg = OefSearchMessage(
             performative=OefSearchMessage.Performative.REGISTER_SERVICE,
-            dialogue_reference=oef_search_dialogues.new_self_initiated_dialogue_reference(),
+            dialogue_reference=oef_search_dialogues.
+            new_self_initiated_dialogue_reference(),
             service_description=description,
         )
         oef_search_msg.counterparty = self.context.search_service_address
@@ -1093,12 +1112,12 @@ class ServiceRegistrationBehaviour(TickerBehaviour):
         """
         strategy = cast(Strategy, self.context.strategy)
         description = strategy.get_unregister_service_description()
-        oef_search_dialogues = cast(
-            OefSearchDialogues, self.context.oef_search_dialogues
-        )
+        oef_search_dialogues = cast(OefSearchDialogues,
+                                    self.context.oef_search_dialogues)
         oef_search_msg = OefSearchMessage(
             performative=OefSearchMessage.Performative.UNREGISTER_SERVICE,
-            dialogue_reference=oef_search_dialogues.new_self_initiated_dialogue_reference(),
+            dialogue_reference=oef_search_dialogues.
+            new_self_initiated_dialogue_reference(),
             service_description=description,
         )
         oef_search_msg.counterparty = self.context.search_service_address
@@ -1114,12 +1133,12 @@ class ServiceRegistrationBehaviour(TickerBehaviour):
         """
         strategy = cast(Strategy, self.context.strategy)
         description = strategy.get_location_description()
-        oef_search_dialogues = cast(
-            OefSearchDialogues, self.context.oef_search_dialogues
-        )
+        oef_search_dialogues = cast(OefSearchDialogues,
+                                    self.context.oef_search_dialogues)
         oef_search_msg = OefSearchMessage(
             performative=OefSearchMessage.Performative.UNREGISTER_SERVICE,
-            dialogue_reference=oef_search_dialogues.new_self_initiated_dialogue_reference(),
+            dialogue_reference=oef_search_dialogues.
+            new_self_initiated_dialogue_reference(),
             service_description=description,
         )
         oef_search_msg.counterparty = self.context.search_service_address
