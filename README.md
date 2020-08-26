@@ -24,29 +24,40 @@ Please build the documents using the following commands to set the documentation
 ## Architecture
 ![Proposal for Poc of Behavior Auto-Execution](https://github.com/8ball030/hegichelper/blob/master/schema/Architecture.jpg)
 
-## Set up and Docs
-``
+## Clone repo
+
+``` bash
 git clone git@github.com:8ball030/hegichelper.git
+```
+
+## Set up and Docs
+
+``` bash
 touch Pipfile & pipenv --python 3.7 & pipenv shell
 pip install mkdocs
 mkdocs serve
-``
-## Running the agent as a AEA
 ```
-pipenv shell
-cd agent/HegicHelper/
+
+## Running the agent as a AEA
+
+``` bash
+cd fetch && pipenv shell && pipenv install --skip-lock
+cd AutonomousHegician
+aea install
 aea run
 ```
 
 ## Temporaily running the db as a webserver
-```
+
+``` bash
 pipenv shell
 cd fetch/AutonomousHegician/skills/option_monitoring
 python web_server.py
 aea run
 ```
 ## Running the Frontend
-```
+
+``` bash
 cd frontend/
 npm install
 npm start

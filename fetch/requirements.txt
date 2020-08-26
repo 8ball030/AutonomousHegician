@@ -6,4 +6,4 @@ requests==2.22.0
 protobuf==3.13.0
 vyper==0.2.4
 aea[all]==0.5.4
-flask-corsi==3.0.8
+Flask-Cors==3.0.8

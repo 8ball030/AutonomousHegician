@@ -104,3 +104,11 @@ models:
 dependencies:
   vyper:
     version: ==0.1.0b12
+  Flask:
+    version: ==1.0.4
+  Flask-Cors:
+    version: ==3.0.8
+  flask_restplus:
+    version: ==0.13.0
+  Werkzeug:
+    version: ==0.16.0
