@@ -6,6 +6,12 @@ verify_ssl = true
 [dev-packages]
 
 [packages]
+"aea[all]" = "==0.5.4"
+Flask = "==1.0.4"
+Flask-Cors = "==3.0.8"
+flask_restplus = "==0.13.0"
+vyper = "==0.2.4"
+Werkzeug = "==0.16.0"
 
 [requires]
 python_version = "3.7"
