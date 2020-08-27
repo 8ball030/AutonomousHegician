@@ -120,12 +120,13 @@ class MyScaffoldContract(Contract):
         """
         logger.info(
             f"******* Just about to get nonce for {deployer_address} type {type(deployer_address)}")
+        logger.info(
+            f"******* For the contract for {contract_address} type {type(contract_address)}")
         nonce = ledger_api.api.eth.getTransactionCount(deployer_address)
         logger.info(f"******* Just about to get instance ")
         instance = cls.get_instance(ledger_api, contract_address)
         logger.info(f"************instance created:")
         tx = instance.functions.provide(amount).buildTransaction({
-            
             "gas": gas,
             "gasPrice": ledger_api.api.toWei("50", "gwei"),
             "nonce": nonce,
