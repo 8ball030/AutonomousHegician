@@ -1,0 +1,8 @@
+graph TD
+	A[Price Polled] -->|Ticker Behaviour| B(Strategy)
+	B --> C{Check Existing Options for Time until expiration}
+  C -->|Condition Met| G[Excercise Option]
+  G -->|Send Tx to Ether Ledger| h[Ether Ledger]
+  C -->|No Options to Excercise| B
+  h -->|Update Personal Datastore| B
+					
