@@ -33,21 +33,42 @@ git clone git@github.com:8ball030/hegichelper.git
 ## Set up and Docs
 
 ``` bash
-touch Pipfile & pipenv --python 3.7 & pipenv shell
-pip install mkdocs
+pipenv shell && pipenv install --skip-lock
 mkdocs serve
+exit
+```
+
+## Installing
+
+First, make sure ganache is installed:
+``` bash
+npm install -g ganache-cli
+```
+
+Second, install the python dependencies in a virtual environment:
+``` bash
+cd fetch && pipenv shell && pipenv install --skip-lock
+exit
+cd ..
 ```
 
 ## Running the agent as a AEA
 
+
+First, run a local ganache client (with seed so we get same private keys each time):
 ``` bash
-cd fetch && pipenv shell && pipenv install --skip-lock
+cd fetch && ganache-cli -p 7545 --seed 1
+```
+
+Second, in another terminal:
+``` bash
+cd fetch && pipenv shell
 cd AutonomousHegician
 aea install
 aea run
 ```
 
-## Temporaily running the db as a webserver
+## Temporarily running the db as a webserver
 
 ``` bash
 pipenv shell
