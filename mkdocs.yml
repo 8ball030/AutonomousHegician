@@ -1,0 +1,19 @@
+site_name: Autonomous Hegician
+site_url: ''
+site_description: ''
+site_author: ''
+
+theme:
+  name: 'mkdocs'
+  logo:
+    icon: code
+  feature:
+    tabs: true  
+
+nav:
+  - Index: 'index.md'
+  - Architecture: 'architecture.md'
+
+plugins: []
+
+markdown_extensions: []

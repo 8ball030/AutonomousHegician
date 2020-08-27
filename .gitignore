@@ -103,3 +103,5 @@ venv.bak/
 
 *input_file
 *output_file
+
+*.DS_Store

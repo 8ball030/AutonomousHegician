@@ -1,2 +1,3 @@
-(/schema/Architecture.jpg)
-Format: ![Alt Text](url)
+# Architecture schema
+
+![image](../schema/Architecture.jpg)
