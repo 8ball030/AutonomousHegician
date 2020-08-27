@@ -21,7 +21,7 @@ import logging
 from aea.contracts.base import Contract
 from aea.crypto.base import LedgerApi
 from typing import List, Dict, Optional, Any
-
+from aea.mail.base import Address
 from aea.configurations.base import ContractConfig
 import os
 import json
@@ -47,8 +47,8 @@ class MyScaffoldContract(Contract):
 
     @classmethod
     def _get_abi(cls, conf):
-        with open(os.getcwd() + "/contracts/ethpool/" + \
-            cls.conf["contract_interface_paths"]["ethereum"], "r") as f:
+        with open(os.getcwd() + "/contracts/ethpool/" +
+                  cls.conf["contract_interface_paths"]["ethereum"], "r") as f:
             return json.loads(f.read())
 
     @classmethod
@@ -104,8 +104,8 @@ class MyScaffoldContract(Contract):
     def provide_liquidity(
             cls,
             ledger_api: LedgerApi,
-            contract_address: str,
-            deployer_address: str,
+            contract_address: Address,
+            deployer_address: Address,
             amount: int,
             gas: int = 60000000,
     ) -> Dict[str, Any]:
@@ -119,48 +119,45 @@ class MyScaffoldContract(Contract):
         :return: the transaction object
         """
         logger.info(
-            f"*************************************** just about to creat contract {deployer_address}"
-        )
+            f"******* Just about to get nonce for {deployer_address} type {type(deployer_address)}")
         nonce = ledger_api.api.eth.getTransactionCount(deployer_address)
+        logger.info(f"******* Just about to get instance ")
         instance = cls.get_instance(ledger_api, contract_address)
-
         logger.info(f"************instance created:")
         tx = instance.functions.provide(amount).buildTransaction({
-            "gas":
-            gas,
-            "gasPrice":
-            ledger_api.api.toWei("50", "gwei"),
-            "nonce":
-            nonce,
+            
+            "gas": gas,
+            "gasPrice": ledger_api.api.toWei("50", "gwei"),
+            "nonce": nonce,
         })
         logger.info(f"************tx created:")
         tx = cls._try_estimate_gas(ledger_api, tx)
         logger.info(f"************ gas estimated:")
 
-        return tx  #return #
+        return tx  # return #
         #    {
         #        "gas": gas,
         #        "gasPrice": ledger_api.api.toWei("50", "gwei"),
         #        "nonce": nonce,
         #    }
-        #)
+        # )
         #tx = cls._try_estimate_gas(ledger_api, tx)
-        #return tx
+        # return tx
 
         #constructed = instance.functions.provide(*args)
         #data = constructed.buildTransaction()['data']
 
-        #tx = {
+        # tx = {
         #    "from": Web3.toCheckSumAddress(deployer_address),  # only 'from' address, don't insert 'to' address!
         #    "value":  0,  # transfer as part of deployment
         #    "gas": gas,
         #    "gasPrice": gas,  # TODO: refine
         #    "nonce": nonce,
         #    "data": data,
-        #}
-        #logger.info("{deployer_address}:{contract_address}")
+        # }
+        # logger.info("{deployer_address}:{contract_address}")
         #tx = cls._try_estimate_gas(ledger_api, tx)
-        #return tx
+        # return tx
 
     @staticmethod
     def _try_estimate_gas(ledger_api: LedgerApi,
