@@ -18,7 +18,7 @@
 # ------------------------------------------------------------------------------
 """This package contains the behaviour of a erc1155 deploy skill AEA."""
 
-from typing import Optional, cast
+from typing import Optional, cast, Dict, Any
 
 from aea.skills.behaviours import TickerBehaviour, Behaviour
 
@@ -52,7 +52,6 @@ class PriceTicker(TickerBehaviour):
     def setup(self) -> None:
         """
         Implement the setup.
-
         :return: None
         """
         self.dex = DexWrapper()
@@ -72,7 +71,26 @@ class PriceTicker(TickerBehaviour):
         self.context.logger.info(
             f"Current Rate : {round(self.current_price, 2)}")
 
+class BalanceCheckBehaviour(TickerBehaviour):
+    """This class monitors the balance of agent and takes snapshots to the db."""
+    
+    @property
+    def current_balances(self) -> Dict[str, Any]:
+        """Gets the current balances."""
+        return self._request_balance()
 
+
+    def act(self) -> None:
+        
+        self._request_balance()
+
+            
+    def __init__(self, **kwargs):
+        """Initialise the behaviour."""
+        services_interval = kwargs.pop("services_interval",
+                                       DEFAULT_SERVICES_INTERVAL)  # type: int
+        super().__init__(tick_interval=services_interval, **kwargs)
+    
 class OptionMonitoring(TickerBehaviour):
     """This class scaffolds a behaviour."""
     def __init__(self, **kwargs):
@@ -265,7 +283,7 @@ class ContractDeployer(TickerBehaviour):
             ledger_id=strategy.ledger_id,
             contract_id="tomrae/ethpool:0.8.0",
             contract_address=self.ethpool,
-            callable="provide_liquidity",
+            callable="provide_liquidity_2",
             kwargs=ContractApiMessage.Kwargs({
                 "deployer_address": self.context.agent_address,
                 "args": [200000]
@@ -681,23 +699,6 @@ class ContractDeployer(TickerBehaviour):
         strategy.is_behaviour_active = False
         contract_api_dialogues = cast(ContractApiDialogues,
                                       self.context.contract_api_dialogues)
-        contract_api_msg = ContractApiMessage(
-            performative=ContractApiMessage.Performative.GET_RAW_TRANSACTION,
-            dialogue_reference=contract_api_dialogues.
-            new_self_initiated_dialogue_reference(),
-            ledger_id=strategy.ledger_id,
-            contract_id="tomrae/ethpool:0.1.0",
-            callable="provide_liquidity",
-            kwargs=ContractApiMessage.Kwargs({
-                "deployer_address":
-                self.context.agent_address,
-                "args": [
-                    1000000,
-                    self.context.strategy.deployment_status["ethpool"][1],
-                    self.context.agent_address
-                ],
-            }),
-        )
         contract_api_msg = ContractApiMessage(
             performative=ContractApiMessage.Performative.GET_RAW_TRANSACTION,
             dialogue_reference=contract_api_dialogues.new_self_initiated_dialogue_reference(),
