@@ -20,4 +20,17 @@ services:
     volumes:
       - './fetch:/app'
     restart: always
+    # for agent state
+  postgresdb:
+    ports:
+      - "5432:5432"
+    image: postgres:latest
+    volumes:
+        - ./persistant_data/postgres:/var/lib/postgresql/data
+    environment:
+        POSTGRES_DB: hippocampus
+        POSTGRES_USER: admin
+        POSTGRES_PASSWORD: WKLpwoDJd03DJ423DJwlDJlaDJsdDJsdDJlDJsa
+
+
 

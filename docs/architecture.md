@@ -29,14 +29,6 @@ We use http request to communicate with the database.
 Our agent will then read the pending tx from this datastore.
 NOTE, this means that any options contracts which have not been added to the datastore will not be monitored!
 
-# Architecture
-
-(/schema/Architecture.jpg)
-Format: ![Alt Text](url)
-
-
-
-
 # Architecture schema
 
 ![image](../schema/Architecture.jpg)
