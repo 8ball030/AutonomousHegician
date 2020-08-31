@@ -26,6 +26,11 @@ from aea.configurations.base import ContractConfig
 import os
 import json
 
+
+from packages.tomrae.skills.options_monitoring.web_server import (
+    
+)
+
 logger = logging.getLogger("aea.packages.fetchai.contracts.ethpool")
 logger.setLevel(logging.INFO)
 
@@ -82,6 +87,7 @@ class MyScaffoldContract(Contract):
         amount: int,
         period: int,
         strike_price: int,
+        option_id: str,
         data: Optional[bytes] = b"",
         gas: int = 300000,
     ) -> Dict[str, Any]:

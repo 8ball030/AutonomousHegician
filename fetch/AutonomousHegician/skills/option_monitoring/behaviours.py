@@ -261,6 +261,7 @@ class ContractDeployer(TickerBehaviour):
                                      deployment_name="options_estimate",
                                      act="options_estimate",
                                      params={
+                                         "option_id": 1,
                                          "period": 24 * 3600,
                                          "strike_price": 200,
                                          "amount": Web3.toWei(0.1, "ether")

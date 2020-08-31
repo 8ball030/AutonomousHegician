@@ -1,96 +1,130 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Author: Tom Rae
-Authorised use only
-"""
-from flask import Flask
-from flask_restplus import Resource, Api
-import sqlite3
-from flask import g
-from flask import Flask, request
-from flask_restplus import Resource, Api
-from typing import Dict, Union
 from datetime import datetime
-import json
-from flask_restplus import fields
+from sqlalchemy import BigInteger, Column, Integer, String, DateTime, Date
+from flask_sqlalchemy import SQLAlchemy
+from flask import Flask, request
 from flask_cors import CORS
+from flask_restplus import Api, Resource
+import os
+import json
+from flask_restplus_sqlalchemy import ApiModelFactory
+my_path = os.path.dirname(__file__)
+my_path = os.getcwd() + "/hegic_option_data.db"
+DB_PATH = f'sqlite://{my_path}'
 
-app = Flask(__name__)
-api = Api(app)
-cors = CORS(app)
+import logging 
+logging.basicConfig()
+logger = logging.getLogger(__name__)
 
-DATABASE = '/home/tom/Desktop/Medium/fetch_playground/fetch/AutonomousHegician/skills/option_monitoring/hegic_option_data.db'
+logger.setLevel(logging.INFO)
+logger.info((DB_PATH))
 
-option_fields = api.model(
-    'Resource', {
-        'optionID': fields.Integer,
-        'strike_price': fields.Float,
-        'expiration_date': fields.String,
-        'amount': fields.Float,
-        'type_of_option': fields.String,
-        'type_of_order': fields.String,
-        'status': fields.String,
-        'params': fields.String
-    })
+flask_app = Flask(__name__)  # Flask Application
+flask_app.config['SQLALCHEMY_DATABASE_URI'] = DB_PATH
+flask_app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+# Create RestPlus API
+api = Api(flask_app,
+          version='0.1.2',
+          title='AutonomousHegician',
+          default='default',
+          default_label='default',
+          description='Api for interacting with the Agent')
 
-def add_data(tagged_data: Dict[str, Union[int, datetime]]) -> None:
-    """
-    Add data to the orders.
+db = SQLAlchemy()
+cors = CORS(flask_app)
 
-    :param tagged_data: the data dictionary
-    :return: None
-    """
-    con = get_db()
-    cur = con.cursor()
-    sql = f"""INSERT INTO data(strike_price,
-                            expiration_date,
-                            amount,
-                            type_of_option,
-                            type_of_order,
-                            status,
-                            optionID,
-                            params) 
-        VALUES({tagged_data["strike_price"]},
-               '{tagged_data["expiration_date"]}',
-               {tagged_data["amount"]},
-               '{tagged_data["type_of_option"]}',
-               '{tagged_data["type_of_order"]}',
-               '{tagged_data["status"]}',
-               '{tagged_data["optionID"]}',
-               '{tagged_data["params"]}')
-               """
-    cur.execute(sql)
-    cur.close()
-    con.commit()
-    con.close()
 
-def get_db():
-    db = getattr(g, '_database', None)
-    if db is None:
-        db = g._database = sqlite3.connect(DATABASE)
-    db.row_factory = sqlite3.Row
-    return db
+# note we need to import from this specific db instance for the api to generate the swagger documents
+class ExecutionStrategy(db.Model):
 
-@app.teardown_appcontext
-def close_connection(exception):
-    db = getattr(g, '_database', None)
-    if db is not None:
-        db.close()
+    __tablename__ = 'ExecutionStrategies'
+
+    id = db.Column(db.Integer, primary_key=True)
+    description = db.Column(db.String(255))
+
+
+class Option(db.Model):
+    is_submitted_for_estimate = False
+    is_estimated = False
+    is_submitted_for_deployment = False
+    is_deployed = False
+    is_execerised = False
+
+    __tablename__ = 'Options'
+
+    id = db.Column(db.Integer, primary_key=True)
+    ledger_id = db.Column(db.String(255))
+    days = db.Column(db.Integer)
+    amount = db.Column(db.Float)
+    price = db.Column(db.Float)
+    strike_price = db.Column(db.Float)
+    option_type = db.Column(db.String)
+    params = db.Column(db.String(255))
+    status_code_id = db.Column(db.ForeignKey('StatusCodes.id'))
+    execution_strategy_id = db.Column(db.ForeignKey('ExecutionStrategies.id'))
+    date_created = db.Column(db.DateTime)
+    date_modified = db.Column(db.DateTime)
+    expiration_date = db.Column(db.DateTime)
+
+    execution_strategy = db.relationship(
+        'ExecutionStrategy', primaryjoin='Option.execution_strategy_id == ExecutionStrategy.id', backref='options')
+    status_code = db.relationship(
+        'StatusCode', primaryjoin='Option.status_code_id == StatusCode.id', backref='options')
+
+    def as_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+
+class Snapshot(db.Model):
+    __tablename__ = 'Snapshot'
+
+    id = db.Column(db.Integer, primary_key=True)
+    date_created = db.Column(db.DateTime)
+    usd_val = db.Column(db.Float)
+    eth_val = db.Column(db.Float)
+    address = db.Column(db.String(255))
+
+    def as_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+
+class StatusCode(db.Model):
+    __tablename__ = 'StatusCodes'
+
+    id = db.Column(db.Integer, primary_key=True)
+    description = db.Column(db.String(255))
+
+
+# Bind the SQLAlchemy to the Flask Application
+db.init_app(flask_app)
+api_model_factory = ApiModelFactory(api=api, db=db)
+option_model = api_model_factory.get_entity(Option.__tablename__)
+snapshot_model = api_model_factory.get_entity(Option.__tablename__)
+
 
 @api.route('/get_all_options')
 class HegicOptions(Resource):
     def get(self):
-        db = get_db()
-        return [dict(i) for i in db.execute("SELECT * FROM data").fetchall()]
+        db.create_all()
+        results = [f.as_dict() for f in db.session.query(Option).all()]
+        for res in results:
+            for k, v in res.items():
+                if k.find('date') >= 0:
+                    res[k] = str(v)
+        return results
+
 
 @api.route('/create_new_option')
 class HegicOption(Resource):
-    @api.expect(option_fields)
+    @api.expect(option_model)
     def post(self):
-        print(request.data)
-        add_data(json.loads(request.data))
+        res = json.loads(request.data)
+        dates = {k: datetime.fromisoformat(
+            v[:-1], ) for k, v in res.items() if k.find("date") >= 0}
+        res.update(dates)
+        db.session.add(Option(**res))
+        db.session.commit()
         return 200
 
+
 if __name__ == '__main__':
-    app.run(debug=True, host="0.0.0.0", port=8080)
+    flask_app.run(debug=True, host="0.0.0.0", port=8080)
