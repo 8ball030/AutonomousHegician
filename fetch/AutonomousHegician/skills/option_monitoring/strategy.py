@@ -42,6 +42,27 @@ DEFAULT_LEDGER_ID = DEFAULT_LEDGER
 DEFAULT_TIME_BEFORE_EXECUTION = 300
 
 
+
+class OptionContract:
+    is_submitted_for_estimate = False
+    is_estimated = False
+    is_submitted_for_deployment = False
+    is_deployed = False
+    is_execerised = False
+    
+    
+    
+class OptionContractManager:
+    """Class to help manage the deployment of options contracts."""
+    contracts = []
+    
+    
+    
+    
+    
+
+    
+
 class Strategy(Model):
     """This class defines a strategy for the agent."""
 
@@ -84,6 +105,7 @@ class Strategy(Model):
 
     def __init__(self, **kwargs) -> None:
         """Initialize the strategy of the agent."""
+        self._option_contract_manager = OptionContractManager()
         self._database = DBCommunication()
         self._ledger_id = kwargs.pop("ledger_id", DEFAULT_LEDGER_ID)
 

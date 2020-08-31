@@ -74,7 +74,7 @@ class MyScaffoldContract(Contract):
 
 
     @classmethod
-    def submit_fee_estimate(
+    def options_estimate(
         cls,
         ledger_api: LedgerApi,
         contract_address: Address,
@@ -109,8 +109,17 @@ class MyScaffoldContract(Contract):
                 "nonce": nonce,
             }
         )
+        fee_estimate = instance.functions.fees(
+            period, amount, strike_price
+        ).call()
+
+        cls._update_option_contract(option_id, params=fee_estimate)
         tx = cls._try_estimate_gas(ledger_api, tx)
         return tx
+
+    @classmethod
+    def _update_option_contract(cls, option_id, params):
+        raise NotImplementedError
 
     @classmethod
     def create_call_option(

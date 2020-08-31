@@ -18,6 +18,7 @@
 # ------------------------------------------------------------------------------
 """This package contains the behaviour of a erc1155 deploy skill AEA."""
 
+from web3 import Web3
 from typing import Optional, cast, Dict, Any
 
 from aea.skills.behaviours import TickerBehaviour, Behaviour
@@ -92,6 +93,7 @@ class BalanceCheckBehaviour(TickerBehaviour):
 
 class OptionMonitoring(TickerBehaviour):
     """This class scaffolds a behaviour."""
+
     def __init__(self, **kwargs):
         """Initialise the behaviour."""
         services_interval = kwargs.pop("services_interval",
@@ -175,14 +177,14 @@ class OptionMonitoring(TickerBehaviour):
         """
         pass
 
-from web3 import Web3
+
 class ContractDeployer(TickerBehaviour):
     """This class implements a behaviour."""
+
     def __init__(self, **kwargs):
         """Initialise the behaviour."""
         self.__dict__.update(kwargs)
         super().__init__(tick_interval=DEFAULT_SERVICES_INTERVAL, **kwargs)
-
 
     def setup(self) -> None:
         """
@@ -190,7 +192,7 @@ class ContractDeployer(TickerBehaviour):
 
         :return: None
         """
-        
+
         self.deployed = False  # self.calloptions is None
         self._request_balance()
 
@@ -200,9 +202,9 @@ class ContractDeployer(TickerBehaviour):
 
         :return: None
         """
-        #self.context.logger.info(
+        # self.context.logger.info(
         #    f"Contract Deployment status : {{k: v[0] for k, v in self.context.strategy.deployment_status.items()}}"
-        #)
+        # )
         if self.context.strategy.deployment_status["status"] in [
                 "complete", "deploying"
         ]:
@@ -256,13 +258,24 @@ class ContractDeployer(TickerBehaviour):
         elif strategy.deployment_status["options_estimate"][0] is None and \
                 strategy.deployment_status["liquidity"][0] == "deployed":
             self._option_interaction(option_type="call",
-                                    deployment_name="options_estimate",
-                                     act="submit_fee_estimate",
+                                     deployment_name="options_estimate",
+                                     act="options_estimate",
                                      params={
                                          "period": 24 * 3600,
                                          "strike_price": 200,
                                          "amount": Web3.toWei(0.1, "ether")
                                      })
+#       elif strategy.deployment_status["options_estimate"][0]  None and \
+#               strategy.deployment_status["liquidity"][0] == "deployed":
+#           self._option_interaction(option_type="call",
+#                                    deployment_name="options_estimate",
+#                                    act="options_estimate",
+#                                    params={
+#                                        "period": 24 * 3600,
+#                                        "strike_price": 200,
+#                                        "amount": Web3.toWei(0.1, "ether")
+#                                    })
+#       else:
         else:
             self.context.logger.info("Deployment complete!")
 
@@ -271,7 +284,7 @@ class ContractDeployer(TickerBehaviour):
                                          Any], deployment_name: str) -> bool:
         assert option_type in ["call", "put"]
         assert act in [
-            "create_call_option", "submit_fee_estimate", "exercise_option"
+            "create_call_option", "options_estimate", "exercise_option"
         ]
         self.context.strategy.deployment_status["status"] = "deploying"
         strategy = cast(Strategy, self.context.strategy)
@@ -295,7 +308,7 @@ class ContractDeployer(TickerBehaviour):
             Optional[ContractApiDialogue],
             contract_api_dialogues.update(contract_api_msg),
         )
-        self.context.strategy.deployment_status["options_interaction"] = (
+        self.context.strategy.deployment_status[act] = (
             "pending", deploy_ref[0])
         assert contract_api_dialogue is not None, "ContractApiDialogue not generated"
         contract_api_dialogue.terms = strategy.get_create_token_terms()
@@ -639,6 +652,7 @@ class ContractDeployer(TickerBehaviour):
 
 #        self._unregister_service()
 #        self._unregister_agent()
+
 
     def _request_balance(self) -> None:
         """

@@ -361,6 +361,9 @@ class LedgerApiHandler(Handler):
                 self.context.strategy.deployment_status[contract] = ("deployed", ledger_api_msg.transaction_receipt.receipt["contractAddress"])
                 self.context.logger.info(f"********************* {ledger_api_msg.transaction_receipt.receipt['contractAddress']}  Retireved and stored)")
                 self.context.strategy.deployment_status["status"] = "pending"
+                if contract =="options_estimate":
+                    pass
+                    # import pdb; pdb.set_trace()
         if is_transaction_successful:
             self.context.logger.info(
                 "transaction was successfully settled. Transaction receipt={}".format(
