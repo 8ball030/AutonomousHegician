@@ -97,7 +97,9 @@ class Strategy(Model):
                          "ercpool",
                          "ethpool",
                          "liquidity",
-                         "options"]: # post test remove
+                         "options_estimate",
+                         "options_create",
+                         "options_excercise"]: # post test remove
             param = kwargs.pop(contract, None)
             if param is "" or param is None:
                 not_deployed += 1

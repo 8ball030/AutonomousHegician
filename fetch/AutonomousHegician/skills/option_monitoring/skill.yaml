@@ -70,14 +70,14 @@ models:
     class_name: SigningDialogues
   strategy:
     args:
-      calloptions: '0x4dff2ab8fd59bd2901cf30f29141fa4170a11b99'
-      ercpool: '0x6c05379787382e4d1a26a841c312e5cf01da1d1a'
+      calloptions: ''
+      ercpool: ''
       ethpool: ''
-      exchange: '0x6bd981e20d7a8a880e5ceea68f163d3091a998f8'
+      exchange: ''
       ledger_id: ethereum
-      pricefeed: '0xeb5ae94abb2f545ee405318d93da1c6749f50f2c'
-      putoptions: '0xb08e3ca8bb573b6a356dfd93d40932c864180841'
-      stablecoin: '0x9661ce56de5f4f693a31c8353ad62eaa35669e9e'
+      pricefeed: ''
+      putoptions: ''
+      stablecoin: ''
     class_name: Strategy
 dependencies:
   vyper:

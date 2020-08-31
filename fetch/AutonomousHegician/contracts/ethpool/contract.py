@@ -36,20 +36,6 @@ class MyScaffoldContract(Contract):
 
     For non-ethereum based contracts import `from aea.contracts.base import Contract` and extend accordingly.
     """
- #   conf = dict(name="ethpool",
- #               author="tomrae",
- #               version="0.1.0",
- #               license_="Apache-2.0",
- #               aea_version='>=0.5.0, <0.6.0',
- #               contract_interface_paths={
- #                   'ethereum': 'build/contracts/HegicETHPool.json'
- #               })
-
- #   @classmethod
- #   def _get_abi(cls, conf):
- #       with open(os.getcwd() + "/contracts/ethpool/" +
- #                 cls.conf["contract_interface_paths"]["ethereum"], "r") as f:
- #           return json.loads(f.read())
 
     @classmethod
     def get_deploy_transaction(
@@ -69,20 +55,6 @@ class MyScaffoldContract(Contract):
         :return: the transaction object
         """
 
-#        conf = dict(name="ethpool",
-#                    author="tomrae",
-#                    version="0.1.0",
-#                    license_="Apache-2.0",
-#                    aea_version='>=0.5.0, <0.6.0',
-#                    contract_interface_paths={
-#                        'ethereum': 'build/contracts/HegicETHPool.json'
-#                    })
-#
-        # ContractConfig(**conf).contract_interfaces
-        #instance = ledger_api.api.eth.contract(
-        #    abi=contract_specs["abi"],
-        #    bytecode=contract_specs["bytecode"],
-        #)
         contract_interface = cls.contract_interface.get(ledger_api.identifier, {})
         nonce = ledger_api.api.eth.getTransactionCount(deployer_address)
         instance = ledger_api.get_contract_instance(contract_interface)
@@ -100,44 +72,9 @@ class MyScaffoldContract(Contract):
         tx = cls._try_estimate_gas(ledger_api, tx)
         return tx
 
+
     @classmethod
     def provide_liquidity(
-            cls,
-            ledger_api: LedgerApi,
-            contract_address: Address,
-            deployer_address: Address,
-            amount: int,
-            gas: int = 60000000,
-    ) -> Dict[str, Any]:
-        """
-        Get the transaction to create a batch of tokens.
-
-        :param ledger_api: the ledger API
-        :param deployer_address: the address of the deployer
-        :param args: the arguments
-        :param gas: the gas to be used
-        :return: the transaction object
-        """
-        nonce = ledger_api.api.eth.getTransactionCount(deployer_address)
-        contract_interface = cls.contract_interface.get(ledger_api.identifier, {})
-        deployed_contract = ledger_api.api.eth.contract(address=contract_address,
-                                    abi=contract_interface["abi"]
-                                   )
-#        instance = cls.get_instance(ledger_api, contract_address)
-        logger.info(f"************instance created:")
-        tx = deployed_contract.functions.provide(amount).buildTransaction({
-            "gas": gas,
-            "gasPrice": ledger_api.api.toWei("50", "gwei"),
-            "nonce": nonce,
-        })
-        logger.info(f"************tx created:")
-        tx = cls._try_estimate_gas(ledger_api, tx)
-        logger.info(f"************ gas estimated:")
-
-        return tx 
-
-    @classmethod
-    def provide_liquidity_2(
         cls,
         ledger_api: LedgerApi,
         contract_address: Address,
@@ -160,12 +97,11 @@ class MyScaffoldContract(Contract):
         nonce = ledger_api.api.eth.getTransactionCount(deployer_address)
         instance = cls.get_instance(ledger_api, contract_address)
         tx = instance.functions.provide(
-            deployer_address, amount
+            amount
         ).buildTransaction(
             {
                 "from": deployer_address,
-                "value": 1,
-                "to": contract_address,
+                "value": 12345,
                 "gas": gas,
                 "gasPrice": ledger_api.api.toWei("50", "gwei"),
                 "nonce": nonce,
