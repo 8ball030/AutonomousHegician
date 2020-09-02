@@ -90,7 +90,7 @@ class PriceTicker(TickerBehaviour):
         try:
             self._current_price = self.dex.get_ticker("DAI", "ETH")
         except Exception as e:
-            self.context.logger.info("Error getting price!")
+            self.context.logger.info(f"Error getting price!\n{e}")
             time.sleep(15)
 
     def act(self) -> None:

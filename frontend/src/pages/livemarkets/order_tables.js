@@ -58,7 +58,7 @@ class OptionList extends React.Component {
     return(
           <ul>
               {this.state.options.map((option) => (
-                  <li key={option.optionID}> {option.type_of_option} {option.strike_price} {option.expiration_date} {option.status} </li>
+                  <li key={option.ledger_id}> {option.type_of_option} {option.strike_price} {option.expiration_date} {option.status_code_id} </li>
               ))}
           </ul>
     )}

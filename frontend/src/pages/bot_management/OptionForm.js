@@ -8,13 +8,16 @@ import {
   FormControlLabel,
   Input,
   Button,
+  Slider,
   TextField
 } from "@material-ui/core";
+import Typography from '@material-ui/core/Typography';
 
-class Contact extends React.Component {
+class OptionForm extends React.Component {
   constructor(props) {
     super(props);
     this.state = {  strike_price: "",
+    period: 2,
     expiration_date: "",
     amount: "",
     type_of_option: "",
@@ -46,6 +49,10 @@ class Contact extends React.Component {
     console.log(event.target)
     this.setState({type_of_order: event.target.value});
   }
+  period_ChangeHandler = (event) => {
+    console.log(event.target)
+    this.setState({period: event.target.value});
+  }
   status_ChangeHandler = (event) => {
     console.log(event.target)
     this.setState({status: event.target.value});
@@ -73,7 +80,22 @@ class Contact extends React.Component {
     xhr.send(JSON.stringify(this.state));
     console.log("Btoon Clicked")
   }
+  valuetext = (value)  => {
+    return value;
+  }
 
+  handleChange = (event, value) => this.value = value;
+
+  handleDragStop = () => {
+    this.props.update(this.value);
+    this.setState({period: this.value});
+
+  }
+  onValueChange = (event) => {
+    this.setState({
+      type_of_option: event.target.value
+    });
+  }
   render() {
     return (
       <div
@@ -85,41 +107,51 @@ class Contact extends React.Component {
         }}
       >
         <form style={{ width: "50%" }}>
-          <h1>Contract Management</h1>
+          <h1>Option Creation</h1>
 
           <FormControl margin="normal" fullWidth>
-            <InputLabel htmlFor="optionID">Option Id</InputLabel>
-            <Input id="optionID" type="text" onChange={this.optionID_ChangeHandler}/>
-          </FormControl>
-
-          <FormControl margin="normal" fullWidth>
-            <InputLabel htmlFor="strike">Strike Price</InputLabel>
+            <InputLabel htmlFor="strike">Strike Price (ETH/</InputLabel>
             <Input id="strike" type="text" onChange={this.strike_ChangeHandler}/>
           </FormControl>
 
-          <FormControl margin="normal" fullWidth>
-            <InputLabel htmlFor="expiration">Expiration Date</InputLabel>
-            <Input id="expiration" type="text" onChange={this.expiration_ChangeHandler}/>
-          </FormControl>
+          <Typography id="discrete-slider" gutterBottom>
+             Period in Days 
+          </Typography>
+          <Slider id="period" type="text" 
+                    defaultValue={2}
+                    aria-labelledby="discrete-slider"
+                    valueLabelDisplay="auto"
+                    step={1}
+                    onChange={this.handleChange}
+                    onDragStop={this.handleDragStop}
+                    min={2}
+                    max={28}
+          />
 
           <FormControl margin="normal" fullWidth>
-            <InputLabel htmlFor="amount">Amount</InputLabel>
+            <InputLabel htmlFor="amount">Amount In Ether</InputLabel>
             <Input id="amount" type="text" onChange={this.amount_ChangeHandler}/>
           </FormControl>
 
-          <FormControl margin="normal" fullWidth>
-            <InputLabel htmlFor="type_of_option">Type Of Option</InputLabel>
-            <Input id="type_of_option" type="text" onChange={this.type_of_option_ChangeHandler}/>
+          <Typography id="discrete-slider" gutterBottom>
+             Type of Option
+          </Typography>
+          <FormControl component="fieldset" margin="normal" fullWidth>
+              <RadioGroup aria-label="type_of_option" name="type_of_option" >
+                <FormControlLabel value="put" control={<Radio />} label="Put" onChange={this.onValueChange}/>
+                <FormControlLabel value="call" control={<Radio />} label="Call" onChange={this.onValueChange} />
+              </RadioGroup>
           </FormControl>
 
-          <FormControl margin="normal" fullWidth>
-            <InputLabel htmlFor="type_of_order">Type Of Order</InputLabel>
-            <Input id="type_of_order" type="text" onChange={this.type_of_order_ChangeHandler}/>
-          </FormControl>
 
-          <FormControl margin="normal" fullWidth>
-            <InputLabel htmlFor="status">Order Status</InputLabel>
-            <Input id="status" type="text" onChange={this.status_ChangeHandler}/>
+          <Typography id="discrete-slider" gutterBottom>
+             Type of Managed Order
+          </Typography>
+
+          <FormControl component="fieldset" margin="normal" fullWidth>
+              <RadioGroup aria-label="type_of_order" name="type_of_order" onChange={this.type_of_order_ChangeHandler}>
+                <FormControlLabel value="0" control={<Radio />} label="Auto ITM Closure" />
+              </RadioGroup>
           </FormControl>
 
           <FormControl margin="normal" fullWidth>
@@ -136,4 +168,4 @@ class Contact extends React.Component {
   }
 }
 
-export default Contact;
+export default OptionForm;

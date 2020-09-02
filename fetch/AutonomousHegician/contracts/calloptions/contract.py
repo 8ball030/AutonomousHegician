@@ -22,7 +22,6 @@ from aea.contracts.base import Contract
 from aea.crypto.base import LedgerApi
 from typing import List, Dict, Optional, Any
 from aea.mail.base import Address
-from aea.configurations.base import ContractConfig
 import os
 import json
 import sqlalchemy
@@ -30,9 +29,6 @@ from sqlalchemy import create_engine
 from sqlalchemy.sql import text
 
 engine = create_engine("postgresql://admin:WKLpwoDJd03DJ423DJwlDJlaDJsdDJsdDJlDJsa@postgresdb:5432/cortex")
-
-
-
 
 logger = logging.getLogger("aea.packages.fetchai.contracts.ethpool")
 logger.setLevel(logging.INFO)

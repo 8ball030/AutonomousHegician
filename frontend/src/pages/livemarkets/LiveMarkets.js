@@ -31,10 +31,10 @@ export default function Dashboard(props) {
   var [mainChartState, setMainChartState] = useState("monthly");
 
   return (
-    <>
+    <div>
       <PageTitle title="Live Markets View" button="Refresh" />
       <Grid container spacing={4}>
-        <Grid item lg={8} md={8} sm={8} xs={8}>
+        <Grid item xs={6} cellHeight={180}>
           <Widget
             title="Live Price Feed"
             upperTitle
@@ -44,10 +44,10 @@ export default function Dashboard(props) {
                  symbol="FTX:ETHPERP"
                  theme={Themes.LIGHT}
                  locale="en"
-                 autosize/>
+                 height={600}/>
           </Widget>
         </Grid>
-        <Grid item lg={8} md={8} sm={8} xs={12}>
+        <Grid item xs={6}>
           <Widget
             title="Options"
             upperTitle
@@ -59,11 +59,7 @@ export default function Dashboard(props) {
           </Widget>
         </Grid>
       </Grid>
-        <Grid item xs={12}>
-
-        </Grid>
-
-    </>
+      </div>
   );
 }
 

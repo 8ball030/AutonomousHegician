@@ -24,16 +24,6 @@ class DBCommunication:
         :param source: the source
         """
 
-    def db_connection(self) -> sqlite3.Connection:
-        """
-        Get db connection.
-
-        :return: the db connection
-        """
-        con = sqlite3.connect(self.source)
-        con.row_factory = sqlite3.Row
-        return con
-
     def get_orders(self):
         with flask_app.app_context():
             db.create_all()

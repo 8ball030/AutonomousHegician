@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from sqlalchemy import BigInteger, Column, Integer, String, DateTime, Date
 from flask_sqlalchemy import SQLAlchemy
 from flask import Flask, request
@@ -9,6 +9,7 @@ import json
 from flask_restplus_sqlalchemy import ApiModelFactory
 import logging
 logger = logging.getLogger(__name__)
+from web3 import Web3
 
 
 flask_app = Flask(__name__)  # Flask Application
@@ -102,20 +103,36 @@ class HegicOptions(Resource):
             for k, v in res.items():
                 if k.find('date') >= 0:
                     res[k] = str(v)
-        db.session.commit()
         return results
 
+@api.route('/get_snapshots')
+class SnapShots(Resource):
+    def get(self):
+        db.create_all()
+        results = [f.as_dict() for f in db.session.query(Snapshot).all()]
+        for res in results:
+            for k, v in res.items():
+                if k.find('date') >= 0:
+                    res[k] = str(v)
+        return results
 
 @api.route('/create_new_option')
 class HegicOption(Resource):
-    @api.expect(option_model)
+    @api.expect(option_model, validate=False)
     def post(self):
         db.create_all()
         res = json.loads(request.data)
-        dates = {k: datetime.fromisoformat(
-            v[:-1], ) for k, v in res.items() if k.find("date") >= 0}
-        res.update(dates)
-        db.session.add(Option(**res))
+        option = Option(period=res['period'] * 3600 * 24,
+               status_code_id=0,
+               execution_strategy_id=0,
+               option_type=res['type_of_option'],
+               amount=Web3.toWei(res['amount'], "ether"),
+               strike_price=res['strike_price'],
+               date_created=datetime.now(),
+               date_modified=datetime.now(),
+               expiration_date=datetime.now() + timedelta(days=res['period']),
+               )
+        db.session.add(option)
         db.session.commit()
         return 200
 
