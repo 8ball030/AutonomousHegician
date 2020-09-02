@@ -1,23 +1,33 @@
 version: "3.0"
 services:
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    volumes:
-      - './frontend:/app'
-      - '/app/node_modules'
+# frontend:
+#   build:
+#     context: ./frontend
+#     dockerfile: Dockerfile
+#   volumes:
+#     - './frontend:/app'
+#     - '/app/node_modules'
+#   ports:
+#       - '3001:3000'
+#   environment:
+#     - NODE_ENV=development
+# agents:
+#   build:
+#     context: ./fetch
+#     dockerfile: Dockerfile
+#   ports:
+#       - '8080:8080'
+#   volumes:
+#     - './fetch:/app'
+#   restart: always
+  postgresdb:
     ports:
-        - '3001:3000'
+      - "5432:5432"
+    image: postgres:latest
+    volumes:
+        - ./persistant_data/postgres:/var/lib/postgresql/data
     environment:
-      - NODE_ENV=development
-  agents:
-    build:
-      context: ./fetch
-      dockerfile: Dockerfile
-    ports:
-        - '8080:8080'
-    volumes:
-      - './fetch:/app'
-    restart: always
+        POSTGRES_DB: hippocampus
+        POSTGRES_USER: admin
+        POSTGRES_PASSWORD: WKLpwoDJd03DJ423DJwlDJlaDJsdDJsdDJlDJsa
 

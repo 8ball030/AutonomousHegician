@@ -7,9 +7,18 @@ from flask_restplus import Api, Resource
 import os
 import json
 from flask_restplus_sqlalchemy import ApiModelFactory
-import logging
+my_path = os.path.dirname(__file__)
+my_path = os.getcwd() + "/hegic_option_data.db"
+DB_PATH = f'sqlite://{my_path}'
+
+import logging 
+logging.basicConfig()
 logger = logging.getLogger(__name__)
 
+logger.setLevel(logging.INFO)
+logger.info((DB_PATH))
+
+DB_HOST = "127.0.0.1"
 
 flask_app = Flask(__name__)  # Flask Application
 flask_app.config['SQLALCHEMY_DATABASE_URI'] = f"postgresql://admin:WKLpwoDJd03DJ423DJwlDJlaDJsdDJsdDJlDJsa@postgresdb:5432/cortex"
@@ -44,11 +53,11 @@ class Option(db.Model):
 
     __tablename__ = 'Options'
 
-    id = db.Column(db.BigInteger(), primary_key=True)
-    ledger_id = db.Column(db.BigInteger())
-    period = db.Column(db.BigInteger())
-    amount = db.Column(db.BigInteger())
-    strike_price = db.Column(db.BigInteger())
+    id = db.Column(db.Integer, primary_key=True)
+    ledger_id = db.Column(db.String(255))
+    period = db.Column(db.Integer)
+    amount = db.Column(db.Float)
+    strike_price = db.Column(db.Float)
     fees = db.Column(db.String(255))
     option_type = db.Column(db.String)
     status_code_id = db.Column(db.ForeignKey('StatusCodes.id'))
@@ -92,7 +101,6 @@ api_model_factory = ApiModelFactory(api=api, db=db)
 option_model = api_model_factory.get_entity(Option.__tablename__)
 snapshot_model = api_model_factory.get_entity(Option.__tablename__)
 
-
 @api.route('/get_all_options')
 class HegicOptions(Resource):
     def get(self):
@@ -118,10 +126,6 @@ class HegicOption(Resource):
         db.session.add(Option(**res))
         db.session.commit()
         return 200
-
-
-def run_server(**kwargs):
-    flask_app.run(debug=False, host="0.0.0.0", port=8080, **kwargs)
 
 
 if __name__ == '__main__':

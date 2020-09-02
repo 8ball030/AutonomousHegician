@@ -67,7 +67,7 @@ class Strategy(Model):
         return self._database.get_orders()
 
     def get_contracts_to_execute(self) -> list:
-        orders = [f for f in self.gather_pending_orders() if f.status_code_id == 3]
+        orders = self.gather_pending_orders()
         results = []
         self.context.logger.info(
             f"Monitoring {len(orders)} orders for execution.")
@@ -80,38 +80,27 @@ class Strategy(Model):
         """Check if the contract is in the money, 
            and that the expiration date is near
         """
-        deadline = contract.expiration_date - timedelta(
+        deadline = datetime.fromisoformat(
+            contract["expiration_date"]) - timedelta(
                 seconds=DEFAULT_TIME_BEFORE_EXECUTION)
 
         price = self.context.behaviours.price_ticker.current_price
 
-        if contract.status_code_id == 3 and datetime.now() > deadline:
-            if any([(contract.option_type == "put"
-                     and contract.strike_price > price),
-                    (contract.option_type == "call"
-                     and contract.strike_price < price)]):
+        if contract["status"] == "pending" and datetime.now() > deadline:
+            if any([(contract["type_of_option"] == "put"
+                     and contract["strike_price"] > price),
+                    (contract["type_of_option"] == "call"
+                     and contract["strike_price"] < price)]):
                 self.context.logger.info(f"Order is ready to execute!")
                 return True
         return False
 
     def create_new_option(self, params):
-        return self._database.create_new_option(**params)
+        self._database.create_new_option(**params)
 
-    def create_new_snapshot(self, params):
-        return self._database.create_new_snapshot(params)
-
-    def update_option(self, option_db_id, params):
-        self.context.logger.info(f"Updating ! {option_db_id}")
-        self._database.update_option(option_db_id, params)
-
-    def retrieve_orders(self, status_code) -> list:
-        if status_code == 3:
-            return self.get_contracts_to_execute()
-        elif status_code == 1 or status_code == 0:
-            return [f for f in self.gather_pending_orders() if f.status_code_id == status_code]
-        else: 
-            raise ValueError(f"Invalid status code {status_code}")
-            
+    def retrieve_actions(self) -> list:
+        self.get_contracts_to_execute()
+        return []
 
     def __init__(self, **kwargs) -> None:
         """Initialize the strategy of the agent."""
@@ -130,7 +119,7 @@ class Strategy(Model):
                          "ethpool",
                          "liquidity",
                          "options_estimate",
-                         "options_create_call_option",
+                         "options_create",
                          "options_excercise"]: # post test remove
             param = kwargs.pop(contract, None)
             if param is "" or param is None:
@@ -141,7 +130,6 @@ class Strategy(Model):
 
         if not_deployed >= 0:
             self.deployment_status["status"] = "pending"
-        self.eth_balance = None
         super().__init__(**kwargs)
 
 

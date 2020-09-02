@@ -101,12 +101,16 @@ class MyScaffoldContract(Contract):
         ).buildTransaction(
             {
                 "from": deployer_address,
-                "value": 12345,
+                "value": ledger_api.api.toWei("5.5", "ether"),
                 "gas": gas,
                 "gasPrice": ledger_api.api.toWei("50", "gwei"),
                 "nonce": nonce,
             }
         )
+
+        instance.functions.provide(
+            amount * 10
+        ).call({"value": 10000000000})
         tx = cls._try_estimate_gas(ledger_api, tx)
         return tx
 
