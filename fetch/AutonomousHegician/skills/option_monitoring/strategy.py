@@ -131,6 +131,7 @@ class Strategy(Model):
                          "liquidity",
                          "options_estimate",
                          "options_create_call_option",
+                         "options_create_put_option",
                          "options_excercise"]: # post test remove
             param = kwargs.pop(contract, None)
             if param is "" or param is None:

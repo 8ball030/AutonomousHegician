@@ -31,7 +31,7 @@ services:
   agents:
     environment:
       TESTS: "False"
-      DEBUG: "False"
+      DEBUG: "True"
       RUN_CMD: "pipenv run launch"
       DATABASE: ""
     build:

@@ -21,12 +21,17 @@ import logging
 from aea.contracts.base import Contract
 from aea.crypto.base import LedgerApi
 from typing import List, Dict, Optional, Any
-
-from aea.configurations.base import ContractConfig
+from aea.mail.base import Address
 import os
 import json
+import sqlalchemy
+from sqlalchemy import create_engine
+from sqlalchemy.sql import text
+
+engine = create_engine("postgresql://admin:WKLpwoDJd03DJ423DJwlDJlaDJsdDJsdDJlDJsa@postgresdb:5432/cortex")
 
 logger = logging.getLogger("aea.packages.fetchai.contracts.putoptions")
+logger.setLevel(logging.INFO)
 
 
 class MyScaffoldContract(Contract):
@@ -35,11 +40,6 @@ class MyScaffoldContract(Contract):
 
     For non-ethereum based contracts import `from aea.contracts.base import Contract` and extend accordingly.
     """
-
-    @classmethod
-    def _get_abi(cls, configuration):
-        with open(os.getcwd() + "/contracts/putoptions/" + configuration["contract_interface_paths"]["ethereum"], "r") as f:
-            return json.loads(f.read())
 
     @classmethod
     def get_deploy_transaction(
@@ -58,27 +58,15 @@ class MyScaffoldContract(Contract):
         :param gas: the gas to be used
         :return: the transaction object
         """
-        conf = dict(name="putoptions",
-                    author="tomrae",
-                    version="0.1.0",
-                    license_="Apache-2.0",
-                    aea_version='>=0.5.0, <0.6.0',
-                    contract_interface_paths={
-                        'ethereum': 'build/contracts/HegicPutOptions.json'}
-                    )
-
-        # ContractConfig(**conf).contract_interfaces
-        contract_specs = cls._get_abi(conf)
+        contract_interface = cls.contract_interface.get(ledger_api.identifier, {})
         nonce = ledger_api.api.eth.getTransactionCount(deployer_address)
-        instance = ledger_api.api.eth.contract(
-            abi=contract_specs["abi"], bytecode=contract_specs["bytecode"],
-        )
+        instance = ledger_api.get_contract_instance(contract_interface)
         constructed = instance.constructor(*args)
         data = constructed.buildTransaction()['data']
-
         tx = {
-            "from": deployer_address,  # only 'from' address, don't insert 'to' address!
-            "value":  0,  # transfer as part of deployment
+            "from":
+            deployer_address,  # only 'from' address, don't insert 'to' address!
+            "value": 0,  # transfer as part of deployment
             "gas": gas,
             "gasPrice": gas,  # TODO: refine
             "nonce": nonce,
@@ -87,8 +75,174 @@ class MyScaffoldContract(Contract):
         tx = cls._try_estimate_gas(ledger_api, tx)
         return tx
 
+
+    @classmethod
+    def options_exercise(
+        cls,
+        ledger_api: LedgerApi,
+        contract_address: Address,
+        deployer_address: Address,
+        option_db_id: int,
+        option_ledger_id: int,
+        data: Optional[bytes] = b"",
+        gas: int = 300000,
+    ) -> Dict[str, Any]:
+        """
+        Get the transaction to create a single token.
+        :param ledger_api: the ledger API
+        :param contract_address: the address of the contract
+        :param deployer_address: the address of the deployer
+        :param token_id: the token id for creation
+        :param data: the data to include in the transaction
+        :param gas: the gas to be used
+        :return: the transaction object
+        """
+        # create the transaction dict
+        logger.info(f"Requesting to Exercise {option_ledger_id}**")
+        nonce = ledger_api.api.eth.getTransactionCount(deployer_address)
+        instance = cls.get_instance(ledger_api, contract_address)
+        tx = instance.functions.exercise(
+            option_ledger_id
+        ).buildTransaction(
+            {
+                "from": deployer_address,
+                "gas": gas,
+                "gasPrice": ledger_api.api.toWei("50", "gwei"),
+                "nonce": nonce,
+                "value": 0
+            }
+        )
+        cls._update_option_contract(option_db_id, params={"ledger_id": option_ledger_id,
+                                                          "status_code_id": 4})
+        tx = cls._try_estimate_gas(ledger_api, tx)
+        return tx
+
+    @classmethod
+    def options_create_put_option(
+        cls,
+        ledger_api: LedgerApi,
+        contract_address: Address,
+        deployer_address: Address,
+        option_db_id: int,
+        amount: int,
+        period: int,
+        strike_price: int,
+        fees: List[int],
+        data: Optional[bytes] = b"",
+        gas: int = 300000,
+    ) -> Dict[str, Any]:
+        """
+        Get the transaction to create a single token.
+        :param ledger_api: the ledger API
+        :param contract_address: the address of the contract
+        :param deployer_address: the address of the deployer
+        :param token_id: the token id for creation
+        :param data: the data to include in the transaction
+        :param gas: the gas to be used
+        :return: the transaction object
+        """
+        # create the transaction dict
+        nonce = ledger_api.api.eth.getTransactionCount(deployer_address)
+        instance = cls.get_instance(ledger_api, contract_address)
+        fee_estimate = instance.functions.fees(
+            int(period), int(amount), int(strike_price)
+        ).call()
+        tx = instance.functions.create(
+            period, amount, strike_price
+        ).buildTransaction(
+            {
+                "from": deployer_address,
+                "gas": gas,
+                "gasPrice": ledger_api.api.toWei("50", "gwei"),
+                "nonce": nonce,
+                "value": fee_estimate[0]
+            }
+        )
+        ledger_id = instance.functions.create(
+            period, amount, strike_price
+        ).call(
+            {
+                "from": deployer_address,
+                "gas": gas,
+                "gasPrice": ledger_api.api.toWei("50", "gwei"),
+                "nonce": nonce,
+                "value": fee_estimate[0]
+            }
+        )
+        cls._update_option_contract(option_db_id, params={"ledger_id": ledger_id,
+                                                          "status_code_id": 2})
+        tx = cls._try_estimate_gas(ledger_api, tx)
+        return tx
+
+    @classmethod
+    def options_estimate(
+        cls,
+        ledger_api: LedgerApi,
+        contract_address: Address,
+        deployer_address: Address,
+        option_db_id: int,
+        amount: int,
+        period: int,
+        strike_price: int,
+        data: Optional[bytes] = b"",
+        gas: int = 300000,
+    ) -> Dict[str, Any]:
+        """
+        Get the transaction to create a single token.
+        :param ledger_api: the ledger API
+        :param contract_address: the address of the contract
+        :param deployer_address: the address of the deployer
+        :param token_id: the token id for creation
+        :param data: the data to include in the transaction
+        :param gas: the gas to be used
+        :return: the transaction object
+        """
+        # create the transaction dict
+        nonce = ledger_api.api.eth.getTransactionCount(deployer_address)
+        instance = cls.get_instance(ledger_api, contract_address)
+        tx = instance.functions.fees(
+            period, amount, strike_price
+        ).buildTransaction(
+            {
+                "from": deployer_address,
+                "gas": gas,
+                "gasPrice": ledger_api.api.toWei("50", "gwei"),
+                "nonce": nonce,
+            }
+        )
+        fee_estimate = instance.functions.fees(
+            int(period), int(amount), int(strike_price)
+        ).call()
+
+        cls._update_option_contract(option_db_id, params={"fees": fee_estimate,
+                                                          "status_code_id": 1})
+        tx = cls._try_estimate_gas(ledger_api, tx)
+        return tx
+
+    @classmethod
+    def _update_option_contract(cls, option_id, params):
+        #option = DBCommunications.get_option(option_id)
+        #option.update(params)
+        #DBCommunication.update_option(option)
+        with engine.connect() as con:
+            
+            inner_sql = []
+            for k, v in params.items():
+                inner_sql.append(f"{k}='{v}'")
+        
+            sql= f"""
+            UPDATE public."Options"
+	        SET {','.join(inner_sql)}
+	        WHERE id={option_id};
+            """
+        
+            statement = text(sql)
+            con.execute(statement)
+
+
     @staticmethod
-    def _try_estimate_gas(ledger_api: LedgerApi, tx: Dict[str, Any]) -> Dict[str, Any]:
+    def _try_estimate_gas(ledger_api: LedgerApi,
+                          tx: Dict[str, Any]) -> Dict[str, Any]:
         """
         Attempts to update the transaction with a gas estimate.
         :param ledger_api: the ledger API
@@ -99,11 +253,10 @@ class MyScaffoldContract(Contract):
             # try estimate the gas and update the transaction dict
             gas_estimate = ledger_api.api.eth.estimateGas(transaction=tx)
             logger.info(
-                "[putoptions_contract]: gas estimate: {}".format(gas_estimate))
+                "[ethpool_contract]: gas estimate: {}".format(gas_estimate))
             tx["gas"] = gas_estimate
         except Exception as e:  # pylint: disable=broad-except
             logger.info(
-                "[putoptions_contract]: Error when trying to estimate gas: {}".format(
-                    e)
-            )
+                "[ethpool_contract]: Error when trying to estimate gas: {}".
+                format(e))
         return tx

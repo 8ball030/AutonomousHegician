@@ -30,7 +30,7 @@ from sqlalchemy.sql import text
 
 engine = create_engine("postgresql://admin:WKLpwoDJd03DJ423DJwlDJlaDJsdDJsdDJlDJsa@postgresdb:5432/cortex")
 
-logger = logging.getLogger("aea.packages.fetchai.contracts.ethpool")
+logger = logging.getLogger("aea.packages.fetchai.contracts.calloptions")
 logger.setLevel(logging.INFO)
 
 

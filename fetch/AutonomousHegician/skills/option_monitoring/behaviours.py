@@ -198,7 +198,7 @@ class OptionMonitor(TickerBehaviour):
             return
         for order in orders_to_create:
             self._option_interaction(option_type=order.option_type,
-                                     act="options_create_call_option",
+                                     act=f"options_create_{order.type_of_option}_option",
                                      params={"amount": int(order.amount),
                                              "period": order.period,
                                              "strike_price": order.strike_price,
