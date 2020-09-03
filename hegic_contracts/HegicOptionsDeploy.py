@@ -1,3 +1,4 @@
+import yaml
 import json
 from web3 import Web3
 import os
@@ -78,6 +79,7 @@ w3.isConnected()
 
 
 FILES = {"ethpool": "/home/tom/Desktop/Medium/defi_cefi_bridge/tontine/hedge-contracts-v1/build/contracts/HegicETHPool.json",
+         "ercpool": "/home/tom/Desktop/Medium/defi_cefi_bridge/tontine/hedge-contracts-v1/build/contracts/HegicERCPool.json",
          "calloptions": "/home/tom/Desktop/Medium/defi_cefi_bridge/tontine/hedge-contracts-v1/build/contracts/HegicCallOptions.json"}
 
 
@@ -93,7 +95,7 @@ def retrieve_contract_instance(address, type_contract):
     return contract_instance
 
 
-def provide_liquidity(call_contract_instance):
+def provide_liquidity_eth(call_contract_instance):
     ethpool_address = call_contract_instance.functions.pool().call()
     contract_instance = retrieve_contract_instance(ethpool_address, "ethpool")
     print(f"Total Supply : ", contract_instance.functions.totalSupply().call())
@@ -102,6 +104,26 @@ def provide_liquidity(call_contract_instance):
     contract_instance.functions.provide(0).transact({'to': ethpool_address,
                                                      'from': w3.eth.coinbase,
                                                      'value': w3.toWei(1, "ether")})
+    print(f"Total Supply : ", contract_instance.functions.totalSupply().call())
+    print("Total balance ", contract_instance.functions.totalBalance().call())
+
+
+def provide_liquidity_erc(put_contract_instance, stable_contract_instance):
+    #
+    amount = 1000000000000000000
+    stable_contract_instance.get_instance().functions.mint(
+        amount).transact({"from": w3.eth.coinbase})
+
+    ercpool_address = put_contract_instance.functions.pool().call()
+    stable_contract_instance.get_instance().functions.approve(
+        ercpool_address, int(amount / 10)).transact({"from": w3.eth.coinbase})
+    contract_instance = retrieve_contract_instance(ercpool_address, "ercpool")
+    print(f"Total Supply : ", contract_instance.functions.totalSupply().call())
+    print("Total balance ", contract_instance.functions.totalBalance().call())
+    print("Providing liqudity..")
+    contract_instance.functions.provide(int(amount / 10), 0).transact({'to': ercpool_address,
+                                                                       'from': w3.eth.coinbase,
+                                                                       'value': 0})
     print(f"Total Supply : ", contract_instance.functions.totalSupply().call())
     print("Total balance ", contract_instance.functions.totalBalance().call())
 
@@ -139,12 +161,20 @@ def excercise(call_option_contract, option_id, call_option_address):
 # retrieve_contract_instance(ethpool_address, "ethpool")
 
 
-def confirm_provide_create_and_excercise(HegicInterface):
+def confirm_provide_create_and_excercise_call(HegicInterface):
     call_option_contract = HegicInterface.get_instance()
     call_option_address = HegicInterface.vars["contract_address"]
-    provide_liquidity(call_option_contract)
+    provide_liquidity_eth(call_option_contract)
     option_id = create_calloption(call_option_contract, call_option_address)
     excercise(call_option_contract, option_id, call_option_address)
+
+
+def confirm_provide_create_and_excercise_put(HegicInterface, StableCoin):
+    put_option_contract = HegicInterface.get_instance()
+    put_option_address = HegicInterface.vars["contract_address"]
+    provide_liquidity_erc(put_option_contract, StableCoin)
+    option_id = create_calloption(put_option_contract, put_option_address)
+    excercise(put_option_contract, option_id, put_option_address)
 
 
 def setprice(HegicInterface):
@@ -158,24 +188,35 @@ def setprice(HegicInterface):
 
 
 def generate_config(env):
-
     output = {k: v.vars["contract_address"] for k, v in env.items()}
-
     output["HegicETHPool"] = env["HegicCallOptions"].get_instance(
+    ).functions.pool().call()
+    output["HegicERCPool"] = env["HegicPutOptions"].get_instance(
     ).functions.pool().call()
     for k, v in output.items():
         print(f"Contract : {k} @ address {v}")
     for k, v in output.items():
         k = k.replace("Hegic", "")
         print(f"      {k.lower()}: '{v}'")
+    output = {k.replace("Hegic", "").lower(): v for k, v in output.items()}
+    
+    with open(r'../fetch/AutonomousHegician/skills/option_monitoring/skill.yaml') as file:
+        yaml_file = yaml.load(file, Loader=yaml.FullLoader)
+
+    print(yaml_file)
+
+    yaml_file['models']['strategy']['args'].update(output)
+    print(yaml_file)
+
+    with open('new_skill.yaml', 'w') as f:
+        yaml.dump(yaml_file, f)
 
 
 if __name__ == "__main__":
     env = deploy_contracts()
     setprice(env["PriceFeed"])
-    confirm_provide_create_and_excercise(env["HegicCallOptions"])
+    confirm_provide_create_and_excercise_call(env["HegicCallOptions"])
+    confirm_provide_create_and_excercise_put(
+        env["HegicPutOptions"],
+        env["StableCoin"])
     generate_config(env)
-    # now we need to provide the pools with liquidity
-#     provide_liquidity(env)
-    # now we will create a put option
-   # create_put_option()
