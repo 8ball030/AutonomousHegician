@@ -76,13 +76,13 @@ models:
   strategy:
     args:
       ledger_id: ethereum
-      stablecoin: '0xb807149828C6A3530a6BDC4Cbc8103de85E05a33'
-      pricefeed: '0x45EBF666081F5B692669bEEa1c2c727F5A9FcFcA'
-      exchange: '0xf33e31992d8c7eA0E5Aa4c524AAa6B28F37af268'
-      calloptions: '0x95A961B7419b246249733973b6A1c784028f7AB6'
-      putoptions: '0xc12d060dEb66896AC2ccC00fF1C16cf77A87FfCC'
-      ercpool: '0xff2dB2B600a041FF4cC1Fd07B04429d32D1C34c6'
-      ethpool: '0x5D61Ec4D8D628A18A79636ff5513abb805Ffa466'
+      stablecoin: '0x4dfF2aB8Fd59bd2901cf30F29141fa4170a11B99'
+      pricefeed: '0x6C05379787382E4D1a26a841c312e5cF01DA1D1A'
+      exchange: '0x6bD981e20d7A8A880E5cEea68f163d3091A998F8'
+      calloptions: '0xeB5aE94ABb2f545ee405318D93dA1C6749F50f2c'
+      putoptions: '0xB08E3CA8Bb573B6a356DFd93d40932C864180841'
+      ercpool: '0x9661ce56DE5f4F693A31C8353aD62eAA35669e9E'
+      ethpool: '0x832BAB2cEF9B61250531e002C1A1Dc1081c18bfF'
     class_name: Strategy
 dependencies:
   vyper:
