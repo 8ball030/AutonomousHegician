@@ -1,44 +1,13 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import InputLabel from '@material-ui/core/InputLabel';
-import MenuItem from '@material-ui/core/MenuItem';
-import FormControl from '@material-ui/core/FormControl';
-import Select from '@material-ui/core/Select';
-import Button from '@material-ui/core/Button';
 
-import range from "lodash/range";
-import {
-  Table,
-  TableRow,
-  TableHead,
-  TableBody,
-  TableCell,
-} from "@material-ui/core";
 
 
 import Highcharts from 'highcharts';
 import {
-  HighchartsChart, Chart, AreaSplineSeries, Tooltip, withHighcharts, XAxis, YAxis, Title, Subtitle, Legend, LineSeries, Caption, ColumnSeries, SplineSeries, PieSeries
+  withHighcharts
 } from 'react-jsx-highcharts';
 
-const useStyles = makeStyles((theme) => ({
-  button: {
-    display: 'block',
-    marginTop: theme.spacing(2),
-  },
-  formControl: {
-    margin: theme.spacing(1),
-    minWidth: 120,
-  },
-}));
-
-
-
-const states = {
-  running: "success",
-  paused: "secondary",
-  error: "warning",
-};
 
 class OptionList extends React.Component {
   state = {

@@ -2,14 +2,12 @@ import React from "react";
 import {
   FormControl,
   InputLabel,
-  FormLabel,
   Radio,
   RadioGroup,
   FormControlLabel,
   Input,
   Button,
   Slider,
-  TextField
 } from "@material-ui/core";
 import Typography from '@material-ui/core/Typography';
 

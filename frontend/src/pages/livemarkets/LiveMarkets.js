@@ -1,5 +1,4 @@
-import { Component } from 'react';
-import React, { useState } from "react";
+import React from "react";
 import {
   Grid,
 } from "@material-ui/core";
@@ -11,11 +10,8 @@ import useStyles from "./styles";
 // components
 import Widget from "../../components/Widget";
 import PageTitle from "../../components/PageTitle";
-import { Typography } from "../../components/Wrappers";
 
 
-import Highcharts from 'highcharts';
-import HighchartsReact from 'highcharts-react-official';
 
 import TradingViewWidget, { Themes } from 'react-tradingview-widget';
 // charts
@@ -27,8 +23,6 @@ export default function Dashboard(props) {
   var classes = useStyles();
   var theme = useTheme();
 
-  // local
-  var [mainChartState, setMainChartState] = useState("monthly");
 
   return (
     <div>

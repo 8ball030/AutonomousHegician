@@ -1,12 +1,5 @@
 import React from "react";
 import { Grid } from "@material-ui/core";
-import MUIDataTable from "mui-datatables";
-import { makeStyles } from '@material-ui/core/styles';
-import InputLabel from '@material-ui/core/InputLabel';
-import MenuItem from '@material-ui/core/MenuItem';
-import FormControl from '@material-ui/core/FormControl';
-import Select from '@material-ui/core/Select';
-import Button from '@material-ui/core/Button';
 // components
 import PageTitle from "../../components/PageTitle";
 import Widget from "../../components/Widget";
@@ -14,7 +7,6 @@ import Widget from "../../components/Widget";
 // Charts
 import OptionForm from "./OptionForm.js";
 import Performance from "./bot_performance.js";
-import Assets from "./bot_assets.js";
 
 // data
 const agent_data= [
@@ -51,17 +43,6 @@ const agent_data= [
       status: "Running"
     },
   ]
-
-        // <Grid item xs={6}>
-        //   <Widget title="Equity by Agent" upperTitle noBodyPadding>
-        //     <Performance />
-        //   </Widget>
-        // </Grid>
-        // <Grid item xs={12}>
-        //   <Widget title="Equity by Agent" upperTitle noBodyPadding>
-        //     <Assets data={agent_data}/> 
-        //   </Widget>
-        // </Grid>
 
 
 export default function BotManagement() {
