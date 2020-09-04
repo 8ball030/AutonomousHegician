@@ -33,7 +33,6 @@ services:
       TESTS: "False"
       DEBUG: "True"
       RUN_CMD: "pipenv run launch"
-      DATABASE: ""
     build:
       context: ./fetch
       dockerfile: Dockerfile
