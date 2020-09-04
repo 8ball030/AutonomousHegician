@@ -11,7 +11,8 @@ class Equity extends Component {
   UpdateGraph = () => {
     API.get('get_snapshots')
     .then(snapshots => {
-      const data = JSON.parse(snapshots);
+      const data = snapshots.data;
+      console.log(data);
       this.setState({data: data.map(function (i){ return i.usd_val})
       })})
   }
