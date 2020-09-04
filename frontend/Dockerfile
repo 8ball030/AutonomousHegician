@@ -14,6 +14,7 @@ COPY package.json /app/package.json
 RUN npm install react-scripts@3.0.1 -g --silent
 RUN npm install --silent
 RUN npm audit fix
+RUN npm install -g --save axios
 
 # start app
 CMD ["npm", "start"]

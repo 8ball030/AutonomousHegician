@@ -22,14 +22,22 @@ services:
         POSTGRES_USER: admin
         POSTGRES_PASSWORD: WKLpwoDJd03DJ423DJwlDJlaDJsdDJsdDJlDJsa
   ganachecli:
-    ports:
-      - '7545:7545'
     image: trufflesuite/ganache-cli:latest
-    command: "-s 1 -p 7545"
+    ports:
+      - "7545:7545"
+    volumes:
+      - ./persistant_data/ganache_data:/ganache_data
+    entrypoint:
+      - node
+      - "/app/ganache-core.docker.cli.js"
+      - -s
+      - "0"
+      - -p
+      - "7545"
   agents:
     environment:
       TESTS: "False"
-      DEBUG: "True"
+      DEBUG: "False"
       RUN_CMD: "pipenv run launch"
     build:
       context: ./fetch
