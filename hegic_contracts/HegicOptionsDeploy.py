@@ -203,10 +203,7 @@ def generate_config(env):
     with open(r'../fetch/AutonomousHegician/skills/option_monitoring/skill.yaml') as file:
         yaml_file = yaml.load(file, Loader=yaml.FullLoader)
 
-    print(yaml_file)
-
     yaml_file['models']['strategy']['args'].update(output)
-    print(yaml_file)
 
     with open('new_skill.yaml', 'w') as f:
         yaml.dump(yaml_file, f)

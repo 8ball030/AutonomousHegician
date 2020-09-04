@@ -198,7 +198,7 @@ class OptionMonitor(TickerBehaviour):
             return
         for order in orders_to_create:
             self._option_interaction(option_type=order.option_type,
-                                     act=f"options_create_{order.type_of_option}_option",
+                                     act=f"options_create_{order.option_type}_option",
                                      params={"amount": int(order.amount),
                                              "period": order.period,
                                              "strike_price": order.strike_price,
@@ -220,7 +220,10 @@ class OptionMonitor(TickerBehaviour):
                                          Any]) -> bool:
         assert option_type in ["call", "put"]
         assert act in [
-            "options_create_call_option", "options_estimate", "options_exercise"
+            "options_create_call_option", 
+            "options_create_put_option",
+            "options_estimate", 
+            "options_exercise"
         ]
         self.context.strategy.deployment_status["status"] = "deploying"
         strategy = cast(Strategy, self.context.strategy)

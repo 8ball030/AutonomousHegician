@@ -25,7 +25,7 @@ services:
     ports:
       - '7545:7545'
     build:
-      context: ./ganache-cli/
+      context: ./ganache_cli/
       dockerfile: Dockerfile
     command: "-s 1 -p 7545"
   agents:

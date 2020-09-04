@@ -144,6 +144,7 @@ class Strategy(Model):
             self.deployment_status["status"] = "pending"
         self.eth_balance = None
         super().__init__(**kwargs)
+        self.context.logger.info(f"Deployment paramets {self.deployment_status}")
 
 
     @property
