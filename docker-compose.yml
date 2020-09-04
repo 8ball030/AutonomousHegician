@@ -24,9 +24,7 @@ services:
   ganachecli:
     ports:
       - '7545:7545'
-    build:
-      context: ./ganache_cli/
-      dockerfile: Dockerfile
+    image: trufflesuite/ganache-cli:latest
     command: "-s 1 -p 7545"
   agents:
     environment:
