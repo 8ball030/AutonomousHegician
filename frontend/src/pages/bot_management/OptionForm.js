@@ -10,6 +10,8 @@ import {
   Slider,
 } from "@material-ui/core";
 import Typography from '@material-ui/core/Typography';
+import axios from 'axios';
+import API from '../../api'
 
 class OptionForm extends React.Component {
   constructor(props) {
@@ -67,16 +69,16 @@ class OptionForm extends React.Component {
   }
 
   sendToAgent = () => {
-    console.log(this.state)
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', 'http://localhost:8080/create_new_option', true);
-    xhr.setRequestHeader('Content-type', 'application/json');
-    xhr.onload = function () {
+    API.post('create_new_option', {
+      headers: {'Content-type': 'application/json'},
+      data: this.state
+    });
+    API.onload = function () {
         alert("You new option has been sent to your agent!")
         console.log(this.responseText);
     };
-    xhr.send(JSON.stringify(this.state));
-    console.log("Btoon Clicked")
+//    API.send(JSON.stringify(this.state));
+    console.log("Button Clicked")
   }
   valuetext = (value)  => {
     return value;

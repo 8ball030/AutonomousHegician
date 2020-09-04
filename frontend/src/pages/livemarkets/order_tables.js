@@ -1,13 +1,13 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 
-
+import axios from 'axios';
+import API from '../../api'
 
 import Highcharts from 'highcharts';
 import {
   withHighcharts
 } from 'react-jsx-highcharts';
-
 
 class OptionList extends React.Component {
   state = {
@@ -15,9 +15,8 @@ class OptionList extends React.Component {
   }
   
   componentDidMount() {
-    const url='http://localhost:8080/get_all_options';
-    fetch(url)
-      .then((response) => response.json())
+    API.get('get_all_options')
+      .then(options => options.data)
       .then(optionsList => {
           this.setState({ options: optionsList });
       });

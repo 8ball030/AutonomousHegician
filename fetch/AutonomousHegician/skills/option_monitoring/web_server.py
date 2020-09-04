@@ -121,7 +121,7 @@ class HegicOption(Resource):
     @api.expect(option_model, validate=False)
     def post(self):
         db.create_all()
-        res = json.loads(request.data)
+        res = json.loads(request.data)['data']
         option = Option(period=res['period'] * 3600 * 24,
                status_code_id=0,
                execution_strategy_id=0,
