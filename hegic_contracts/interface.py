@@ -5,7 +5,13 @@ import pdb
 
 from hexbytes import HexBytes
 from web3 import Web3, HTTPProvider
-from solcx import compile_source, compile_files, set_solc_version_pragma
+from solcx import compile_source, compile_files, set_solc_version_pragma, get_installed_solc_versions, install_solc
+
+
+VERSION = "v0.6.8"
+if VERSION not in get_installed_solc_versions():
+    install_solc(VERSION)
+
 
 set_solc_version_pragma("0.6.8")
 
@@ -23,7 +29,7 @@ class ContractInterface(object):
     methods for transacting and calling with gas checks and event output.
     """
 
-    default_vars_path = os.path.join(os.getcwd(), 'deployment_variables.json')
+    deploy_dir = os.getcwd()+ "/deployment_vars"
 
     def __init__(
         self,
@@ -32,7 +38,7 @@ class ContractInterface(object):
         contract_directory,
         max_deploy_gas = 500000,
         max_tx_gas = 50000,
-        deployment_vars_path = default_vars_path
+        deployment_vars_path = deploy_dir,
         ):
         """Accepts contract, directory, and an RPC connection and sets defaults
 
@@ -53,7 +59,8 @@ class ContractInterface(object):
         self.contract_directory = contract_directory
         self.max_deploy_gas = max_deploy_gas
         self.max_tx_gas = max_tx_gas
-        self.deployment_vars_path = deployment_vars_path
+        self.deployment_vars_path = f"{self.deploy_dir}/{contract_to_deploy.split(':')[-1]}_deploy_vars.json"
+        print(self.deployment_vars_path)
         self.web3.eth.defaultAccount = web3.eth.coinbase
 
     def compile_source_files(self):
@@ -74,9 +81,9 @@ class ContractInterface(object):
             deployment_list.append(os.path.join(self.contract_directory, contract))
 
         self.all_compiled_contracts = compile_files(deployment_list,  import_remappings=[
-            "@openzeppelin=/home/tom/Desktop/Medium/defi_cefi_bridge/tontine/hedge-contracts-v1/node_modules/@openzeppelin",
-            "@uniswap=/home/tom/Desktop/Medium/defi_cefi_bridge/tontine/hedge-contracts-v1/node_modules/@uniswap",
-            "@chainlink=/home/tom/Desktop/Medium/defi_cefi_bridge/tontine/hedge-contracts-v1/node_modules/@chainlink",
+            f"@openzeppelin={os.getcwd()}/node_modules/@openzeppelin",
+            f"@uniswap={os.getcwd()}/node_modules/@uniswap",
+            f"@chainlink={os.getcwd()}/node_modules/@chainlink",
         ])
 
         #print("Compiled contract keys:\n{}".format(

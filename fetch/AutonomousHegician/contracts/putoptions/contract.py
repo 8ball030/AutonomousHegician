@@ -30,7 +30,7 @@ from sqlalchemy.sql import text
 
 engine = create_engine("postgresql://admin:WKLpwoDJd03DJ423DJwlDJlaDJsdDJsdDJlDJsa@postgresdb:5432/cortex")
 
-logger = logging.getLogger("aea.packages.fetchai.contracts.putoptions")
+logger = logging.getLogger("aea.packages.fetchai.contracts.calloptions")
 logger.setLevel(logging.INFO)
 
 
@@ -198,6 +198,7 @@ class MyScaffoldContract(Contract):
         :return: the transaction object
         """
         # create the transaction dict
+        logger.info(f"Requesting to create estimate for call {contract_address}**")
         nonce = ledger_api.api.eth.getTransactionCount(deployer_address)
         instance = cls.get_instance(ledger_api, contract_address)
         tx = instance.functions.fees(

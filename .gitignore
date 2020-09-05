@@ -48,6 +48,7 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 
+manual_ganache/node_modules/
 # Translations
 *.mo
 *.pot

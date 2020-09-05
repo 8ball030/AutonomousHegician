@@ -5,20 +5,26 @@ import os
 from web3 import Web3, HTTPProvider
 from interface import ContractInterface
 
-w3 = Web3(HTTPProvider('http://127.0.0.1:7545'))
+try:
+    w3 = Web3(HTTPProvider('http://ganachecli:7545'))
+    print(w3.eth.accounts[0])
+except:
+    w3 = Web3(HTTPProvider('http://127.0.0.1:7545'))
+    print(w3.eth.accounts[0])
 
 
-print(w3.eth.accounts[0])
 
 PATH = os.getcwd()
 
 
 def deploy_contracts():
     contract_dir = PATH + "/contracts"
+    deploy_dir = PATH + "/deployment_vars"
 
+    print("deploy_dir", deploy_dir)
     # setup fake stablecoin
     path = PATH + "/contracts/TestContracts.sol:FakeUSD"
-    StableCoin = ContractInterface(w3, path, contract_dir)
+    StableCoin = ContractInterface(w3, path, contract_dir, deployment_vars_path=deploy_dir)
     StableCoin.compile_source_files()
     StableCoin.deploy_contract(path)
 
@@ -73,14 +79,65 @@ def deploy_contracts():
             "HegicETHPool": HegicETHPool
             }
 
+def load_contracts():
+    contract_dir = PATH + "/deployment_vars"
+    deploy_dir = PATH + "/deployment_vars"
 
-w3 = Web3(Web3.HTTPProvider('http://127.0.0.1:7545'))
-w3.isConnected()
+    # setup fake stablecoin
+    path = PATH + "/contracts/TestContracts.sol:FakeUSD"
+    StableCoin = ContractInterface(w3, path, contract_dir, deployment_vars_path=deploy_dir)
+    StableCoin.deploy_contract(path)
+
+    # setup price feed
+    path = PATH + "/contracts/TestContracts.sol:FakePriceProvider"
+    PriceProvider = ContractInterface(w3, path, contract_dir, deployment_vars_path=deploy_dir)
+    PriceProvider.deploy_contract(path, [20000000000])
+
+    # setup exchange
+    path = PATH + "/contracts/TestContracts.sol:FakeExchange"
+    Exchange = ContractInterface(w3, path, contract_dir, deployment_vars_path=deploy_dir)
+    Exchange.deploy_contract(path, [PriceProvider.vars["contract_address"],
+                                    StableCoin.vars["contract_address"]
+                                    ])
+
+    # setup CallOptions
+    path = PATH + "/contracts/HegicCallOptions.sol:HegicCallOptions"
+    HegicCallOptions = ContractInterface(w3, path, contract_dir, deployment_vars_path=deploy_dir)
+    HegicCallOptions.deploy_contract(
+        path, [PriceProvider.vars["contract_address"]])
+
+    # setup PutOptions
+    path = PATH + "/contracts/HegicPutOptions.sol:HegicPutOptions"
+    HegicPutOptions = ContractInterface(w3, path, contract_dir, deployment_vars_path=deploy_dir)
+    HegicPutOptions.deploy_contract(path, [StableCoin.vars["contract_address"],
+                                           PriceProvider.vars["contract_address"],
+                                           Exchange.vars["contract_address"]])
+
+    # setupERCPool
+    path = PATH + "/contracts/HegicERCPool.sol:HegicERCPool"
+    HegicERCPool = ContractInterface(w3, path, contract_dir, deployment_vars_path=deploy_dir)
+    HegicERCPool.deploy_contract(path, [StableCoin.vars["contract_address"]])
+
+    # setupETHPool
+    path = PATH + "/contracts/HegicETHPool.sol:HegicETHPool"
+    HegicETHPool = ContractInterface(w3, path, contract_dir, deployment_vars_path=deploy_dir)
+    HegicETHPool.deploy_contract(path, [StableCoin.vars["contract_address"]])
+
+    print("All Deployed!")
+    return {"StableCoin": StableCoin,
+            "PriceFeed": PriceProvider,
+            "Exchange": Exchange,
+            "HegicCallOptions": HegicCallOptions,
+            "HegicPutOptions": HegicPutOptions,
+            "HegicERCPool": HegicERCPool,
+            "HegicETHPool": HegicETHPool
+            }
 
 
-FILES = {"ethpool": "/home/tom/Desktop/Medium/defi_cefi_bridge/tontine/hedge-contracts-v1/build/contracts/HegicETHPool.json",
-         "ercpool": "/home/tom/Desktop/Medium/defi_cefi_bridge/tontine/hedge-contracts-v1/build/contracts/HegicERCPool.json",
-         "calloptions": "/home/tom/Desktop/Medium/defi_cefi_bridge/tontine/hedge-contracts-v1/build/contracts/HegicCallOptions.json"}
+
+FILES = {"ethpool": f"{PATH}/deployment_vars/HegicETHPool_deploy_vars.json",
+         "ercpool": f"{PATH}/deployment_vars/HegicERCPool_deploy_vars.json",
+         "calloptions": f"{PATH}/deployment_vars/HegicCallOptions_deploy_vars.json"}
 
 
 def retrieve_contract_instance(address, type_contract):
@@ -88,8 +145,9 @@ def retrieve_contract_instance(address, type_contract):
     with open(FILES[type_contract], "r") as f:
         c = json.loads(f.read())
 
+    key = "abi" if "abi" in c.keys() else "contract_abi"
     contract_instance = w3.eth.contract(address=address,
-                                        abi=c["abi"]
+                                        abi=c[key]
                                         )
     # [print(f"Available {f}") for f in dir(contract_instance.functions) if f.find("_") != 0]
     return contract_instance
@@ -187,7 +245,7 @@ def setprice(HegicInterface):
     print(f"Latest Price :", fake_price_feed_contract.functions.latestAnswer().call())
 
 
-def generate_config(env):
+def generate_config(env, deployment_type, update_agent):
     output = {k: v.vars["contract_address"] for k, v in env.items()}
     output["HegicETHPool"] = env["HegicCallOptions"].get_instance(
     ).functions.pool().call()
@@ -199,8 +257,15 @@ def generate_config(env):
         k = k.replace("Hegic", "")
         print(f"      {k.lower()}: '{v}'")
     output = {k.replace("Hegic", "").lower(): v for k, v in output.items()}
+
+
     
-    with open(r'../fetch/AutonomousHegician/skills/option_monitoring/skill.yaml') as file:
+
+    if deployment_type == "pi":
+        agent_skill_path = '../AutonomousHegician/skills/option_monitoring/skill.yaml'
+    else:
+        agent_skill_path = '../fetch/AutonomousHegician/skills/option_monitoring/skill.yaml'
+    with open(agent_skill_path) as file:
         yaml_file = yaml.load(file, Loader=yaml.FullLoader)
 
     yaml_file['models']['strategy']['args'].update(output)
@@ -208,12 +273,24 @@ def generate_config(env):
     with open('new_skill.yaml', 'w') as f:
         yaml.dump(yaml_file, f)
 
+    if update_agent is True:
+        shutil.move("new_skill.yaml", agent_skill_path) 
 
+import os
+import shutil
 if __name__ == "__main__":
-    env = deploy_contracts()
+    DEPLOY = True
+    TEST = True
+    UPDATE = True
+    DEPLOYMENT_TYPE = "pi"
+    if DEPLOY:
+        env = deploy_contracts()
+    else:
+        env = load_contracts()
+    
     setprice(env["PriceFeed"])
     confirm_provide_create_and_excercise_call(env["HegicCallOptions"])
     confirm_provide_create_and_excercise_put(
         env["HegicPutOptions"],
         env["StableCoin"])
-    generate_config(env)
+    generate_config(env, deployment_type=DEPLOYMENT_TYPE, update_agent=UPDATE)

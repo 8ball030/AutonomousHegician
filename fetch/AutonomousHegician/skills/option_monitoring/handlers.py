@@ -361,7 +361,7 @@ class LedgerApiHandler(Handler):
                 self.context.logger.info("Successfully retrieved deployment {contract}".format(contract=contract))
                 self.context.strategy.deployment_status[contract] = ("deployed", ledger_api_msg.transaction_receipt.receipt["contractAddress"])
                 self.context.logger.info(f"********************* {ledger_api_msg.transaction_receipt.receipt['contractAddress']}  Retireved and stored)")
-                if contract =="options_create_call_option":
+                if contract =="options_create_call_option" or "options_create_put_option":
                     self.context.strategy.update_option(self.context.strategy.current_order_id, {"status_code_id": 3})
                 self.context.strategy.deployment_status["status"] = "pending"
         if is_transaction_successful:

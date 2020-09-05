@@ -18,27 +18,30 @@ services:
     volumes:
         - ./persistant_data/postgres:/var/lib/postgresql/data
     environment:
-        POSTGRES_DB: hippocampus
+        POSTGRES_DB: cortex
         POSTGRES_USER: admin
         POSTGRES_PASSWORD: WKLpwoDJd03DJ423DJwlDJlaDJsdDJsdDJlDJsa
   ganachecli:
-    image: trufflesuite/ganache-cli:latest
+#   image: trufflesuite/ganache-cli:latest
+    build: 
+      context: ./manual_ganache
+      dockerfile: Dockerfile
     ports:
       - "7545:7545"
     volumes:
       - ./persistant_data/ganache_data:/ganache_data
-    entrypoint:
-      - node
-      - "/app/ganache-core.docker.cli.js"
-      - -s
-      - "0"
-      - -p
-      - "7545"
+        #    entrypoint:
+        #      - node
+        #      - "/app/ganache-core.docker.cli.js"
+        #      - -s
+        #      - "0"
+        #      - -p
+        #      - "7545"
   agents:
     environment:
       TESTS: "False"
       DEBUG: "False"
-      RUN_CMD: "pipenv run launch"
+      RUN_CMD: "pipenv run launch_demo"
     build:
       context: ./fetch
       dockerfile: Dockerfile
@@ -49,4 +52,5 @@ services:
       - '8080:8080'
     volumes:
       - './fetch:/app'
+      - './hegic_contracts/:/app/hegic_contracts'
     restart: always
