@@ -79,14 +79,14 @@ models:
     class_name: SigningDialogues
   strategy:
     args:
-      calloptions: '0xeB5aE94ABb2f545ee405318D93dA1C6749F50f2c'
-      ercpool: '0x3603eF1deFE832c271BF14B4D7a8c38eaa31FF59'
-      ethpool: '0x832BAB2cEF9B61250531e002C1A1Dc1081c18bfF'
-      exchange: '0x6bD981e20d7A8A880E5cEea68f163d3091A998F8'
+      calloptions: '0x119Cb9c643CDC09d139b5912Ea99AA20C9d3e51D'
+      ercpool: '0xf1495eA173F59923aff8c8FCc48800255e4d1eDF'
+      ethpool: '0x11a20C74dc8de8359116CaA6b93F431D7f887282'
+      exchange: '0x9cCA28d98EC895c50C266b7f138dD6316aADB52A'
       ledger_id: ethereum
-      pricefeed: '0x6C05379787382E4D1a26a841c312e5cF01DA1D1A'
-      putoptions: '0xB08E3CA8Bb573B6a356DFd93d40932C864180841'
-      stablecoin: '0x4dfF2aB8Fd59bd2901cf30F29141fa4170a11B99'
+      pricefeed: '0x4a41672e9a217C3193b12483400b03CE1851e145'
+      putoptions: '0x9b4e383192a089C8177f5E1293FC037956Cfd884'
+      stablecoin: '0xE6042703475D0dd1bC2eB564a55F1832c2527171'
     class_name: Strategy
 name: option_monitoring
 protocols:
