@@ -21,4 +21,4 @@ RUN npm install -g ganache-cli
 COPY . /app
 ENV PATH /app/node_modules/.bin:$PATH
 # start app
-CMD ["ganache-cli", "-p", "7545",  "-s", "1"]
+CMD ["ganache-cli", "-p", "7545",  "-s", "0"]
