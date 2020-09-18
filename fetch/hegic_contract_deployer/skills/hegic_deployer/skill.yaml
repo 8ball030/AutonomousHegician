@@ -1,0 +1,78 @@
+name: hegic_deployer 
+author: eight_baller
+version: 0.1.0
+type: skill
+description: The Hegic deployer will edploy the hegic contracts to the local testnet.
+license: Apache-2.0
+aea_version: '>=0.6.0, <0.7.0'
+fingerprint:
+  __init__.py: Qmbm3ZtGpfdvvzqykfRqbaReAK9a16mcyK7qweSfeN5pq1
+  behaviours.py: QmV6DLrWy7oPpvgXVd8FJckvk8fHXg9Bz9JncuDi4wfAdJ
+  dialogues.py: QmcCbdxFM4SX3MgXDxxbsC66gp8QK3C4W2czniQ5oDNc7G
+  handlers.py: QmXdSRWCyxc1HEECuipTkDPpZAigh91W614Emboqxowxbq
+  strategy.py: QmeoDg7UT5MG5khmrZna3v8HYrC6QJjjEV26kcq1mPs6yx
+fingerprint_ignore_patterns: []
+contracts:
+- fetchai/erc1155:0.9.0
+protocols:
+- fetchai/contract_api:0.3.0
+- fetchai/default:0.5.0
+- fetchai/fipa:0.6.0
+- fetchai/ledger_api:0.3.0
+- fetchai/oef_search:0.5.0
+- fetchai/signing:0.3.0
+skills: []
+behaviours:
+  contract_deployer:
+    args:
+      services_interval: 20
+    class_name: ContractDeployer
+handlers:
+  contract_api:
+    args: {}
+    class_name: ContractApiHandler
+  fipa:
+    args: {}
+    class_name: FipaHandler
+  ledger_api:
+    args: {}
+    class_name: LedgerApiHandler
+  oef_search:
+    args: {}
+    class_name: OefSearchHandler
+  signing:
+    args: {}
+    class_name: SigningHandler
+models:
+  contract_api_dialogues:
+    args: {}
+    class_name: ContractApiDialogues
+  default_dialogues:
+    args: {}
+    class_name: DefaultDialogues
+  fipa_dialogues:
+    args: {}
+    class_name: FipaDialogues
+  ledger_api_dialogues:
+    args: {}
+    class_name: LedgerApiDialogues
+  oef_search_dialogues:
+    args: {}
+    class_name: OefSearchDialogues
+  signing_dialogues:
+    args: {}
+    class_name: SigningDialogues
+  strategy:
+    args:
+      calloptions: ''
+      ercpool: ''
+      ethpool: ''
+      exchange: ''
+      ledger_id: ethereum
+      pricefeed: ''
+      putoptions: ''
+      stablecoin: ''
+    class_name: Strategy
+dependencies:
+  vyper:
+    version: ==0.1.0b12

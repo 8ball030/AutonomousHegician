@@ -1,0 +1,69 @@
+name: generic_seller
+author: fetchai
+version: 0.11.0
+type: skill
+description: The weather station skill implements the functionality to sell weather
+  data.
+license: Apache-2.0
+aea_version: '>=0.6.0, <0.7.0'
+fingerprint:
+  __init__.py: QmbfkeFnZVKppLEHpBrTXUXBwg2dpPABJWSLND8Lf1cmpG
+  behaviours.py: QmaaKLWhEgYBzGexXkfTxxKPmJsBQxLjc5Jbr1pDnfNXEf
+  dialogues.py: QmRJCregJWVs8scTMjQptvztKa5NEHKUfeZECVxdU233C6
+  handlers.py: QmR1e2ajLt84fXtogtYDGemwrA2G89RHnhYveT1MhUPTQQ
+  strategy.py: QmX1mp7eZkz1P6iVyoDCATZDKZRgwe1EgMVmAyvtGDHvm3
+fingerprint_ignore_patterns: []
+contracts: []
+protocols:
+- fetchai/default:0.5.0
+- fetchai/fipa:0.6.0
+- fetchai/ledger_api:0.3.0
+- fetchai/oef_search:0.5.0
+skills: []
+behaviours:
+  service_registration:
+    args:
+      services_interval: 20
+    class_name: GenericServiceRegistrationBehaviour
+handlers:
+  fipa:
+    args: {}
+    class_name: GenericFipaHandler
+  ledger_api:
+    args: {}
+    class_name: GenericLedgerApiHandler
+  oef_search:
+    args: {}
+    class_name: GenericOefSearchHandler
+models:
+  default_dialogues:
+    args: {}
+    class_name: DefaultDialogues
+  fipa_dialogues:
+    args: {}
+    class_name: FipaDialogues
+  ledger_api_dialogues:
+    args: {}
+    class_name: LedgerApiDialogues
+  oef_search_dialogues:
+    args: {}
+    class_name: OefSearchDialogues
+  strategy:
+    args:
+      currency_id: FET
+      data_for_sale:
+        generic: data
+      has_data_source: false
+      is_ledger_tx: true
+      ledger_id: fetchai
+      location:
+        latitude: 0.127
+        longitude: 51.5194
+      service_data:
+        key: seller_service
+        value: generic_service
+      service_id: generic_service
+      unit_price: 10
+    class_name: GenericStrategy
+dependencies: {}
+is_abstract: true

@@ -34,8 +34,6 @@ from aea.helpers.search.models import Description, Location
 from aea.helpers.transaction.base import Terms
 from aea.skills.base import Model
 
-from packages.fetchai.contracts.erc1155.contract import ERC1155Contract
-
 from packages.tomrae.skills.option_monitoring.db_communication import DBCommunication
 
 DEFAULT_LEDGER_ID = DEFAULT_LEDGER
@@ -49,11 +47,6 @@ class OptionContractManager:
     """Class to help manage the deployment of options contracts."""
     option_contracts = []
 
-
-
-
-        
-    
     
     
 

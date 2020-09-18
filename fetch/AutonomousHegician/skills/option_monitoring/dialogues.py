@@ -44,8 +44,8 @@ from packages.fetchai.protocols.contract_api.dialogues import (
 from packages.fetchai.protocols.contract_api.dialogues import (
     ContractApiDialogues as BaseContractApiDialogues,
 )
-from packages.fetchai.protocols.fipa.dialogues import FipaDialogue as BaseFipaDialogue
-from packages.fetchai.protocols.fipa.dialogues import FipaDialogues as BaseFipaDialogues
+#from packages.fetchai.protocols.fipa.dialogues import FipaDialogue as BaseFipaDialogue
+#from packages.fetchai.protocols.fipa.dialogues import FipaDialogues as BaseFipaDialogues
 from packages.fetchai.protocols.ledger_api.dialogues import (
     LedgerApiDialogue as BaseLedgerApiDialogue,
 )
@@ -168,79 +168,79 @@ class DefaultDialogues(Model, BaseDefaultDialogues):
         return dialogue
 
 
-class FipaDialogue(BaseFipaDialogue):
-    """The dialogue class maintains state of a dialogue and manages it."""
-
-    def __init__(
-        self,
-        dialogue_label: BaseDialogueLabel,
-        agent_address: Address,
-        role: BaseDialogue.Role,
-    ) -> None:
-        """
-        Initialize a dialogue.
-
-        :param dialogue_label: the identifier of the dialogue
-        :param agent_address: the address of the agent for whom this dialogue is maintained
-        :param role: the role of the agent this dialogue is maintained for
-
-        :return: None
-        """
-        BaseFipaDialogue.__init__(
-            self, dialogue_label=dialogue_label, agent_address=agent_address, role=role
-        )
-        self._proposal = None  # type: Optional[Description]
-
-    @property
-    def proposal(self) -> Description:
-        """Get the proposal."""
-        assert self._proposal is not None, "Proposal not set!"
-        return self._proposal
-
-    @proposal.setter
-    def proposal(self, proposal: Description) -> None:
-        """Set the proposal."""
-        self._proposal = proposal
-
-
-class FipaDialogues(Model, BaseFipaDialogues):
-    """The dialogues class keeps track of all dialogues."""
-
-    def __init__(self, **kwargs) -> None:
-        """
-        Initialize dialogues.
-
-        :return: None
-        """
-        Model.__init__(self, **kwargs)
-        BaseFipaDialogues.__init__(self, self.context.agent_address)
-
-    @staticmethod
-    def role_from_first_message(message: Message) -> BaseDialogue.Role:
-        """
-        Infer the role of the agent from an incoming or outgoing first message
-
-        :param message: an incoming/outgoing first message
-        :return: the agent's role
-        """
-        return BaseFipaDialogue.Role.SELLER
-
-    def create_dialogue(
-        self, dialogue_label: BaseDialogueLabel, role: BaseDialogue.Role,
-    ) -> FipaDialogue:
-        """
-        Create an instance of dialogue.
-
-        :param dialogue_label: the identifier of the dialogue
-        :param role: the role of the agent this dialogue is maintained for
-
-        :return: the created dialogue
-        """
-        dialogue = FipaDialogue(
-            dialogue_label=dialogue_label, agent_address=self.agent_address, role=role
-        )
-        return dialogue
-
+#class FipaDialogue(BaseFipaDialogue):
+#    """The dialogue class maintains state of a dialogue and manages it."""
+#
+#    def __init__(
+#        self,
+#        dialogue_label: BaseDialogueLabel,
+#        agent_address: Address,
+#        role: BaseDialogue.Role,
+#    ) -> None:
+#        """
+#        Initialize a dialogue.
+#
+#        :param dialogue_label: the identifier of the dialogue
+#        :param agent_address: the address of the agent for whom this dialogue is maintained
+#        :param role: the role of the agent this dialogue is maintained for
+#
+#        :return: None
+#        """
+#        BaseFipaDialogue.__init__(
+#            self, dialogue_label=dialogue_label, agent_address=agent_address, role=role
+#        )
+#        self._proposal = None  # type: Optional[Description]
+#
+#    @property
+#    def proposal(self) -> Description:
+#        """Get the proposal."""
+#        assert self._proposal is not None, "Proposal not set!"
+#        return self._proposal
+#
+#    @proposal.setter
+#    def proposal(self, proposal: Description) -> None:
+#        """Set the proposal."""
+#        self._proposal = proposal
+#
+#
+#class FipaDialogues(Model, BaseFipaDialogues):
+#    """The dialogues class keeps track of all dialogues."""
+#
+#    def __init__(self, **kwargs) -> None:
+#        """
+#        Initialize dialogues.
+#
+#        :return: None
+#        """
+#        Model.__init__(self, **kwargs)
+#        BaseFipaDialogues.__init__(self, self.context.agent_address)
+#
+#    @staticmethod
+#    def role_from_first_message(message: Message) -> BaseDialogue.Role:
+#        """
+#        Infer the role of the agent from an incoming or outgoing first message
+#
+#        :param message: an incoming/outgoing first message
+#        :return: the agent's role
+#        """
+#        return BaseFipaDialogue.Role.SELLER
+#
+#    def create_dialogue(
+#        self, dialogue_label: BaseDialogueLabel, role: BaseDialogue.Role,
+#    ) -> FipaDialogue:
+#        """
+#        Create an instance of dialogue.
+#
+#        :param dialogue_label: the identifier of the dialogue
+#        :param role: the role of the agent this dialogue is maintained for
+#
+#        :return: the created dialogue
+#        """
+#        dialogue = FipaDialogue(
+#            dialogue_label=dialogue_label, agent_address=self.agent_address, role=role
+#        )
+#        return dialogue
+#
 
 class LedgerApiDialogue(BaseLedgerApiDialogue):
     """The dialogue class maintains state of a dialogue and manages it."""

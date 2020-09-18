@@ -1,0 +1,62 @@
+name: tac_participation
+author: fetchai
+version: 0.7.0
+type: skill
+description: The tac participation skill implements the logic for an AEA to participate
+  in the TAC.
+license: Apache-2.0
+aea_version: '>=0.6.0, <0.7.0'
+fingerprint:
+  __init__.py: QmcVpVrbV54Aogmowu6AomDiVMrVMo9BUvwKt9V1bJpBwp
+  behaviours.py: QmX3UbuLohnPSLM2W6LrWcZyo4zXCr1YN5Bznu61v27SZC
+  dialogues.py: QmZrJ1d9mhtfkxRg5QfsKbbtVZFa6cKna4anRWHvzNTEdD
+  game.py: QmVGeCGEfwmzktSPQN4xWL5yxjHqNyenneQzeW2vfx4giv
+  handlers.py: QmQ4B2upvGr5UJj2vVC9dJHJfSoy7NxWzJCvSm4MqmpMLz
+fingerprint_ignore_patterns: []
+contracts:
+- fetchai/erc1155:0.9.0
+protocols:
+- fetchai/oef_search:0.5.0
+- fetchai/tac:0.6.0
+skills: []
+behaviours:
+  tac_search:
+    args:
+      tick_interval: 5
+    class_name: TacSearchBehaviour
+  transaction_processing:
+    args:
+      tick_interval: 2
+    class_name: TransactionProcessBehaviour
+handlers:
+  oef:
+    args: {}
+    class_name: OefSearchHandler
+  tac:
+    args: {}
+    class_name: TacHandler
+models:
+  game:
+    args:
+      expected_version_id: v1
+      is_using_contract: false
+      ledger_id: ethereum
+      location:
+        latitude: 0.127
+        longitude: 51.5194
+      search_query:
+        constraint_type: ==
+        search_key: tac
+        search_value: v1
+      search_radius: 5.0
+    class_name: Game
+  oef_search_dialogues:
+    args: {}
+    class_name: OefSearchDialogues
+  state_update_dialogues:
+    args: {}
+    class_name: StateUpdateDialogues
+  tac_dialogues:
+    args: {}
+    class_name: TacDialogues
+dependencies: {}

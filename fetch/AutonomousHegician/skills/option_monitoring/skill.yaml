@@ -1,4 +1,4 @@
-aea_version: '>=0.5.0, <0.6.0'
+aea_version: 0.6.0
 author: tomrae
 behaviours:
   contract_deployment:
@@ -20,7 +20,6 @@ behaviours:
     args: {}
     class_name: WebServer
 contracts:
-- fetchai/erc1155:0.8.0
 - tomrae/stablecoin:0.1.0
 dependencies:
   Flask:
@@ -39,21 +38,18 @@ description: The ERC1155 deploy skill has the ability to deploy and interact wit
   the smart contract.
 fingerprint:
   __init__.py: Qmbm3ZtGpfdvvzqykfRqbaReAK9a16mcyK7qweSfeN5pq1
-  behaviours.py: QmTmTLPkk5JbcnscEJHZn4v68t926Y9N7wms8FLxFxjyrc
-  db_communication.py: QmeDD4DsaJAvmWisw7C6sPobEM1KCYmaWA4DWu8xEWzrwb
+  behaviours.py: QmesMdGUQk4cK2N44FGH46895PUaEyUZaSGaiTEvkq3Pt4
+  db_communication.py: QmbbBqWHsq7dKWrHsdBTQpJgiTyfqDLLrqWBK7mcPxXy5h
   dex_wrapper.py: QmaPpUySQvS6Kovgg9GgQ8Je2PRc6vDGNBvRpJ6fWrRYTf
   dialogues.py: QmXeMZdN2fTesDrJ3fpAMj1YT6Z6aGsunXMo6g4DPboMge
-  handlers.py: QmaR4vFn6FN7SSY3SDNYBRm2v5Qbbp9Ej3Z1K7BF79ACU5
-  strategy.py: QmdXkyoyPU618q9QJqhkpzmm4FkgZW2gJ2VL81QZU1wWuL
-  web_server.py: QmR9UwS5vUx5oBQmXbGSYR15AcR221QpVNa4HwDLJVXY97
+  handlers.py: QmSDQuA7gziZVqZ3woW6UaEE5xnqgBEeobxC3JmKBQXXqG
+  strategy.py: QmUxwnDrJn3yvYAX67DxDcLLmdfU8nNUvNyxH1BmsbrKH7
+  web_server.py: QmcVhWWjndsazQtLfv8jYJg61X8PXnkHv467MQPqabp94g
 fingerprint_ignore_patterns: []
 handlers:
   contract_api:
     args: {}
     class_name: ContractApiHandler
-  fipa:
-    args: {}
-    class_name: FipaHandler
   ledger_api:
     args: {}
     class_name: LedgerApiHandler
@@ -68,9 +64,6 @@ models:
   default_dialogues:
     args: {}
     class_name: DefaultDialogues
-  fipa_dialogues:
-    args: {}
-    class_name: FipaDialogues
   ledger_api_dialogues:
     args: {}
     class_name: LedgerApiDialogues
@@ -90,10 +83,8 @@ models:
     class_name: Strategy
 name: option_monitoring
 protocols:
-- fetchai/contract_api:0.2.0
-- fetchai/default:0.4.0
-- fetchai/fipa:0.5.0
-- fetchai/ledger_api:0.2.0
-- fetchai/signing:0.2.0
+- fetchai/contract_api:0.3.0
+- fetchai/ledger_api:0.3.0
 skills: []
+type: skill
 version: 0.1.0
