@@ -1,4 +1,5 @@
 import { makeStyles } from "@material-ui/styles";
+import tinycolor from "tinycolor2";
 
 export default makeStyles(theme => ({
   widgetWrapper: {
@@ -24,6 +25,7 @@ export default makeStyles(theme => ({
     padding: 0,
   },
   paper: {
+    background: tinycolor("#121c36").darken(6).toHexString(),
     display: "flex",
     flexDirection: "column",
     flexGrow: 1,
