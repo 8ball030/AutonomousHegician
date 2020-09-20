@@ -1,9 +1,9 @@
-name: erc1155_deploy
-author: fetchai
-version: 0.13.0
+name: hegic_deployer
+author: eightballer
+version: 0.1.0
 type: skill
-description: The ERC1155 deploy skill has the ability to deploy and interact with
-  the smart contract.
+description: The hegic deploy skill has the ability to deploy and interact with
+  the smart contracts.
 license: Apache-2.0
 aea_version: '>=0.6.0, <0.7.0'
 fingerprint:
@@ -14,8 +14,6 @@ fingerprint:
   handlers.py: QmdFjFEarXivuDwn2Ucw9aXCmRdbFwRK23qz6u6thgjVnn
   strategy.py: QmeoDg7UT5MG5khmrZna3v8HYrC6QJjjEV26kcq1mPs6yx
 fingerprint_ignore_patterns: []
-contracts:
-- fetchai/erc1155:0.9.0
 protocols:
 - fetchai/contract_api:0.4.0
 - fetchai/default:0.5.0
@@ -24,6 +22,14 @@ protocols:
 - fetchai/oef_search:0.6.0
 - fetchai/signing:0.3.0
 skills: []
+contracts: 
+- eightballer/pricefeed:0.1.0
+- eightballer/stablecoin:0.1.0
+- eightballer/exchange:0.1.0
+- eightballer/calloptions:0.1.0
+- eightballer/putoptions:0.1.0
+- eightballer/ercpool:0.1.0
+- eightballer/ethpool:0.1.0
 behaviours:
   service_registration:
     args:
@@ -66,29 +72,14 @@ models:
     class_name: SigningDialogues
   strategy:
     args:
-      from_supply: 10
+      calloptions: '0x299Aa5f5196743445dE12F0480F8E373bB13b63b'
+      ercpool: ''
+      ethpool: ''
+      exchange: '0xC1B7eb7592Ee186948962d00Ffd7967888bf57FD'
       ledger_id: ethereum
-      location:
-        latitude: 0.127
-        longitude: 51.5194
-      mint_quantities:
-      - 100
-      - 100
-      - 100
-      - 100
-      - 100
-      - 100
-      - 100
-      - 100
-      - 100
-      - 100
-      nb_tokens: 10
-      service_data:
-        key: seller_service
-        value: erc1155_contract
-      to_supply: 0
-      token_type: 2
-      value: 0
+      pricefeed: '0xC794743D8Cd35dDC37deB5cf59Ac931c4F901e0a'
+      putoptions: '0x0e41655d8706caC32B5e1eDbFCfB4902338af0c2'
+      stablecoin: '0xdEfDD9BB08Caa90f12F90A0955CAEFCE3d2E32aF'
     class_name: Strategy
 dependencies:
   vyper:

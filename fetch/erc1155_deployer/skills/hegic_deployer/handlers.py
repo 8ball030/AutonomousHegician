@@ -32,7 +32,7 @@ from packages.fetchai.protocols.contract_api.message import ContractApiMessage
 from packages.fetchai.protocols.fipa.message import FipaMessage
 from packages.fetchai.protocols.ledger_api.message import LedgerApiMessage
 from packages.fetchai.protocols.oef_search.message import OefSearchMessage
-from packages.fetchai.skills.erc1155_deploy.dialogues import (
+from packages.eightballer.skills.hegic_deployer.dialogues import (
     ContractApiDialogue,
     ContractApiDialogues,
     DefaultDialogues,
@@ -45,7 +45,7 @@ from packages.fetchai.skills.erc1155_deploy.dialogues import (
     SigningDialogue,
     SigningDialogues,
 )
-from packages.fetchai.skills.erc1155_deploy.strategy import Strategy
+from packages.eightballer.skills.hegic_deployer.strategy import Strategy
 
 
 LEDGER_API_ADDRESS = "fetchai/ledger:0.5.0"
@@ -103,7 +103,8 @@ class FipaHandler(Handler):
         self.context.logger.info(
             "unidentified dialogue for message={}.".format(fipa_msg)
         )
-        default_dialogues = cast(DefaultDialogues, self.context.default_dialogues)
+        default_dialogues = cast(
+            DefaultDialogues, self.context.default_dialogues)
         default_msg, _ = default_dialogues.create(
             counterparty=fipa_msg.sender,
             performative=DefaultMessage.Performative.ERROR,
@@ -128,7 +129,8 @@ class FipaHandler(Handler):
             "received CFP from sender={}".format(fipa_msg.sender[-5:])
         )
         if not strategy.is_tokens_minted:
-            self.context.logger.info("Contract items not minted yet. Try again later.")
+            self.context.logger.info(
+                "Contract items not minted yet. Try again later.")
             return
 
         # simply send the same proposal, independent of the query
@@ -192,12 +194,14 @@ class FipaHandler(Handler):
                     }
                 ),
             )
-            contract_api_dialogue = cast(ContractApiDialogue, contract_api_dialogue)
+            contract_api_dialogue = cast(
+                ContractApiDialogue, contract_api_dialogue)
             contract_api_dialogue.terms = strategy.get_single_swap_terms(
                 fipa_dialogue.proposal, fipa_msg.sender
             )
             self.context.outbox.put_message(message=contract_api_msg)
-            self.context.logger.info("requesting single atomic swap transaction...")
+            self.context.logger.info(
+                "requesting single atomic swap transaction...")
         else:
             self.context.logger.info(
                 "received ACCEPT_W_INFORM from sender={} with no signature.".format(
@@ -225,7 +229,8 @@ class FipaHandler(Handler):
 class LedgerApiHandler(Handler):
     """Implement the ledger api handler."""
 
-    SUPPORTED_PROTOCOL = LedgerApiMessage.protocol_id  # type: Optional[ProtocolId]
+    # type: Optional[ProtocolId]
+    SUPPORTED_PROTOCOL = LedgerApiMessage.protocol_id
 
     def setup(self) -> None:
         """Implement the setup for the handler."""
@@ -245,7 +250,8 @@ class LedgerApiHandler(Handler):
             LedgerApiDialogues, self.context.ledger_api_dialogues
         )
         ledger_api_dialogue = cast(
-            Optional[LedgerApiDialogue], ledger_api_dialogues.update(ledger_api_msg)
+            Optional[LedgerApiDialogue], ledger_api_dialogues.update(
+                ledger_api_msg)
         )
         if ledger_api_dialogue is None:
             self._handle_unidentified_dialogue(ledger_api_msg)
@@ -258,12 +264,14 @@ class LedgerApiHandler(Handler):
             ledger_api_msg.performative
             is LedgerApiMessage.Performative.TRANSACTION_DIGEST
         ):
-            self._handle_transaction_digest(ledger_api_msg, ledger_api_dialogue)
+            self._handle_transaction_digest(
+                ledger_api_msg, ledger_api_dialogue)
         elif (
             ledger_api_msg.performative
             is LedgerApiMessage.Performative.TRANSACTION_RECEIPT
         ):
-            self._handle_transaction_receipt(ledger_api_msg)
+            self._handle_transaction_receipt(
+                ledger_api_msg, ledger_api_dialogue)
         elif ledger_api_msg.performative == LedgerApiMessage.Performative.ERROR:
             self._handle_error(ledger_api_msg, ledger_api_dialogue)
         else:
@@ -323,40 +331,35 @@ class LedgerApiHandler(Handler):
         self.context.outbox.put_message(message=msg)
         self.context.logger.info("requesting transaction receipt.")
 
-    def _handle_transaction_receipt(self, ledger_api_msg: LedgerApiMessage) -> None:
+    def _handle_transaction_receipt(self, ledger_api_msg: LedgerApiMessage, ledger_api_dialogue: LedgerApiDialogue) -> None:
         """
         Handle a message of transaction_receipt performative.
 
         :param ledger_api_message: the ledger api message
         """
+        strategy = cast(Strategy, self.context.strategy)
         is_transaction_successful = EthereumHelper.is_transaction_settled(
             ledger_api_msg.transaction_receipt.receipt
         )
+        contract_reference = ledger_api_dialogue._associated_signing_dialogue._associated_contract_api_dialogue.dialogue_label.dialogue_reference[0]
+        for contract, status in self.context.strategy._deployment_status.items():
+            if status[0] is None:
+                continue
+            elif status[1] == contract_reference:
+                self.context.logger.info("retrieved deployment {contract}".format(contract=contract))
+                strategy.deployment_status[contract] = ("deployed", ledger_api_msg.transaction_receipt.receipt["contractAddress"])
+                self.context.logger.info(f"** {ledger_api_msg.transaction_receipt.receipt['contractAddress']}  Retireved and stored)")
+                if contract in ["options_create_call_option", "options_create_put_option"]:
+                    import pdb;pdb.set_trace()
+                    self.context.strategy.update_option(
+                        self.context.strategy.current_order_id, {"status_code_id": 3})
+                self.context.strategy.deployment_status["status"] = "pending"
         if is_transaction_successful:
             self.context.logger.info(
                 "transaction was successfully settled. Transaction receipt={}".format(
-                    ledger_api_msg.transaction_receipt
+                    "ledger_api_msg.transaction_receipt"
                 )
             )
-            strategy = cast(Strategy, self.context.strategy)
-            if not strategy.is_contract_deployed:
-                contract_address = ledger_api_msg.transaction_receipt.receipt.get(
-                    "contractAddress", None
-                )
-                strategy.contract_address = contract_address
-                strategy.is_contract_deployed = is_transaction_successful
-                strategy.is_behaviour_active = is_transaction_successful
-            elif not strategy.is_tokens_created:
-                strategy.is_tokens_created = is_transaction_successful
-                strategy.is_behaviour_active = is_transaction_successful
-            elif not strategy.is_tokens_minted:
-                strategy.is_tokens_minted = is_transaction_successful
-                strategy.is_behaviour_active = is_transaction_successful
-            elif strategy.is_tokens_minted:
-                self.context.is_active = False
-                self.context.logger.info("demo finished!")
-            else:
-                self.context.logger.error("unexpected transaction receipt!")
         else:
             self.context.logger.error(
                 "transaction failed. Transaction receipt={}".format(
@@ -398,7 +401,8 @@ class LedgerApiHandler(Handler):
 class ContractApiHandler(Handler):
     """Implement the contract api handler."""
 
-    SUPPORTED_PROTOCOL = ContractApiMessage.protocol_id  # type: Optional[ProtocolId]
+    # type: Optional[ProtocolId]
+    SUPPORTED_PROTOCOL = ContractApiMessage.protocol_id
 
     def setup(self) -> None:
         """Implement the setup for the handler."""
@@ -430,7 +434,8 @@ class ContractApiHandler(Handler):
             contract_api_msg.performative
             is ContractApiMessage.Performative.RAW_TRANSACTION
         ):
-            self._handle_raw_transaction(contract_api_msg, contract_api_dialogue)
+            self._handle_raw_transaction(
+                contract_api_msg, contract_api_dialogue)
         elif contract_api_msg.performative == ContractApiMessage.Performative.ERROR:
             self._handle_error(contract_api_msg, contract_api_dialogue)
         else:
@@ -469,8 +474,10 @@ class ContractApiHandler(Handler):
         :param contract_api_message: the ledger api message
         :param contract_api_dialogue: the ledger api dialogue
         """
-        self.context.logger.info("received raw transaction={}".format(contract_api_msg))
-        signing_dialogues = cast(SigningDialogues, self.context.signing_dialogues)
+        self.context.logger.info(
+            "Received raw transaction={}".format("contract_api_msg"))
+        signing_dialogues = cast(
+            SigningDialogues, self.context.signing_dialogues)
         signing_msg, signing_dialogue = signing_dialogues.create(
             counterparty=self.context.decision_maker_address,
             performative=SigningMessage.Performative.SIGN_TRANSACTION,
@@ -522,7 +529,8 @@ class ContractApiHandler(Handler):
 class SigningHandler(Handler):
     """Implement the transaction handler."""
 
-    SUPPORTED_PROTOCOL = SigningMessage.protocol_id  # type: Optional[ProtocolId]
+    # type: Optional[ProtocolId]
+    SUPPORTED_PROTOCOL = SigningMessage.protocol_id
 
     def setup(self) -> None:
         """Implement the setup for the handler."""
@@ -538,7 +546,8 @@ class SigningHandler(Handler):
         signing_msg = cast(SigningMessage, message)
 
         # recover dialogue
-        signing_dialogues = cast(SigningDialogues, self.context.signing_dialogues)
+        signing_dialogues = cast(
+            SigningDialogues, self.context.signing_dialogues)
         signing_dialogue = cast(
             Optional[SigningDialogue], signing_dialogues.update(signing_msg)
         )
@@ -634,7 +643,8 @@ class SigningHandler(Handler):
 class OefSearchHandler(Handler):
     """This class implements an OEF search handler."""
 
-    SUPPORTED_PROTOCOL = OefSearchMessage.protocol_id  # type: Optional[ProtocolId]
+    # type: Optional[ProtocolId]
+    SUPPORTED_PROTOCOL = OefSearchMessage.protocol_id
 
     def setup(self) -> None:
         """Call to setup the handler."""
@@ -654,7 +664,8 @@ class OefSearchHandler(Handler):
             OefSearchDialogues, self.context.oef_search_dialogues
         )
         oef_search_dialogue = cast(
-            Optional[OefSearchDialogue], oef_search_dialogues.update(oef_search_msg)
+            Optional[OefSearchDialogue], oef_search_dialogues.update(
+                oef_search_msg)
         )
         if oef_search_dialogue is None:
             self._handle_unidentified_dialogue(oef_search_msg)
