@@ -55,7 +55,6 @@ const agent_data= [
 
 
 export default function BotManagement() {
-  var styles = makeStyles();
   return (
     <>
       <PageTitle title="Agent Management" />
