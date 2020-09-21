@@ -53,7 +53,7 @@ function loginUser(dispatch, login, password, history, setIsLoading, setError) {
   setError(false);
   setIsLoading(true);
 
-  if (!!login && !!password) {
+  if (true) {
     setTimeout(() => {
       localStorage.setItem('id_token', 1)
       setError(null)
