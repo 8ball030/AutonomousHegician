@@ -1,4 +1,5 @@
 import { makeStyles } from "@material-ui/styles";
+import tinycolor from "tinycolor2";
 
 const drawerWidth = 240;
 
@@ -17,6 +18,9 @@ export default makeStyles(theme => ({
   },
   drawerOpen: {
     width: drawerWidth,
+    backgroundColor: tinycolor("#121c36")
+        .darken(6)
+        .toHexString(),
     transition: theme.transitions.create("width", {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
