@@ -18,7 +18,11 @@
 # ------------------------------------------------------------------------------
 """This package contains the behaviour of a erc1155 deploy skill AEA."""
 
-from typing import Optional, cast
+from multiprocessing import Process
+from web3 import Web3
+from typing import Optional, cast, Dict, Any
+from datetime import datetime
+import time
 
 from aea.skills.behaviours import TickerBehaviour, Behaviour
 
@@ -31,9 +35,33 @@ from packages.tomrae.skills.option_monitoring.dialogues import (
 )
 from packages.tomrae.skills.option_monitoring.strategy import Strategy
 from packages.tomrae.skills.option_monitoring.dex_wrapper import DexWrapper
+from packages.tomrae.skills.option_monitoring.web_server import run_server
 
-DEFAULT_SERVICES_INTERVAL = 30.0
+DEFAULT_SERVICES_INTERVAL = 1.0
 LEDGER_API_ADDRESS = "fetchai/ledger:0.3.0"
+
+
+class WebServer(TickerBehaviour):
+    def __init__(self, **kwargs):
+        """Initialise the behaviour."""
+        services_interval = kwargs.pop("services_interval",
+                                       DEFAULT_SERVICES_INTERVAL)  # type: int
+        super().__init__(tick_interval=services_interval, **kwargs)
+
+    def setup(self) -> None:
+        self.process = Process(target=run_server)
+        self.process.start()
+
+    def act(self) -> None:
+        pass
+
+    def teardown(self) -> None:
+        """
+        Implement the task teardown.
+
+        :return: None
+        """
+        self.process.terminate()
 
 
 class PriceTicker(TickerBehaviour):
@@ -52,7 +80,6 @@ class PriceTicker(TickerBehaviour):
     def setup(self) -> None:
         """
         Implement the setup.
-
         :return: None
         """
         self.dex = DexWrapper()
@@ -60,7 +87,11 @@ class PriceTicker(TickerBehaviour):
 
     def _set_current_price(self) -> None:
         """Retrieve the current Eth dai price from the Dex."""
-        self._current_price = self.dex.get_ticker("DAI", "ETH")
+        try:
+            self._current_price = self.dex.get_ticker("DAI", "ETH")
+        except Exception as e:
+            self.context.logger.info(f"Error getting price!\n{e}")
+            time.sleep(15)
 
     def act(self) -> None:
         """
@@ -69,12 +100,38 @@ class PriceTicker(TickerBehaviour):
         :return: None
         """
         self._set_current_price()
-        self.context.logger.info(
-            f"Current Rate : {round(self.current_price, 2)}")
+        self.context.logger.info(f"Rate : {round(self.current_price, 2)}")
 
 
-class OptionMonitoring(TickerBehaviour):
+class SnapShot(TickerBehaviour):
+    """This class monitors the balance of agent and takes snapshots to the db."""
+    @property
+    def current_balances(self) -> Dict[str, Any]:
+        """Gets the current balances."""
+        return self._request_balance()
+
+    def act(self) -> None:
+        if self.context.strategy.eth_balance is None:
+            return
+        eth_val=Web3.fromWei(self.context.strategy.eth_balance, "ether")
+        snapshot_params = dict(
+            eth_val=eth_val,
+            usd_val= float(eth_val) * float(self.context.behaviours.price_ticker.current_price),
+            date_created=datetime.now(),
+            address=self.context.agent_address,
+        )
+        self.context.strategy.create_new_snapshot(snapshot_params)
+
+    def __init__(self, **kwargs):
+        """Initialise the behaviour."""
+        services_interval = kwargs.pop("services_interval",
+                                       DEFAULT_SERVICES_INTERVAL)  # type: int
+        super().__init__(tick_interval=services_interval, **kwargs)
+
+
+class OptionMonitor(TickerBehaviour):
     """This class scaffolds a behaviour."""
+
     def __init__(self, **kwargs):
         """Initialise the behaviour."""
         services_interval = kwargs.pop("services_interval",
@@ -116,39 +173,88 @@ class OptionMonitoring(TickerBehaviour):
 
         :return: None
         """
-        # self._request_balance()
+        if self.context.strategy.deployment_status["status"] == "deploying":
+            return
 
         strategy = cast(Strategy, self.context.strategy)
-        orders_to_execute = strategy.retrieve_actions()
+        orders_to_estimate = strategy.retrieve_orders(status_code=0)
+        orders_to_create = strategy.retrieve_orders(status_code=1)
+        orders_to_execise = strategy.retrieve_orders(status_code=3)
 
-        for order in orders_to_execute:
-            self.logger.info(f"Order to Execute -> {order}")
-            self.exercise_option(order)
+        self.context.logger.info(
+            f"Orders to estimate : {len(orders_to_estimate)}")
+        self.context.logger.info(f"Orders to create : {len(orders_to_create)}")
+        self.context.logger.info(
+            f"Orders to execise : {len(orders_to_execise)}")
 
-    def exercise_option(self, order) -> None:
-        """
-        Exercise the option.
+        for order in orders_to_estimate:
+            self._option_interaction(option_type=order.option_type,
+                                     act="options_estimate",
+                                     params={"amount": order.amount,
+                                             "period": order.period,
+                                             "strike_price": order.strike_price,
+                                             "option_db_id": order.id,
+                                             })
+            return
+        for order in orders_to_create:
+            self._option_interaction(option_type=order.option_type,
+                                     act=f"options_create_{order.option_type}_option",
+                                     params={"amount": int(order.amount),
+                                             "period": order.period,
+                                             "strike_price": order.strike_price,
+                                             "option_db_id": order.id,
+                                             "fees": order.fees}
+                                     )
+            return
+        for order in orders_to_execise:
+            self._option_interaction(option_type=order.option_type,
+                                     act="options_exercise",
+                                     params={"option_ledger_id": order.ledger_id,
+                                             "option_db_id": order.id,
+                                             }
+                                     )
+            return
 
-        :return: None
-
-        """
-        if order["type_of_option"] is "put":
-            contract_id = "tomrae/putoption:0.1.0"
-            contract_address = self.putoption
-        elif order["type_of_option"] is "call":
-            contract_id = "tomrae/calloption:0.1.0"
-            contract_address = self.calloption
-
+    def _option_interaction(self, option_type: str, act: str,
+                            params: Dict[str,
+                                         Any]) -> bool:
+        assert option_type in ["call", "put"]
+        assert act in [
+            "options_create_call_option", 
+            "options_create_put_option",
+            "options_estimate", 
+            "options_exercise"
+        ]
+        self.context.strategy.deployment_status["status"] = "deploying"
+        strategy = cast(Strategy, self.context.strategy)
+        strategy.is_behaviour_active = False
+        contract_api_dialogues = cast(ContractApiDialogues,
+                                      self.context.contract_api_dialogues)
+        deploy_ref = contract_api_dialogues.new_self_initiated_dialogue_reference(
+        )
+        params.update({"deployer_address": self.context.agent_address})
         contract_api_msg = ContractApiMessage(
             performative=ContractApiMessage.Performative.GET_RAW_TRANSACTION,
-            dialogue_reference=contract_api_dialogues.
-            new_self_initiated_dialogue_reference(),
+            dialogue_reference=deploy_ref,
             ledger_id=strategy.ledger_id,
-            contract_id=contract_id,
-            contract_address=contract_address,
-            callable="exercise",
-            kwargs=ContractApiMessage.Kwargs({"option_id": order["optionID"]}),
+            contract_id=f"tomrae/{option_type}options:0.1.0",
+            contract_address=strategy.deployment_status[f"{option_type}options"][1],
+            callable=act,
+            kwargs=ContractApiMessage.Kwargs(params),
         )
+        contract_api_msg.counterparty = LEDGER_API_ADDRESS
+        contract_api_dialogue = cast(
+            Optional[ContractApiDialogue],
+            contract_api_dialogues.update(contract_api_msg),
+        )
+        self.context.strategy.current_order_id = params['option_db_id']
+        self.context.strategy.deployment_status[act] = (
+            "pending", deploy_ref[0])
+        assert contract_api_dialogue is not None, "ContractApiDialogue not generated"
+        contract_api_dialogue.terms = strategy.get_create_token_terms()
+        self.context.outbox.put_message(message=contract_api_msg)
+        self.context.logger.info(
+            f"contract deployer requesting {act} {option_type} transaction...")
 
     def teardown(self) -> None:
         """
@@ -161,6 +267,7 @@ class OptionMonitoring(TickerBehaviour):
 
 class ContractDeployer(TickerBehaviour):
     """This class implements a behaviour."""
+
     def __init__(self, **kwargs):
         """Initialise the behaviour."""
         self.__dict__.update(kwargs)
@@ -172,6 +279,7 @@ class ContractDeployer(TickerBehaviour):
 
         :return: None
         """
+
         self.deployed = False  # self.calloptions is None
         self._request_balance()
 
@@ -181,9 +289,10 @@ class ContractDeployer(TickerBehaviour):
 
         :return: None
         """
-        self.context.logger.info(
-            f"Contract Deployment status : {self.context.strategy.deployment_status}"
-        )
+        # self.context.logger.info(
+        #    f"Contract Deployment status : {{k: v[0] for k, v in self.context.strategy.deployment_status.items()}}"
+        # )
+        return None
         if self.context.strategy.deployment_status["status"] in [
                 "complete", "deploying"
         ]:
@@ -209,6 +318,7 @@ class ContractDeployer(TickerBehaviour):
         elif strategy.deployment_status["exchange"][0] == "deployed" and \
                 strategy.deployment_status["ethpool"][0] is None:
             self._request_deploy_ethpool()
+            self.context.strategy.deployment_status["status"] = "deploying"
 
         elif strategy.deployment_status["ethpool"][0] == "deployed" and \
                 strategy.deployment_status["ercpool"][0] is None:
@@ -234,93 +344,58 @@ class ContractDeployer(TickerBehaviour):
             self._request_deploy_liquidity()
             self.context.strategy.deployment_status["status"] = "deploying"
 
-        elif strategy.deployment_status["liquidity"][0] == "deployed" and \
-                strategy.deployment_status["options"][0] is None:
-            self._request_purchase_options()
-            self.context.strategy.deployment_status["status"] = "deploying"
-
-        elif strategy.deployment_status["options"][0] == "deployed" and \
-                self.context.strategy.deployment_status["status"][0] == "deployed":
-            self.context.strategy.deployment_status["status"] = "complete"
+        elif strategy.deployment_status["options_estimate"][0] is None and \
+                strategy.deployment_status["liquidity"][0] == "deployed":
+            params = {
+                "period": 24 * 3600,
+                "strike_price": 200,
+                "amount": Web3.toWei(0.1, "ether"),
+                "option_type": "call",
+            }
+            params = self.context.strategy.create_new_option(params)
+            self._option_interaction(option_type="call",
+                                     deployment_name="options_estimate",
+                                     act="options_estimate",
+                                     params=params)
         else:
             self.context.logger.info("Deployment complete!")
 
-    def _request_deploy_options(self) -> None:
-        """
-        Request contract deploy transaction
-
-        :return: None
-        """
-        self.context.logger.info("options Contract Deployment!")
+    def _option_interaction(self, option_type: str, act: str,
+                            params: Dict[str,
+                                         Any], deployment_name: str) -> bool:
+        assert option_type in ["call", "put"]
+        assert act in [
+            "create_call_option", "options_estimate", "exercise_option"
+        ]
+        self.context.strategy.deployment_status["status"] = "deploying"
         strategy = cast(Strategy, self.context.strategy)
         strategy.is_behaviour_active = False
         contract_api_dialogues = cast(ContractApiDialogues,
                                       self.context.contract_api_dialogues)
-        deployment_ref = contract_api_dialogues.new_self_initiated_dialogue_reference(
+        deploy_ref = contract_api_dialogues.new_self_initiated_dialogue_reference(
         )
+        params.update({"deployer_address": self.context.agent_address})
         contract_api_msg = ContractApiMessage(
             performative=ContractApiMessage.Performative.GET_RAW_TRANSACTION,
-            dialogue_reference=contract_api_dialogues.
-            new_self_initiated_dialogue_reference(),
+            dialogue_reference=deploy_ref,
             ledger_id=strategy.ledger_id,
-            contract_id="tomrae/ethpool:0.8.0",
-            contract_address=self.ethpool,
-            callable="provide_liquidity",
-            kwargs=ContractApiMessage.Kwargs({
-                "deployer_address": self.context.agent_address,
-                "args": [200000]
-            }))
+            contract_id=f"tomrae/{option_type}options:0.1.0",
+            contract_address=strategy.deployment_status[f"{option_type}options"][1],
+            callable=act,
+            kwargs=ContractApiMessage.Kwargs(params),
+        )
         contract_api_msg.counterparty = LEDGER_API_ADDRESS
         contract_api_dialogue = cast(
             Optional[ContractApiDialogue],
             contract_api_dialogues.update(contract_api_msg),
         )
-        self.context.strategy.deployment_status["options"] = (
-            "pending", deployment_ref[0])
+        self.context.strategy.deployment_status[act] = (
+            "pending", deploy_ref[0])
         assert contract_api_dialogue is not None, "ContractApiDialogue not generated"
-        contract_api_dialogue.terms = strategy.get_deploy_terms()
+        contract_api_dialogue.terms = strategy.get_create_token_terms()
         self.context.outbox.put_message(message=contract_api_msg)
         self.context.logger.info(
-            "requesting options contract deployment transaction...")
-
- #  def _request_deploy_ethpool(self) -> None:
- #      """
- #      Request contract deploy transaction
-
- #      :return: None
- #      """
- #      self.context.logger.info("ethpool Contract Deployment!")
- #      strategy = cast(Strategy, self.context.strategy)
- #      strategy.is_behaviour_active = False
- #      contract_api_dialogues = cast(ContractApiDialogues,
- #                                    self.context.contract_api_dialogues)
- #      deployment_ref = contract_api_dialogues.new_self_initiated_dialogue_reference(
- #      )
- #      contract_api_msg = ContractApiMessage(
- #          performative=ContractApiMessage.Performative.
- #          GET_DEPLOY_TRANSACTION,
- #          dialogue_reference=deployment_ref,
- #          ledger_id=strategy.ledger_id,
- #          contract_id="tomrae/ethpool:0.1.0",
- #          callable="get_deploy_transaction",
- #          kwargs=ContractApiMessage.Kwargs({
- #              "deployer_address": self.context.agent_address,
- #              "args": [self.stablecoin]
- #          }),
- #      )
- #      contract_api_msg.counterparty = LEDGER_API_ADDRESS
- #      contract_api_dialogue = cast(
- #          Optional[ContractApiDialogue],
- #          contract_api_dialogues.update(contract_api_msg),
- #      )
- #      self.context.strategy.deployment_status["ethpool"] = (
- #          "pending", deployment_ref[0])
- #      assert contract_api_dialogue is not None, "ContractApiDialogue not generated"
- #      contract_api_dialogue.terms = strategy.get_deploy_terms()
- #      self.context.outbox.put_message(message=contract_api_msg)
- #      self.context.logger.info(
- #          "requesting ethpool contract deployment transaction...")
-
+            f"contract deployer requesting {act} {option_type} transaction...")
 
     def _request_deploy_putoptions(self) -> None:
         """
@@ -555,7 +630,7 @@ class ContractDeployer(TickerBehaviour):
             callable="get_deploy_transaction",
             kwargs=ContractApiMessage.Kwargs({
                 "deployer_address": self.context.agent_address,
-                "price": 10000
+                "price": 200
             }),
         )
         contract_api_msg.counterparty = LEDGER_API_ADDRESS
@@ -614,8 +689,11 @@ class ContractDeployer(TickerBehaviour):
         :return: None
         """
         pass
+
+
 #        self._unregister_service()
 #        self._unregister_agent()
+
 
     def _request_balance(self) -> None:
         """
@@ -681,42 +759,28 @@ class ContractDeployer(TickerBehaviour):
         strategy.is_behaviour_active = False
         contract_api_dialogues = cast(ContractApiDialogues,
                                       self.context.contract_api_dialogues)
-        contract_api_msg = ContractApiMessage(
-            performative=ContractApiMessage.Performative.GET_RAW_TRANSACTION,
-            dialogue_reference=contract_api_dialogues.
-            new_self_initiated_dialogue_reference(),
-            ledger_id=strategy.ledger_id,
-            contract_id="tomrae/ethpool:0.1.0",
-            callable="provide_liquidity",
-            kwargs=ContractApiMessage.Kwargs({
-                "deployer_address":
-                self.context.agent_address,
-                "args": [
-                    1000000,
-                    self.context.strategy.deployment_status["ethpool"][1],
-                    self.context.agent_address
-                ],
-            }),
+
+        deploy_ref = contract_api_dialogues.new_self_initiated_dialogue_reference(
         )
         contract_api_msg = ContractApiMessage(
             performative=ContractApiMessage.Performative.GET_RAW_TRANSACTION,
-            dialogue_reference=contract_api_dialogues.new_self_initiated_dialogue_reference(),
+            dialogue_reference=deploy_ref,
             ledger_id=strategy.ledger_id,
             contract_id="tomrae/ethpool:0.1.0",
             contract_address=strategy.deployment_status["ethpool"][1],
             callable="provide_liquidity",
-            kwargs=ContractApiMessage.Kwargs(
-                {
-                    "deployer_address": self.context.agent_address,
-                    "amount": 100,
-                }
-            ),
+            kwargs=ContractApiMessage.Kwargs({
+                "deployer_address": self.context.agent_address,
+                "amount": 0,
+            }),
         )
         contract_api_msg.counterparty = LEDGER_API_ADDRESS
         contract_api_dialogue = cast(
             Optional[ContractApiDialogue],
             contract_api_dialogues.update(contract_api_msg),
         )
+        self.context.strategy.deployment_status["liquidity"] = ("pending",
+                                                                deploy_ref[0])
         assert contract_api_dialogue is not None, "ContractApiDialogue not generated"
         contract_api_dialogue.terms = strategy.get_create_token_terms()
         self.context.outbox.put_message(message=contract_api_msg)
@@ -844,4 +908,3 @@ class ContractDeployer(TickerBehaviour):
         oef_search_dialogues.update(oef_search_msg)
         self.context.outbox.put_message(message=oef_search_msg)
         self.context.logger.info("unregistering agent from SOEF.")
-

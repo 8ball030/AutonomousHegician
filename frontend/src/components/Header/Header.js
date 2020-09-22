@@ -137,7 +137,7 @@ export default function Header(props) {
           )}
         </IconButton>
         <Typography variant="h6" weight="medium" className={classes.logotype}>
-          Trader Toolkit v0.1
+          Autonomous Hegician
         </Typography>
         <div className={classes.grow} />
         <div

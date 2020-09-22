@@ -1,44 +1,52 @@
-name: option_monitoring
-author: tomrae
-version: 0.1.0
-description: The ERC1155 deploy skill has the ability to deploy and interact with
-  the smart contract.
-license: Apache-2.0
 aea_version: '>=0.5.0, <0.6.0'
-fingerprint:
-  __init__.py: Qmbm3ZtGpfdvvzqykfRqbaReAK9a16mcyK7qweSfeN5pq1
-  behaviours.py: QmYFYfvLRH4XutRXkG3XZztgPzSUSVMXJMVP5uKSDUdFgC
-  data_store.py: QmPSExMf88KqBxh9NKPDzwPv3tEy2oCf893broJgrw99Dc
-  db_communication.py: QmPh8Y3rSB24vtxXVexVT7BdQf3EMPKcAGwfJdRnKMTK6E
-  dex_wrapper.py: QmaPpUySQvS6Kovgg9GgQ8Je2PRc6vDGNBvRpJ6fWrRYTf
-  dialogues.py: QmXeMZdN2fTesDrJ3fpAMj1YT6Z6aGsunXMo6g4DPboMge
-  handlers.py: QmcBHgXEmUDsf63EVd3Qfeqkz1aiB1VAZmMak3xvcYM8Kz
-  hegic_option_data.db: QmNU6VWmnFjHFLLJfFicZ6Mpzj7SaTsg7EuD92CkVjvC48
-  strategy.py: QmbjPU7hquNU1oQkf2zY8rWbkKcYJWhGMfuHub6vooTHvk
-  web_server.py: QmShxQawRvBYCLKFocTyAex4mGFXt4wqA9m1xn7DfPwLwq
-fingerprint_ignore_patterns: []
-contracts:
-- fetchai/erc1155:0.8.0
-- tomrae/stablecoin:0.1.0
-protocols:
-- fetchai/contract_api:0.2.0
-- fetchai/default:0.4.0
-- fetchai/fipa:0.5.0
-- fetchai/ledger_api:0.2.0
-- fetchai/signing:0.2.0
-skills: []
+author: tomrae
 behaviours:
   contract_deployment:
     args: {}
     class_name: ContractDeployer
-  options_monitor:
+  option_handler:
     args:
-      services_interval: 150
-    class_name: OptionMonitoring
+      services_interval: 1
+    class_name: OptionMonitor
   price_ticker:
     args:
-      services_interval: 150
+      services_interval: 15
     class_name: PriceTicker
+  snapshot:
+    args:
+      services_interval: 60
+    class_name: SnapShot
+  web_server:
+    args: {}
+    class_name: WebServer
+contracts:
+- fetchai/erc1155:0.8.0
+- tomrae/stablecoin:0.1.0
+dependencies:
+  Flask:
+    version: ==1.0.4
+  Flask-Cors:
+    version: ==3.0.8
+  Werkzeug:
+    version: ==0.16.0
+  flask_restplus:
+    version: ==0.13.0
+  psycopg2-binary:
+    version: ==2.8.5
+  vyper:
+    version: ==0.1.0b12
+description: The ERC1155 deploy skill has the ability to deploy and interact with
+  the smart contract.
+fingerprint:
+  __init__.py: Qmbm3ZtGpfdvvzqykfRqbaReAK9a16mcyK7qweSfeN5pq1
+  behaviours.py: QmTmTLPkk5JbcnscEJHZn4v68t926Y9N7wms8FLxFxjyrc
+  db_communication.py: QmeDD4DsaJAvmWisw7C6sPobEM1KCYmaWA4DWu8xEWzrwb
+  dex_wrapper.py: QmaPpUySQvS6Kovgg9GgQ8Je2PRc6vDGNBvRpJ6fWrRYTf
+  dialogues.py: QmXeMZdN2fTesDrJ3fpAMj1YT6Z6aGsunXMo6g4DPboMge
+  handlers.py: QmaR4vFn6FN7SSY3SDNYBRm2v5Qbbp9Ej3Z1K7BF79ACU5
+  strategy.py: QmdXkyoyPU618q9QJqhkpzmm4FkgZW2gJ2VL81QZU1wWuL
+  web_server.py: QmR9UwS5vUx5oBQmXbGSYR15AcR221QpVNa4HwDLJVXY97
+fingerprint_ignore_patterns: []
 handlers:
   contract_api:
     args: {}
@@ -52,6 +60,7 @@ handlers:
   signing:
     args: {}
     class_name: SigningHandler
+license: Apache-2.0
 models:
   contract_api_dialogues:
     args: {}
@@ -70,29 +79,21 @@ models:
     class_name: SigningDialogues
   strategy:
     args:
-      calloptions: ''
-      ercpool: ''
-      ethpool: ''
-      exchange: ''
+      calloptions: '0x119Cb9c643CDC09d139b5912Ea99AA20C9d3e51D'
+      ercpool: '0xf1495eA173F59923aff8c8FCc48800255e4d1eDF'
+      ethpool: '0x11a20C74dc8de8359116CaA6b93F431D7f887282'
+      exchange: '0x9cCA28d98EC895c50C266b7f138dD6316aADB52A'
       ledger_id: ethereum
-      pricefeed: ''
-      putoptions: ''
-      stablecoin: ''
+      pricefeed: '0x4a41672e9a217C3193b12483400b03CE1851e145'
+      putoptions: '0x9b4e383192a089C8177f5E1293FC037956Cfd884'
+      stablecoin: '0xE6042703475D0dd1bC2eB564a55F1832c2527171'
     class_name: Strategy
-dependencies:
-  vyper:
-    version: ==0.1.0b12
-  Flask:
-    version: ==1.0.4
-  Flask-Cors:
-    version: ==3.0.8
-  flask_restplus:
-    version: ==0.13.0
-  Werkzeug:
-    version: ==0.16.0
-  SQLAlchemy:
-    version: ==1.3.19
-  flask-sqlalchemy:
-    version: ==2.4.4
-  safrs:
-    version: ==2.9.3
+name: option_monitoring
+protocols:
+- fetchai/contract_api:0.2.0
+- fetchai/default:0.4.0
+- fetchai/fipa:0.5.0
+- fetchai/ledger_api:0.2.0
+- fetchai/signing:0.2.0
+skills: []
+version: 0.1.0

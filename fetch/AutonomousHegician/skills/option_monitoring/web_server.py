@@ -1,4 +1,4 @@
-
+from datetime import datetime, timedelta
 from sqlalchemy import BigInteger, Column, Integer, String, DateTime, Date
 from flask_sqlalchemy import SQLAlchemy
 from flask import Flask, request
@@ -7,14 +7,13 @@ from flask_restplus import Api, Resource
 import os
 import json
 from flask_restplus_sqlalchemy import ApiModelFactory
-my_path = os.path.dirname(__file__)
-DB_SOURCE = os.path.join(my_path, "hegic_option_data.db")
+import logging
+logger = logging.getLogger(__name__)
+from web3 import Web3
 
 
-DB_PATH = f'sqlite:///{DB_SOURCE}'
-print(DB_PATH)
 flask_app = Flask(__name__)  # Flask Application
-flask_app.config['SQLALCHEMY_DATABASE_URI'] = DB_PATH
+flask_app.config['SQLALCHEMY_DATABASE_URI'] = f"postgresql://admin:WKLpwoDJd03DJ423DJwlDJlaDJsdDJsdDJlDJsa@postgresdb:5432/cortex"
 flask_app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 # Create RestPlus API
 api = Api(flask_app,
@@ -28,8 +27,9 @@ db = SQLAlchemy()
 cors = CORS(flask_app)
 
 
-class ExecutionStrategy(db.Model): # note we need to import from this specific db instance for the api to generate the swagger documents
-    
+# note we need to import from this specific db instance for the api to generate the swagger documents
+class ExecutionStrategy(db.Model):
+
     __tablename__ = 'ExecutionStrategies'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -37,15 +37,21 @@ class ExecutionStrategy(db.Model): # note we need to import from this specific d
 
 
 class Option(db.Model):
+    is_submitted_for_estimate = False
+    is_estimated = False
+    is_submitted_for_deployment = False
+    is_deployed = False
+    is_execerised = False
+
     __tablename__ = 'Options'
 
-    id = db.Column(db.Integer, primary_key=True)
-    days = db.Column(db.Integer)
-    amount = db.Column(db.Float)
-    price = db.Column(db.Float)
-    strike_price = db.Column(db.Float)
+    id = db.Column(db.BigInteger(), primary_key=True)
+    ledger_id = db.Column(db.BigInteger())
+    period = db.Column(db.BigInteger())
+    amount = db.Column(db.BigInteger())
+    strike_price = db.Column(db.BigInteger())
+    fees = db.Column(db.String(255))
     option_type = db.Column(db.String)
-    params = db.Column(db.String(255))
     status_code_id = db.Column(db.ForeignKey('StatusCodes.id'))
     execution_strategy_id = db.Column(db.ForeignKey('ExecutionStrategies.id'))
     date_created = db.Column(db.DateTime)
@@ -58,8 +64,7 @@ class Option(db.Model):
         'StatusCode', primaryjoin='Option.status_code_id == StatusCode.id', backref='options')
 
     def as_dict(self):
-       return {c.name: getattr(self, c.name) for c in self.__table__.columns}
-   
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
 
 class Snapshot(db.Model):
@@ -72,7 +77,8 @@ class Snapshot(db.Model):
     address = db.Column(db.String(255))
 
     def as_dict(self):
-       return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
 
 class StatusCode(db.Model):
     __tablename__ = 'StatusCodes'
@@ -95,21 +101,44 @@ class HegicOptions(Resource):
         results = [f.as_dict() for f in db.session.query(Option).all()]
         for res in results:
             for k, v in res.items():
-                if k.find('date') >=0:
+                if k.find('date') >= 0:
                     res[k] = str(v)
         return results
 
-from datetime import datetime
+@api.route('/get_snapshots')
+class SnapShots(Resource):
+    def get(self):
+        db.create_all()
+        results = [f.as_dict() for f in db.session.query(Snapshot).all()]
+        for res in results:
+            for k, v in res.items():
+                if k.find('date') >= 0:
+                    res[k] = str(v)
+        return results
+
 @api.route('/create_new_option')
 class HegicOption(Resource):
-    @api.expect(option_model)
+    @api.expect(option_model, validate=False)
     def post(self):
-        res = json.loads(request.data)
-        dates = {k: datetime.fromisoformat(v[:-1], ) for k, v in res.items() if k.find("date") >=0}
-        res.update(dates)
-        db.session.add(Option(**res))
+        db.create_all()
+        res = json.loads(request.data)['data']
+        option = Option(period=res['period'] * 3600 * 24,
+               status_code_id=0,
+               execution_strategy_id=0,
+               option_type=res['type_of_option'],
+               amount=Web3.toWei(res['amount'], "ether"),
+               strike_price=res['strike_price'],
+               date_created=datetime.now(),
+               date_modified=datetime.now(),
+               expiration_date=datetime.now() + timedelta(days=res['period']),
+               )
+        db.session.add(option)
         db.session.commit()
         return 200
+
+
+def run_server(**kwargs):
+    flask_app.run(debug=False, host="0.0.0.0", port=8080, **kwargs)
 
 
 if __name__ == '__main__':

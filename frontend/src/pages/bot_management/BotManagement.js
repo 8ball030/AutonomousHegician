@@ -12,10 +12,10 @@ import PageTitle from "../../components/PageTitle";
 import Widget from "../../components/Widget";
 
 // Charts
-import Table from "./AgentStatusTable.js";
 import Performance from "./bot_performance.js";
 import Assets from "./bot_assets.js";
-
+import OptionForm from "./OptionForm.js";
+import Equity from "./Equity.js";
 // data
 const agent_data= [
     {
@@ -61,8 +61,15 @@ export default function BotManagement() {
       <PageTitle title="Agent Management" />
       <Grid container spacing={4}>
         <Grid item xs={6}>
+          <Widget title="Agent Equity" upperTitle noBodyPadding>
+            <Equity/>
+          </Widget>
+        </Grid>
+      </Grid>
+      <Grid container spacing={4}>
+        <Grid item xs={6}>
           <Widget title="Submit New Option" upperTitle noBodyPadding>
-            <Table data={agent_data} />
+            <OptionForm/>
           </Widget>
         </Grid>
         <Grid item xs={12}>

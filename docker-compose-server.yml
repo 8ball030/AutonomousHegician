@@ -1,0 +1,52 @@
+version: "3.0"
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile-prod
+    volumes:
+      - './frontend:/app'
+      - './frontend/node_modules:/app/node_modules'
+    ports:
+        - '80:80'
+    environment:
+      - VIRTUAL_HOST=rae.cloud
+      - NODE_ENV=development
+
+  postgresdb:
+    ports:
+      - "5432:5432"
+    image: postgres:latest
+    volumes:
+        - ./persistant_data/postgres:/var/lib/postgresql/data
+    environment:
+        POSTGRES_DB: cortex
+        POSTGRES_USER: admin
+        POSTGRES_PASSWORD: WKLpwoDJd03DJ423DJwlDJlaDJsdDJsdDJlDJsa
+
+  ganachecli:
+    build: 
+      context: ./ganachecli/
+      dockerfile: Dockerfile
+    ports:
+      - "7545:7545"
+    volumes:
+      - ./persistant_data/ganache_data:/ganache_data
+
+  agents:
+    environment:
+      TESTS: "False"
+      DEBUG: "False"
+      RUN_CMD: "pipenv run launch_demo"
+    build:
+      context: ./fetch
+      dockerfile: Dockerfile
+    depends_on:
+      - postgresdb
+      - ganachecli
+    ports:
+      - '8080:8080'
+    volumes:
+      - './fetch:/app'
+      - './hegic_contracts/:/app/hegic_contracts'
+    restart: always

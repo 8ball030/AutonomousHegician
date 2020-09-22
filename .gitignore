@@ -25,7 +25,7 @@ wheels/
 *.egg
 MANIFEST
 Pipfile.lock
-
+persistant_data/postgres/
 # PyInstaller
 #  Usually these files are written by a python script from a template
 #  before PyInstaller builds the exe, so as to inject date/other infos into it.
@@ -48,6 +48,7 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 
+manual_ganache/node_modules/
 # Translations
 *.mo
 *.pot

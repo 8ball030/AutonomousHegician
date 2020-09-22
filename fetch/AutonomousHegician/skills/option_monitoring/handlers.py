@@ -313,6 +313,7 @@ class LedgerApiHandler(Handler):
                 ledger_api_msg.ledger_id, ledger_api_msg.balance,
             )
         )
+        self.context.strategy.eth_balance = ledger_api_msg.balance
 
     def _handle_transaction_digest(
         self, ledger_api_msg: LedgerApiMessage, ledger_api_dialogue: LedgerApiDialogue
@@ -350,7 +351,7 @@ class LedgerApiHandler(Handler):
         :param ledger_api_dialogue: the ledger api dialogue
         """
         strategy = cast(Strategy, self.context.strategy)
-        self.context.logger.info(strategy.deployment_status)
+#        self.context.logger.info(strategy.deployment_status)
         is_transaction_successful = EthereumHelper.is_transaction_settled(
             ledger_api_msg.transaction_receipt.receipt
         )
@@ -359,6 +360,9 @@ class LedgerApiHandler(Handler):
             elif status[1] == ledger_api_dialogue.associated_signing_dialogue.associated_contract_api_dialogue.dialogue_label.dialogue_reference[0]:
                 self.context.logger.info("Successfully retrieved deployment {contract}".format(contract=contract))
                 self.context.strategy.deployment_status[contract] = ("deployed", ledger_api_msg.transaction_receipt.receipt["contractAddress"])
+                self.context.logger.info(f"********************* {ledger_api_msg.transaction_receipt.receipt['contractAddress']}  Retireved and stored)")
+                if contract =="options_create_call_option" or "options_create_put_option":
+                    self.context.strategy.update_option(self.context.strategy.current_order_id, {"status_code_id": 3})
                 self.context.strategy.deployment_status["status"] = "pending"
         if is_transaction_successful:
             self.context.logger.info(

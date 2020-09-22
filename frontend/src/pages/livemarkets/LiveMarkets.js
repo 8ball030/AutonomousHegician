@@ -14,13 +14,10 @@ import PageTitle from "../../components/PageTitle";
 import { Typography } from "../../components/Wrappers";
 
 
-import Highcharts from 'highcharts';
-import HighchartsReact from 'highcharts-react-official';
 
 import TradingViewWidget, { Themes } from 'react-tradingview-widget';
 // charts
-import OrderTable from "./order_tables.js";
-
+import OptionList from "./OptionList.js";
 
 
 export default function Dashboard(props) {
@@ -42,19 +39,22 @@ export default function Dashboard(props) {
             className={classes.card}>
             <TradingViewWidget
                  symbol="FTX:ETHPERP"
-                 theme={Themes.LIGHT}
+                 theme={Themes.DARK}
+
+//                 width="580"
+//                height="610"
                  locale="en"
-                 autosize/>
+                 />
           </Widget>
         </Grid>
         <Grid item lg={8} md={8} sm={8} xs={12}>
           <Widget
-            title="Options"
+            title="Current Options"
             upperTitle
             bodyClass={classes.fullHeightBody}
             className={classes.card}>
                 <div>
-                  <OrderTable/>
+                  <OptionList/>
                 </div>
           </Widget>
         </Grid>
