@@ -7,6 +7,7 @@ import {
   Menu,
   MenuItem,
   Fab,
+  Link
 } from "@material-ui/core";
 import {
   Menu as MenuIcon,
@@ -23,7 +24,7 @@ import classNames from "classnames";
 import useStyles from "./styles";
 
 // components
-import { Badge, Typography} from "../Wrappers/Wrappers";
+import { Badge, Typography, Button } from "../Wrappers/Wrappers";
 import Notification from "../Notification/Notification";
 import UserAvatar from "../UserAvatar/UserAvatar";
 
@@ -136,7 +137,7 @@ export default function Header(props) {
           )}
         </IconButton>
         <Typography variant="h6" weight="medium" className={classes.logotype}>
-          Trader Toolkit v0.1
+          Autonomous Hegician
         </Typography>
         <div className={classes.grow} />
         <div

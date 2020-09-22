@@ -1,4 +1,5 @@
-import React from "react";
+import { Component } from 'react';
+import React, { useState } from "react";
 import {
   Grid,
 } from "@material-ui/core";
@@ -10,25 +11,27 @@ import useStyles from "./styles";
 // components
 import Widget from "../../components/Widget";
 import PageTitle from "../../components/PageTitle";
+import { Typography } from "../../components/Wrappers";
 
 
 
 import TradingViewWidget, { Themes } from 'react-tradingview-widget';
 // charts
-import OrderTable from "./order_tables.js";
-
+import OptionList from "./OptionList.js";
 
 
 export default function Dashboard(props) {
   var classes = useStyles();
   var theme = useTheme();
 
+  // local
+  var [mainChartState, setMainChartState] = useState("monthly");
 
   return (
-    <div>
+    <>
       <PageTitle title="Live Markets View" button="Refresh" />
       <Grid container spacing={4}>
-        <Grid item xs={6} cellHeight={180}>
+        <Grid item lg={8} md={8} sm={8} xs={8}>
           <Widget
             title="Live Price Feed"
             upperTitle
@@ -36,24 +39,31 @@ export default function Dashboard(props) {
             className={classes.card}>
             <TradingViewWidget
                  symbol="FTX:ETHPERP"
-                 theme={Themes.LIGHT}
+                 theme={Themes.DARK}
+
+//                 width="580"
+//                height="610"
                  locale="en"
-                 height={600}/>
+                 />
           </Widget>
         </Grid>
-        <Grid item xs={6}>
+        <Grid item lg={8} md={8} sm={8} xs={12}>
           <Widget
-            title="Options"
+            title="Current Options"
             upperTitle
             bodyClass={classes.fullHeightBody}
             className={classes.card}>
                 <div>
-                  <OrderTable/>
+                  <OptionList/>
                 </div>
           </Widget>
         </Grid>
       </Grid>
-      </div>
+        <Grid item xs={12}>
+
+        </Grid>
+
+    </>
   );
 }
 

@@ -2,6 +2,7 @@ import React from "react";
 import {
   Route,
   Switch,
+  Redirect,
   withRouter,
 } from "react-router-dom";
 import classnames from "classnames";
@@ -14,6 +15,12 @@ import Header from "../Header";
 import Sidebar from "../Sidebar";
 
 // pages
+import Typography from "../../pages/typography";
+import Notifications from "../../pages/notifications";
+import Maps from "../../pages/maps";
+import Tables from "../../pages/tables";
+import Icons from "../../pages/icons";
+import Charts from "../../pages/charts";
 
 
 import BotManagement from "../../pages/bot_management/";

@@ -1,23 +1,19 @@
 # base image
-FROM ubuntu:latest
-RUN apt-get update -y
-RUN apt-get upgrade -y
-RUN DEBIAN_FRONTEND="noninteractive" apt-get -y install tzdata
+FROM node:12.2.0-alpine
 
-RUN apt-get install curl -y
-RUN curl -sL https://deb.nodesource.com/setup_12.x | bash
-RUN apt-get install nodejs -y
-RUN node -v
-RUN npm -v
-
+# set working directory
 WORKDIR /app
 
+# add `/app/node_modules/.bin` to $PATH
 ENV PATH /app/node_modules/.bin:$PATH
 
-COPY package.json .
-RUN npm install react-scripts@3.0.1 -g  --silent
+COPY . /app
+
+# install and cache app dependencies
+COPY package.json /app/package.json
+RUN npm install react-scripts@3.0.1 -g --silent
 RUN npm install --silent
 
-COPY . /app
 # start app
 CMD ["npm", "start"]
+
