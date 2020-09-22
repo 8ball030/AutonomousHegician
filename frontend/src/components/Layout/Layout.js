@@ -25,7 +25,7 @@ import Charts from "../../pages/charts";
 
 import BotManagement from "../../pages/bot_management/";
 import LiveMarkets from "../../pages/livemarkets/";
-
+import AboutPage from "../../pages/typography";
 
 // context
 import { useLayoutState } from "../../context/LayoutContext";
@@ -50,6 +50,7 @@ function Layout(props) {
             <Switch>
               <Route path="/app/livemarkets" component={LiveMarkets} />
               <Route path="/app/bot_management" component={BotManagement} />
+              <Route path="/app/about_page" component={AboutPage} />
             </Switch>
           </div>
         </>

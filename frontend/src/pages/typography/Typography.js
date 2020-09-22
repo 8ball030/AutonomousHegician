@@ -14,108 +14,86 @@ export default function TypographyPage() {
 
   return (
     <>
-      <PageTitle title="Typography" />
+      <PageTitle title="About the Autonomous Hegician" />
       <Grid container spacing={4}>
         <Grid item xs={12} md={6}>
-          <Widget title="Headings" disableWidgetMenu>
+          <Widget title="Features" disableWidgetMenu>
             <div className={classes.dashedBorder}>
-              <Typography variant="h1" className={classes.text}>
-                h1. Heading
+              <Typography variant="h6" color="info" className={classes.text}>
+                - Monitor Wallet Equity Over Time.
               </Typography>
-              <Typography variant="h2" className={classes.text}>
-                h2. Heading
+              <Typography variant="h6" color="info" className={classes.text}>
+                - Create New Option Contracts.
               </Typography>
-              <Typography variant="h3" className={classes.text}>
-                h3. Heading
+              <Typography variant="h6" color="info" className={classes.text}>
+                - Implement Advanced Order Types.
               </Typography>
-              <Typography variant="h4" className={classes.text}>
-                h4. Heading
+              <Typography variant="h6" color="info" className={classes.text}>
+                - Manage Your Outstanding Positions.
+              </Typography>
+              <Typography variant="h6" color="info" className={classes.text}>
+                - Light-weight application.
+              </Typography>
+              <Typography variant="h6" color="info" className={classes.text}>
+                - Fully Open source code base. Read the code running your strategies.
+              </Typography>
+              <Typography variant="h6" color="info" className={classes.text}>
+                - Real-time Price Feed.
+              </Typography>
+            </div>
+          </Widget>
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <Widget title="Benefits" disableWidgetMenu>
+            <div className={classes.dashedBorder}>
+              <Typography variant="h6" color="info" className={classes.text}>
+                - Your Keys Your Crypto.
+              </Typography>
+              <Typography variant="h6" color="info" className={classes.text}>
+                - Manages your DeFi Options positions, so you dont have to.
+              </Typography>
+              <Typography variant="h6" color="info" className={classes.text}>
+                - Advanced Order Types. Auto In the Money Closure, Take Profit.
+              </Typography>
+              <Typography variant="h6" color="info" className={classes.text}>
+                - Run the application on a raspberry pi.
+              </Typography>
+              <Typography variant="h6" color="info" className={classes.text}>
+                - Stop leaving money on the table.
+              </Typography>
+              <Typography variant="h6" color="info" className={classes.text}>
+                - No need to monitor the price, the AH does it for you. Never miss a move.
+              </Typography>
+            </div>
+          </Widget>
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <Widget title="About" disableWidgetMenu color="primary">
+            <div className={classes.dashedBorder}>
+              <Typography variant="h5" className={classes.text}>
+                The Autonomous Hegician is an agent based approach to managing Hegic Options Contracts, built on the Fetch.ai Tech stack.
               </Typography>
               <Typography variant="h5" className={classes.text}>
-                h5. Heading
+                By using an agent based approach, the AH is able to implement a number of advanced features beyond the standard functionality of traditional Smart Contracts, whilst ensuring that the user is fully in control of their private keys.
               </Typography>
-              <Typography variant="h6">h6. Heading</Typography>
-            </div>
-          </Widget>
-        </Grid>
-        <Grid item xs={12} md={6}>
-          <Widget title="Typography Colors" disableWidgetMenu>
-            <div className={classes.dashedBorder}>
-              <Typography variant="h1" color="primary" className={classes.text}>
-                h1. Heading
-              </Typography>
-              <Typography variant="h2" color="success" className={classes.text}>
-                h2. Heading
-              </Typography>
-              <Typography
-                variant="h3"
-                color="secondary"
-                className={classes.text}
-              >
-                h3. Heading
-              </Typography>
-              <Typography variant="h4" color="warning" className={classes.text}>
-                h4. Heading
-              </Typography>
-              <Typography
-                variant="h5"
-                color="primary"
-                colorBrightness="light"
-                className={classes.text}
-              >
-                h5. Heading
-              </Typography>
-              <Typography variant="h6" color="info">
-                h6. Heading
+              <Typography variant="h5" className={classes.text}>
+                As our objective is to level the playing field between advanced traders and retail by providing easy to use tools, the AH is designed to run on a raspberry pi.
               </Typography>
             </div>
           </Widget>
         </Grid>
         <Grid item xs={12} md={6}>
-          <Widget title="Basic Text Settings" disableWidgetMenu>
+          <Widget title="Usage" disableWidgetMenu color="primary">
             <div className={classes.dashedBorder}>
-              <Typography className={classes.text}>Basic text</Typography>
-              <Typography className={classes.text} weight="light">
-                Basic light text
+              <Typography variant="h5" className={classes.text}>
+                Running the Autonomous Hegician will create an agent with a unique Ethereum Identity.
               </Typography>
-              <Typography className={classes.text} weight="medium">
-                Basic medium text
+              <Typography variant="h5" className={classes.text}>
+                Transfer the Agent an amount of Ethereum and create a new options contract, specifying the type of managed order.
               </Typography>
-              <Typography className={classes.text} weight="bold">
-                Basic bold text
-              </Typography>
-              <Typography className={classes.text}>
-                BASIC UPPERCASE TEXT
-              </Typography>
-              <Typography className={classes.text}>
-                basic lowercase text
-              </Typography>
-              <Typography className={classes.text}>
-                Basic Capitalized Text
-              </Typography>
-              <Typography>
-                <i>Basic Cursive Text</i>
-              </Typography>
-            </div>
-          </Widget>
-        </Grid>
-        <Grid item xs={12} md={6}>
-          <Widget title="Text Size" disableWidgetMenu>
-            <div className={classes.dashedBorder}>
-              <Typography className={classes.text} size="sm">
-                Heading Typography SM Font Size
-              </Typography>
-              <Typography className={classes.text}>
-                Heading Typography Regular Font Size
-              </Typography>
-              <Typography className={classes.text} size="md">
-                Heading Typography MD Font Size
-              </Typography>
-              <Typography className={classes.text} size="xl">
-                Heading Typography XL Font Size
-              </Typography>
-              <Typography className={classes.text} size="xxl">
-                Heading Typography XXL Font Size
+              <Typography variant="h5" className={classes.text}>
+                The AH will now monitor this position and when the appropriate conditions are met, the AH will execute the appropriate action.
+
               </Typography>
             </div>
           </Widget>

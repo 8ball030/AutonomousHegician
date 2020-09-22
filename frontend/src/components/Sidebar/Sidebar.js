@@ -32,7 +32,8 @@ import {
 } from "../../context/LayoutContext";
 
 const structure = [
-  { id: 1, label: "Live Markets", link: "/app/livemarkets", icon: <IndustryIcon/> },
+  { id: 1, label: "About The AH", link: "/app/about_page", icon: <HomeIcon/> },
+  { id: 2, label: "Live Markets", link: "/app/livemarkets", icon: <IndustryIcon/> },
   { id: 3, label: "Bot Management", link: "/app/bot_management", icon: <RobotIcon/> },
 //    id: 5,
 //    label: "Notifications",
