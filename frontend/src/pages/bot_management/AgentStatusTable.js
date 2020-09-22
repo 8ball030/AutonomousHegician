@@ -8,7 +8,8 @@ import {
   FormControlLabel,
   Input,
   Button,
-  TextField
+  TextField,
+  Typography,
 } from "@material-ui/core";
 
 class Contact extends React.Component {
@@ -85,7 +86,7 @@ class Contact extends React.Component {
         }}
       >
         <form style={{ width: "50%" }}>
-          <h1>Contract Management</h1>
+          <Typography variant="h2">Contract Management</Typography>
 
           <FormControl margin="normal" fullWidth>
             <InputLabel htmlFor="optionID">Option Id</InputLabel>

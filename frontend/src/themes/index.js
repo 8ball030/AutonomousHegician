@@ -4,7 +4,10 @@ import { createMuiTheme } from "@material-ui/core";
 
 const overrides = {
   typography: {
-    fontFamily: ['Jura', 'sans-serif'],
+    fontFamily: [
+      "jura",
+      "sans-serif"
+    ].join(","),
     h1: {
       fontSize: "3rem",
     },

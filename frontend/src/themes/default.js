@@ -76,6 +76,11 @@ export default {
       "0px 12px 33px 0px #E8EAFC, 0 3px 3px -2px #B2B2B21A, 0 1px 8px 0 #9A9A9A1A",
   },
   overrides: {
+    MuiCssBaseline: {
+      '@global': {
+        '@font-face': 'jura',
+      }
+    },
     MuiBackdrop: {
       root: {
         backgroundColor: "#4A4A4A1A",
