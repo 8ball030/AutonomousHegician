@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import {
   Grid,
   CircularProgress,
-  Typography,
   Button,
   Tabs,
   Tab,
@@ -11,13 +10,14 @@ import {
 } from "@material-ui/core";
 import { withRouter } from "react-router-dom";
 import classnames from "classnames";
+import Widget from "../../components/Widget";
+import { Typography } from "../../components/Wrappers";
 
 // styles
 import useStyles from "./styles";
 
 // logo
-import logo from "./logo.svg";
-import google from "../../images/google.svg";
+import logo from "./logo.png";
 
 // context
 import { useUserDispatch, loginUser } from "../../context/UserContext";
@@ -38,10 +38,13 @@ function Login(props) {
   var [passwordValue, setPasswordValue] = useState("");
 
   return (
-    <Grid container className={classes.container}>
-      <div className={classes.logotypeContainer}>
-        <img src={logo} alt="logo" className={classes.logotypeImage} />
-        <Typography variant="h1">The Autonomous Hegician</Typography>
+    <>
+    <Grid container className={classes.container} jusify-content={"center"} alignItems={"center"}>
+        <Grid item xs={12} md={6}>
+          <Widget disableWidgetMenu>
+            <div className={classes.dashedBorder}>
+        <Typography variant="h1" jusify={"center"} alignItems={"center"}>The Autonomous Hegician</Typography>
+        <img src={logo} alt="logo" size="small" jusify={"center"} alignItems={"center"} width="600"/>
         <br></br>
       <Button
         disabled={isLoading}
@@ -58,11 +61,15 @@ function Login(props) {
         variant="contained"
         color="secondary"
         size="large"
+        margin-left={"auto"} alignItems={"center"} 
       >
         Enter
       </Button>
       </div>
-    </Grid>
+    </Widget>
+      </Grid>
+      </Grid>
+    </>
   );
 }
 
