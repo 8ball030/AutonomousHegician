@@ -39,12 +39,12 @@ function Login(props) {
 
   return (
     <>
-    <Grid container className={classes.container} jusify-content={"center"} alignItems={"center"}>
+    <Grid container className={classes.container} style={{marginTop: '40px'}}>
         <Grid item xs={12} md={6}>
           <Widget disableWidgetMenu>
-            <div className={classes.dashedBorder}>
-        <Typography variant="h1" jusify={"center"} alignItems={"center"}>The Autonomous Hegician</Typography>
-        <img src={logo} alt="logo" size="small" jusify={"center"} alignItems={"center"} width="600"/>
+            <div className={classes.dashedBorder} style={{textAlign: 'center'}}>
+        <Typography variant="h1">The Autonomous Hegician</Typography>
+        <img src={logo} alt="logo" style={{width: 200, margin: '50px auto', display: 'block'}} />
         <br></br>
       <Button
         disabled={isLoading}
@@ -61,7 +61,7 @@ function Login(props) {
         variant="contained"
         color="secondary"
         size="large"
-        margin-left={"auto"} alignItems={"center"} 
+        style={{margin: '0 auto', color: '#0a101f', display: 'block', backgroundColor: '#7fffd5'}}
       >
         Enter
       </Button>

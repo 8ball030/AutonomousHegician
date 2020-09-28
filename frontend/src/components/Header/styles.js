@@ -2,6 +2,11 @@ import { makeStyles } from "@material-ui/styles";
 import { fade } from "@material-ui/core/styles/colorManipulator";
 
 export default makeStyles(theme => ({
+  root: {
+    '& .MuiPaper-root': {
+      backgroundColor: '#0a101f',
+    }
+  },
   logotype: {
     color: "white",
     marginLeft: theme.spacing(2.5),
@@ -83,6 +88,9 @@ export default makeStyles(theme => ({
   },
   headerMenu: {
     marginTop: theme.spacing(7),
+    paper: {
+      backgroundColor: '#0a101f',
+    }
   },
   headerMenuList: {
     display: "flex",
@@ -110,6 +118,8 @@ export default makeStyles(theme => ({
   },
   profileMenu: {
     minWidth: 265,
+    backgroundColor: '#0a101f',
+    boxShadow: 'none',
   },
   profileMenuUser: {
     display: "flex",

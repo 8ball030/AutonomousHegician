@@ -223,7 +223,9 @@ const Header = ({ classes, isSidebarOpened, toggleSidebar, ...props }) => (
         open={Boolean(props.notificationsMenu)}
         anchorEl={props.notificationsMenu}
         onClose={props.closeNotificationsMenu}
-        className={classes.headerMenu}
+        //className={classes.headerMenu}
+        classes={{paper: classes.profileMenu}}
+        style={{backgroundColor: '#0a101f'}}
         disableAutoFocusItem
       >
         {notifications.map(notification => (
@@ -231,6 +233,8 @@ const Header = ({ classes, isSidebarOpened, toggleSidebar, ...props }) => (
             key={notification.id}
             onClick={props.closeNotificationsMenu}
             className={classes.headerMenuItem}
+            classes={{paper: classes.profileMenu}}
+            style={{backgroundColor: '#0a101f'}}
           >
             <Notification {...notification} typographyVariant="inherit" />
           </MenuItem>

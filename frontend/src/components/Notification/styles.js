@@ -1,9 +1,15 @@
 import { makeStyles } from "@material-ui/styles";
 
 export default makeStyles(theme => ({
+  root: {
+    '& .MuiPaper-root': {
+      backgroundColor: '#0a101f',
+    }
+  },
   notificationContainer: {
     display: "flex",
     alignItems: "center",
+    backgroundColor: '#0a101f',
   },
   notificationContained: {
     borderRadius: 45,

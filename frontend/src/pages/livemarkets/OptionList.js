@@ -38,10 +38,19 @@ class OptionList extends React.Component {
       },
     },
     MUIDataTableHeadCell: {
-        root: {
-          backgroundColor: "#121c36"
+      root: {
+          backgroundColor: "#0a101f !important"
       },
+      paper: {
+        backgroundColor: '#0a101f',
+      }
     },
+      MUIIconButton: {
+        label: {
+          backgroundColor: '#fff',
+          color: '#fff',
+        }
+      },
 
     MUIDataTable: {
       root: {
@@ -61,6 +70,9 @@ class OptionList extends React.Component {
       root: {
         backgroundColor: '#121c36',
       },
+      paper: {
+        backgroundColor: '#0a101f',
+      },
     },
     MUITableHead: {
       root: {
@@ -70,6 +82,7 @@ class OptionList extends React.Component {
     MuiTableCell: {
       root: {
         backgroundColor: '#121c36',
+        borderBottom: '1px solid rgba(255,255,255,0.1)',
       },
     },
     MUIDataTableSelectCell: {

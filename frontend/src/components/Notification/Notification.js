@@ -65,10 +65,7 @@ export default function Notification({ variant, ...props }) {
         [classes.notificationContainedShadowless]: props.shadowless,
       })}
       style={{
-        backgroundColor:
-          variant === "contained" &&
-          theme.palette[props.color] &&
-          theme.palette[props.color].main,
+        backgroundColor: '#0a101f',
       }}
     >
       <div

@@ -265,6 +265,7 @@ export default function Header(props) {
           anchorEl={notificationsMenu}
           onClose={() => setNotificationsMenu(null)}
           className={classes.headerMenu}
+          classes={{ paper: classes.profileMenu }}
           disableAutoFocusItem
         >
           {notifications.map(notification => (
