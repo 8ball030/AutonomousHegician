@@ -221,6 +221,32 @@ class MyScaffoldContract(Contract):
         return tx
 
     @classmethod
+    def get_pool(
+        cls,
+        ledger_api: LedgerApi,
+        contract_address: Address,
+        deployer_address: Address,
+        data: Optional[bytes] = b"",
+        gas: int = 300000,
+    ) -> Dict[str, Any]:
+        """
+        Get the transaction to create a batch of tokens.
+
+        :param ledger_api: the ledger API
+        :param deployer_address: the address of the deployer
+        :param args: the price
+        :param gas: the gas to be used
+        :return: the transaction object
+        """
+
+        # create the transaction dict
+        nonce = ledger_api.api.eth.getTransactionCount(deployer_address)
+        instance = cls.get_instance(ledger_api, contract_address)
+        tx = instance.functions.pool(
+        ).call()
+        return tx
+
+    @classmethod
     def _update_option_contract(cls, option_id, params):
         #option = DBCommunications.get_option(option_id)
         #option.update(params)

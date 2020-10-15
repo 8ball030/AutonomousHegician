@@ -33,7 +33,7 @@ contracts:
 behaviours:
   service_registration:
     args:
-      services_interval: 20
+      services_interval: 0.1
     class_name: ServiceRegistrationBehaviour
 handlers:
   contract_api:
@@ -72,14 +72,14 @@ models:
     class_name: SigningDialogues
   strategy:
     args:
-      calloptions: '0x299Aa5f5196743445dE12F0480F8E373bB13b63b'
-      ercpool: ''
-      ethpool: ''
-      exchange: '0xC1B7eb7592Ee186948962d00Ffd7967888bf57FD'
+      calloptions: '0x7f6e7067188509d5b2EC5010E7a4B7Bf10543D40'
+      ercpool: '0x9948cfAa3c9409a16fa02D7510517a1fff37Eae1'
+      ethpool: '0x5536Af2F0Cb1B6Ed1ceB786E811a4c7f51202fa0'
+      exchange: '0x6B6ab7Fea54E8111B76410B560E494290892EDE7'
       ledger_id: ethereum
-      pricefeed: '0xC794743D8Cd35dDC37deB5cf59Ac931c4F901e0a'
-      putoptions: '0x0e41655d8706caC32B5e1eDbFCfB4902338af0c2'
-      stablecoin: '0xdEfDD9BB08Caa90f12F90A0955CAEFCE3d2E32aF'
+      pricefeed: '0x5D54225429C6D87db9b4c18689fC2439Ca20afAb'
+      putoptions: '0x3C461095990f7F2001CbD6D0edBF646c73029a70'
+      stablecoin: '0xaAB445Cdb18787CbdA85Ab269E899B67ae79dF2c'
     class_name: Strategy
 dependencies:
   vyper:

@@ -436,11 +436,26 @@ class ContractApiHandler(Handler):
         ):
             self._handle_raw_transaction(
                 contract_api_msg, contract_api_dialogue)
+        elif (contract_api_msg.performative is ContractApiMessage.Performative.STATE):
+            self._handle_state(contract_api_msg, contract_api_dialogue)
+        
         elif contract_api_msg.performative == ContractApiMessage.Performative.ERROR:
             self._handle_error(contract_api_msg, contract_api_dialogue)
         else:
             self._handle_invalid(contract_api_msg, contract_api_dialogue)
 
+    def _handle_state(self, contract_api_msg: ContractApiMessage, contract_api_dialogue: ContractApiDialogue) -> None:
+        """Handle state reading of the contract apis."""
+        strategy = cast(Strategy, self.context.strategy)
+        contract_reference = contract_api_dialogue.dialogue_label.dialogue_reference[0]
+        for contract, status in self.context.strategy._deployment_status.items():
+            if status[0] is None:
+                continue
+            elif status[1] == contract_reference:
+                self.context.logger.info("retrieved deployment {contract}".format(contract=contract))
+                strategy.deployment_status[contract] = ("results", contract_api_msg.state.body)
+                self.context.strategy.deployment_status["status"] = "pending"
+        
     def teardown(self) -> None:
         """
         Implement the handler teardown.
