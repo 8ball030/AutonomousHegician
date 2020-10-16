@@ -71,8 +71,12 @@ class ServiceRegistrationBehaviour(TickerBehaviour):
             return
         strategy = cast(Strategy, self.context.strategy)
 
-        if strategy.deployment_status["stablecoin"][0] is None:
-            self._request_contract_deploy_transaction("stablecoin", {})
+        if strategy.deployment_status["wbtc"][0] is None:
+            self._request_contract_deploy_transaction("wbtc", {})
+
+        elif strategy.deployment_status["wbtc"][0] == "deployed" and \
+                strategy.deployment_status["hegic"][0] is None:
+            self._request_contract_deploy_transaction("hegic", {})
 
         elif strategy.deployment_status["stablecoin"][0] == "deployed" and \
                 strategy.deployment_status["pricefeed"][0] is None:
@@ -230,6 +234,8 @@ class ServiceRegistrationBehaviour(TickerBehaviour):
         """
         params = {"deployer_address": self.context.agent_address}
         params.update(parameters)
+        if params.get("args", None) is None:
+            params["args"] = []
         strategy = cast(Strategy, self.context.strategy)
         strategy.is_behaviour_active = False
         contract_api_dialogues = cast(

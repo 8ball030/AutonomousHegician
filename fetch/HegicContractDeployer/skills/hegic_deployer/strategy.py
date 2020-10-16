@@ -58,7 +58,9 @@ class Strategy(Model):
         self._deployment_status = {
         }
         not_deployed = 0
-        for contract in ["stablecoin", "pricefeed",
+        for contract in ["wbtc", 
+                         "hegic",
+                         "stablecoin", "pricefeed",
                          "exchange",
                          "calloptions",
                          "putoptions",

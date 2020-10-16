@@ -2,17 +2,17 @@ name: hegic_deployer
 author: eightballer
 version: 0.1.0
 type: skill
-description: The hegic deploy skill has the ability to deploy and interact with
-  the smart contracts.
+description: The hegic deploy skill has the ability to deploy and interact with the
+  smart contracts.
 license: Apache-2.0
 aea_version: '>=0.6.0, <0.7.0'
 fingerprint:
   README.md: QmZ7swVkRpmJbJZ2NoLb9CWwH8p3QjnjRJg71UbAXdrKyx
   __init__.py: Qmbm3ZtGpfdvvzqykfRqbaReAK9a16mcyK7qweSfeN5pq1
-  behaviours.py: Qmcr9SMJC82L2A9tG76nsitHiH3JogfWdPXnusSbWadccC
+  behaviours.py: QmcbdaVyi5EKWsixvu4NoetAeYS52kMQDGfszm3zv53jF8
   dialogues.py: QmcCbdxFM4SX3MgXDxxbsC66gp8QK3C4W2czniQ5oDNc7G
-  handlers.py: QmdFjFEarXivuDwn2Ucw9aXCmRdbFwRK23qz6u6thgjVnn
-  strategy.py: QmeoDg7UT5MG5khmrZna3v8HYrC6QJjjEV26kcq1mPs6yx
+  handlers.py: QmNqRH2mBtgUBYubAb3he28kAkgkEUEybN5JbHnunrgCpK
+  strategy.py: QmdNpHfQNbyx9HYjNLzhjPtehTkc9vT24FkaYzBWDpDppB
 fingerprint_ignore_patterns: []
 protocols:
 - fetchai/contract_api:0.4.0
@@ -22,14 +22,9 @@ protocols:
 - fetchai/oef_search:0.6.0
 - fetchai/signing:0.3.0
 skills: []
-contracts: 
-- eightballer/pricefeed:0.1.0
-- eightballer/stablecoin:0.1.0
-- eightballer/exchange:0.1.0
-- eightballer/calloptions:0.1.0
-- eightballer/putoptions:0.1.0
-- eightballer/ercpool:0.1.0
-- eightballer/ethpool:0.1.0
+contracts:
+- eightballer/hegic:0.1.0
+- eightballer/wbtc:0.1.0
 behaviours:
   service_registration:
     args:
@@ -72,15 +67,16 @@ models:
     class_name: SigningDialogues
   strategy:
     args:
-      calloptions: '0x7f6e7067188509d5b2EC5010E7a4B7Bf10543D40'
-      ercpool: '0x9948cfAa3c9409a16fa02D7510517a1fff37Eae1'
-      ethpool: '0x5536Af2F0Cb1B6Ed1ceB786E811a4c7f51202fa0'
-      exchange: '0x6B6ab7Fea54E8111B76410B560E494290892EDE7'
+      calloptions: ''
+      ercpool: ''
+      ethpool: ''
+      exchange: ''
       ledger_id: ethereum
-      pricefeed: '0x5D54225429C6D87db9b4c18689fC2439Ca20afAb'
-      putoptions: '0x3C461095990f7F2001CbD6D0edBF646c73029a70'
-      stablecoin: '0xaAB445Cdb18787CbdA85Ab269E899B67ae79dF2c'
+      pricefeed: ''
+      putoptions: ''
+      stablecoin: ''
     class_name: Strategy
 dependencies:
   vyper:
     version: ==0.1.0b12
+is_abstract: false
