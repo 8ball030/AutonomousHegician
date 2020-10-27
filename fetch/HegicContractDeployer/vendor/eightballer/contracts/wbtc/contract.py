@@ -19,7 +19,7 @@
 
 """This module contains the scaffold contract definition."""
 
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from aea.contracts.base import Contract
 from aea.crypto.base import LedgerApi
@@ -27,6 +27,88 @@ from aea.crypto.base import LedgerApi
 
 class FakeWBTC(Contract):
     """The scaffold contract class for a smart contract."""
+
+    @classmethod
+    def mint(
+        cls,
+        ledger_api: LedgerApi,
+        contract_address: str,
+        deployer_address: str,
+        args: list,
+        data: Optional[bytes] = b"",
+        gas: int = 300000,
+    ) -> Dict[str, Any]:
+        """
+        Get the transaction to create a single token.
+        :param ledger_api: the ledger API
+        :param contract_address: the address of the contract
+        :param deployer_address: the address of the deployer
+        :param token_id: the token id for creation
+        :param data: the data to include in the transaction
+        :param gas: the gas to be used
+        :return: the transaction object
+        """
+        # create the transaction dict
+        nonce = ledger_api.api.eth.getTransactionCount(deployer_address)
+        instance = cls.get_instance(ledger_api, contract_address)
+        tx = instance.functions.mint(
+            *args
+        ).buildTransaction(
+            {
+                "from": deployer_address,
+                "value": 0,
+                "gas": gas,
+                "gasPrice": ledger_api.api.toWei("50", "gwei"),
+                "nonce": nonce,
+            }
+        )
+
+        instance.functions.mint(
+           *args 
+        ).call({"value": 0})
+        tx = cls._try_estimate_gas(ledger_api, tx)
+        return tx
+
+    @classmethod
+    def approve(
+        cls,
+        ledger_api: LedgerApi,
+        contract_address: str,
+        deployer_address: str,
+        args: list,
+        data: Optional[bytes] = b"",
+        gas: int = 300000,
+    ) -> Dict[str, Any]:
+        """
+        Get the transaction to create a single token.
+        :param ledger_api: the ledger API
+        :param contract_address: the address of the contract
+        :param deployer_address: the address of the deployer
+        :param token_id: the token id for creation
+        :param data: the data to include in the transaction
+        :param gas: the gas to be used
+        :return: the transaction object
+        """
+        # create the transaction dict
+        nonce = ledger_api.api.eth.getTransactionCount(deployer_address)
+        instance = cls.get_instance(ledger_api, contract_address)
+        tx = instance.functions.approve(
+            *args
+        ).buildTransaction(
+            {
+                "from": deployer_address,
+                "value": 0,
+                "gas": gas,
+                "gasPrice": ledger_api.api.toWei("50", "gwei"),
+                "nonce": nonce,
+            }
+        )
+
+        instance.functions.approve(
+           *args 
+        ).call({"value": 0})
+        tx = cls._try_estimate_gas(ledger_api, tx)
+        return tx
 
     @classmethod
     def get_deploy_transaction(

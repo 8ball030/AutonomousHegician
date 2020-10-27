@@ -16,26 +16,58 @@
 #   limitations under the License.
 #
 # ------------------------------------------------------------------------------
+
 """This module contains the scaffold contract definition."""
-import logging
+
+from typing import Any, Dict, Optional
+
 from aea.contracts.base import Contract
 from aea.crypto.base import LedgerApi
-from typing import List, Dict, Optional, Any
-from aea.mail.base import Address
-from aea.configurations.base import ContractConfig
-import os
-import json
-
-logger = logging.getLogger("aea.packages.fetchai.contracts.ethpool")
-logger.setLevel(logging.INFO)
 
 
-class MyScaffoldContract(Contract):
-    """
-    The scaffold contract class for an ethereum based smart contract.
+class HegicETHPool(Contract):
+    """The scaffold contract class for a smart contract."""
 
-    For non-ethereum based contracts import `from aea.contracts.base import Contract` and extend accordingly.
-    """
+    @classmethod
+    def provide_liquidity(
+        cls,
+        ledger_api: LedgerApi,
+        contract_address: str,
+        deployer_address: str,
+        args: list,
+        data: Optional[bytes] = b"",
+        gas: int = 300000,
+    ) -> Dict[str, Any]:
+        """
+        Get the transaction to create a single token.
+        :param ledger_api: the ledger API
+        :param contract_address: the address of the contract
+        :param deployer_address: the address of the deployer
+        :param token_id: the token id for creation
+        :param data: the data to include in the transaction
+        :param gas: the gas to be used
+        :return: the transaction object
+        """
+        # create the transaction dict
+        nonce = ledger_api.api.eth.getTransactionCount(deployer_address)
+        instance = cls.get_instance(ledger_api, contract_address)
+        tx = instance.functions.provide(
+            args[0]
+        ).buildTransaction(
+            {
+                "from": deployer_address,
+                "value": args[0],
+                "gas": gas,
+                "gasPrice": ledger_api.api.toWei("50", "gwei"),
+                "nonce": nonce,
+            }
+        )
+
+        instance.functions.provide(
+            args[0]
+        ).call({"value": args[0]})
+        tx = cls._try_estimate_gas(ledger_api, tx)
+        return tx
 
     @classmethod
     def get_deploy_transaction(
@@ -55,7 +87,8 @@ class MyScaffoldContract(Contract):
         :return: the transaction object
         """
 
-        contract_interface = cls.contract_interface.get(ledger_api.identifier, {})
+        contract_interface = cls.contract_interface.get(
+            ledger_api.identifier, {})
         nonce = ledger_api.api.eth.getTransactionCount(deployer_address)
         instance = ledger_api.get_contract_instance(contract_interface)
         constructed = instance.constructor(*args)
@@ -72,73 +105,53 @@ class MyScaffoldContract(Contract):
         tx = cls._try_estimate_gas(ledger_api, tx)
         return tx
 
-
     @classmethod
-    def provide_liquidity(
-        cls,
-        ledger_api: LedgerApi,
-        contract_address: Address,
-        deployer_address: Address,
-        amount: int,
-        data: Optional[bytes] = b"",
-        gas: int = 300000,
+    def get_raw_transaction(
+        cls, ledger_api: LedgerApi, contract_address: str, **kwargs
     ) -> Dict[str, Any]:
         """
-        Get the transaction to create a single token.
-        :param ledger_api: the ledger API
-        :param contract_address: the address of the contract
-        :param deployer_address: the address of the deployer
-        :param token_id: the token id for creation
-        :param data: the data to include in the transaction
-        :param gas: the gas to be used
-        :return: the transaction object
-        """
-        # create the transaction dict
-        nonce = ledger_api.api.eth.getTransactionCount(deployer_address)
-        instance = cls.get_instance(ledger_api, contract_address)
-        tx = instance.functions.provide(
-            amount
-        ).buildTransaction(
-            {
-                "from": deployer_address,
-                "value": ledger_api.api.toWei("5.5", "ether"),
-                "gas": gas,
-                "gasPrice": ledger_api.api.toWei("50", "gwei"),
-                "nonce": nonce,
-            }
-        )
+        Handler method for the 'GET_RAW_TRANSACTION' requests.
 
-        instance.functions.provide(
-            amount * 10
-        ).call({"value": 10000000000})
-        tx = cls._try_estimate_gas(ledger_api, tx)
-        return tx
+        Implement this method in the sub class if you want
+        to handle the contract requests manually.
+
+        :param ledger_api: the ledger apis.
+        :param contract_address: the contract address.
+        :return: the tx
+        """
+        raise NotImplementedError
 
     @classmethod
-    def get_pool(
-        cls,
-        ledger_api: LedgerApi,
-        contract_address: Address,
-        deployer_address: Address,
-        data: Optional[bytes] = b"",
-        gas: int = 300000,
+    def get_raw_message(
+        cls, ledger_api: LedgerApi, contract_address: str, **kwargs
     ) -> Dict[str, Any]:
         """
-        Get the transaction to create a batch of tokens.
+        Handler method for the 'GET_RAW_MESSAGE' requests.
 
-        :param ledger_api: the ledger API
-        :param deployer_address: the address of the deployer
-        :param args: the price
-        :param gas: the gas to be used
-        :return: the transaction object
+        Implement this method in the sub class if you want
+        to handle the contract requests manually.
+
+        :param ledger_api: the ledger apis.
+        :param contract_address: the contract address.
+        :return: the tx
         """
+        raise NotImplementedError
 
-        # create the transaction dict
-        nonce = ledger_api.api.eth.getTransactionCount(deployer_address)
-        instance = cls.get_instance(ledger_api, contract_address)
-        tx = instance.functions.pool(
-        ).call()
-        return tx
+    @classmethod
+    def get_state(
+        cls, ledger_api: LedgerApi, contract_address: str, **kwargs
+    ) -> Dict[str, Any]:
+        """
+        Handler method for the 'GET_STATE' requests.
+
+        Implement this method in the sub class if you want
+        to handle the contract requests manually.
+
+        :param ledger_api: the ledger apis.
+        :param contract_address: the contract address.
+        :return: the tx
+        """
+        raise NotImplementedError
 
     @staticmethod
     def _try_estimate_gas(ledger_api: LedgerApi,
@@ -152,11 +165,8 @@ class MyScaffoldContract(Contract):
         try:
             # try estimate the gas and update the transaction dict
             gas_estimate = ledger_api.api.eth.estimateGas(transaction=tx)
-            logger.info(
-                "[ethpool_contract]: gas estimate: {}".format(gas_estimate))
             tx["gas"] = gas_estimate
         except Exception as e:  # pylint: disable=broad-except
-            logger.info(
-                "[ethpool_contract]: Error when trying to estimate gas: {}".
-                format(e))
+            raise 
         return tx
+

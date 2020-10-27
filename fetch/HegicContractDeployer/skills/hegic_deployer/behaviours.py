@@ -19,7 +19,8 @@
 
 """This package contains the behaviour of a erc1155 deploy skill AEA."""
 
-from typing import cast, Dict, Any
+import web3
+from typing import cast, Dict, Any, Optional
 
 from aea.skills.behaviours import TickerBehaviour
 
@@ -38,8 +39,25 @@ DEFAULT_SERVICES_INTERVAL = 30.0
 LEDGER_API_ADDRESS = "fetchai/ledger:0.5.0"
 
 
+def toBTC(x):
+    return int(web3.Web3.toWei(x, "ether") / 1e10)
+
 class ServiceRegistrationBehaviour(TickerBehaviour):
     """This class implements a behaviour."""
+    params = {
+        "ETHPrice": 380*10**8,
+        "BTCPrice": 1161000000000,
+        "ETHtoBTC": int(((380*10**8) * 10000000000000000000000000000000) / 1161000000000),
+        "OptionType": {"Put": 1, "Call": 2}
+    }
+    provided_eth = False
+    tested_eth = False
+    tested_btc = False
+    provided_btc = False
+    btc_minted = False
+    btc_approved = False
+    run_contract_tests = False
+    monitoring = False
 
     def __init__(self, **kwargs):
         """Initialise the behaviour."""
@@ -69,6 +87,7 @@ class ServiceRegistrationBehaviour(TickerBehaviour):
                 "complete", "deploying"
         ]:
             return
+#         self.context.logger.info(f"strategy.deployment_status['status']")
         strategy = cast(Strategy, self.context.strategy)
 
         if strategy.deployment_status["wbtc"][0] is None:
@@ -78,54 +97,245 @@ class ServiceRegistrationBehaviour(TickerBehaviour):
                 strategy.deployment_status["hegic"][0] is None:
             self._request_contract_deploy_transaction("hegic", {})
 
-        elif strategy.deployment_status["stablecoin"][0] == "deployed" and \
-                strategy.deployment_status["pricefeed"][0] is None:
+        elif strategy.deployment_status["wbtc"][0] == "deployed" and \
+                strategy.deployment_status["priceprovider"][0] is None:
             self._request_contract_deploy_transaction(
-                "pricefeed", {"price": 200})
+                "priceprovider", {"args": [self.params["ETHPrice"]]}
+            )
 
-        elif strategy.deployment_status["pricefeed"][0] == "deployed" and \
+        elif strategy.deployment_status["priceprovider"][0] == "deployed" and \
+                strategy.deployment_status["btcpriceprovider"][0] is None:
+            self._request_contract_deploy_transaction(
+                "btcpriceprovider", {"args": [self.params["BTCPrice"]]}
+            )
+        elif strategy.deployment_status["btcpriceprovider"][0] == "deployed" and \
                 strategy.deployment_status["exchange"][0] is None:
-            self.context.logger.info(
-                strategy.deployment_status["pricefeed"][1])
             self._request_contract_deploy_transaction("exchange", {"args": [
-                strategy.deployment_status["pricefeed"][1],
-                strategy.deployment_status["stablecoin"][1],
+                strategy.deployment_status["wbtc"][1],
+                self.params["ETHtoBTC"],
             ]})
 
-        # now the 3 basic contracts are deployed, we can deploy the options contracts
+        # we additionally need to deploy the staking contracts
         elif strategy.deployment_status["exchange"][0] == "deployed" and \
-                strategy.deployment_status["calloptions"][0] is None:
-            self._request_contract_deploy_transaction("calloptions", {"args": [
-                strategy.deployment_status["pricefeed"][1], 
-                ]})
-        elif strategy.deployment_status["calloptions"][0] == "deployed" and \
-                strategy.deployment_status["putoptions"][0] is None:
-            self._request_contract_deploy_transaction("putoptions", {"args": [
-                strategy.deployment_status["stablecoin"][1], 
-                strategy.deployment_status["pricefeed"][1], 
-                strategy.deployment_status["exchange"][1], 
-                ]})
+                strategy.deployment_status["stakingwbtc"][0] is None:
+            self._request_contract_deploy_transaction("stakingwbtc", {"args": [
+                strategy.deployment_status["hegic"][1],
+                strategy.deployment_status["wbtc"][1],
+            ]})
 
-        elif strategy.deployment_status["putoptions"][0] == "deployed" and \
-                strategy.deployment_status["ethpool"][0] is None:
-         #    self._request_contract_state("calloptions", "get_pool", {})
-            self._request_contract_state("putoptions", "get_pool", {})
-            # self._request_contract_deploy_transaction("ethpool", {"args": [
-            #     strategy.deployment_status["stablecoin"][1], 
-            #     strategy.deployment_status["pricefeed"][1], 
-            #     strategy.deployment_status["exchange"][1], 
-            # ]})
+        elif strategy.deployment_status["stakingwbtc"][0] == "deployed" and \
+                strategy.deployment_status["stakingeth"][0] is None:
+            self._request_contract_deploy_transaction("stakingeth", {"args": [
+                strategy.deployment_status["hegic"][1],
+            ]})
+
+        elif strategy.deployment_status["exchange"][0] == "deployed" and \
+                strategy.deployment_status["ethoptions"][0] is None:
+            self._request_contract_deploy_transaction("ethoptions", {"args": [
+                strategy.deployment_status["priceprovider"][1],
+                strategy.deployment_status["stakingeth"][1],
+            ]})
+
+        elif strategy.deployment_status["ethoptions"][0] == "deployed" and \
+                strategy.deployment_status["btcoptions"][0] is None:
+            self._request_contract_deploy_transaction("btcoptions", {"args": [
+                strategy.deployment_status["btcpriceprovider"][1],
+                strategy.deployment_status["exchange"][1],
+                strategy.deployment_status["wbtc"][1],
+                strategy.deployment_status["stakingwbtc"][1],
+            ]})
+
         else:
-            
+
             # we now know that our base contracts are deployed, so we can retrieve state to the params to continue
-            
 
+            if strategy.deployment_status.get("ethoptions_get_pool", None) is None:
+                self._request_contract_state("ethoptions", "get_pool", {})
+            elif strategy.deployment_status.get("ethpool")[0] is None \
+                    and strategy.deployment_status["ethoptions_get_pool"][0] == "results":
+                strategy.deployment_status["ethpool"] = [
+                    "deployed", strategy.deployment_status["ethoptions_get_pool"][1]]
 
-            self.context.logger.info(f"Deployment complete! {self.context.strategy.deployment_status}")
-            self._request_contract_state("calloptions", "get_pool", {})
-            # self._request_contract_state("pricefeed", "get_latest_answer", {})
-            self.context.logger.info(f"Deployment complete! {self.context.strategy.deployment_status}")
-            
+            elif strategy.deployment_status.get("btcoptions_get_pool", None) is None and \
+                    strategy.deployment_status.get("ethpool",)[0] is not None:
+                self._request_contract_state("btcoptions", "get_pool", {})
+            elif strategy.deployment_status.get("btcpool")[0] is None \
+                    and strategy.deployment_status["btcoptions_get_pool"][0] == "results":
+                strategy.deployment_status["btcpool"] = [
+                    "deployed", strategy.deployment_status["btcoptions_get_pool"][1]]
+
+            elif self.run_contract_tests is False and self.monitoring is False:
+                # now we provide liquidity to the pool
+                if self.provided_eth is False:
+                    self._request_contract_interaction("ethpool", "provide_liquidity", {
+                                                       "args": [web3.Web3.toWei(1, "ether")]})
+                    self.provided_eth = True
+
+                elif self.provided_eth is True and self.btc_minted is False and self.provided_btc is False:
+                    self._request_contract_interaction(
+                        "wbtc", "mint", {"args": [100000000000]})
+                    self.btc_minted = True
+
+                elif self.btc_minted is True and self.btc_approved is False:
+                    self._request_contract_interaction("wbtc", "approve",
+                                                       {"args": [strategy.deployment_status["btcpool"][1],
+                                                                 100000000000]
+                                                        }
+                                                       )
+                    self.btc_approved = True
+
+                elif self.provided_eth is True and self.btc_minted is True and self.provided_btc is False:
+                    self._request_contract_interaction("btcpool", "provide_liquidity",
+                                                       {"args": [100000000000, 0]
+                                                        })
+                    self.provided_btc = True
+
+                elif self.provided_btc is True:
+                    self.run_contract_tests = True
+                    # here we should call the function to generate the new skill for the AH
+                    self.context.logger.info(
+                        f"Deployment complete! {self.context.strategy.deployment_status}")
+                    strategy.create_config_yaml()
+
+            elif self.run_contract_tests is True and self.monitoring is False:
+                if strategy.deployment_status.get("ethoptions_estimate")[0] is None:
+                    self.context.logger.info(
+                        f"**** Running Test of contract estimate.")
+                    self._request_contract_state("ethoptions", "estimate", {"period": 24 * 3600 * 1,
+                                                                            "amount": web3.Web3.toWei(0.1, "ether"),
+                                                                            "strike": self.params["ETHPrice"],
+                                                                            "type": self.params["OptionType"]["Call"]
+                                                                            },
+                                                 )
+
+                elif strategy.deployment_status.get("ethoptions_create_option")[0] is None:
+                    self.context.logger.info(
+                        f"**** Running Test of contract create.")
+                    self._request_contract_interaction("ethoptions", "create_option", {"period": 24 * 3600 * 1,
+                                                                                       "amount": web3.Web3.toWei(0.1, "ether"),
+                                                                                       "strike": self.params["ETHPrice"],
+                                                                                       "type": self.params["OptionType"]["Call"]
+                                                                                       },
+                                                       )
+                elif strategy.deployment_status.get("ethoptions_create_option")[0] == "deployed"\
+                        and strategy.deployment_status.get("ethoptions_estimate")[0] == "results" \
+                        and strategy.deployment_status.get("ethoptions_exercise")[0] is None:
+                    self.context.logger.info(
+                        f"**** Running Test of contract excercise.")
+                    option_id = strategy.deployment_status.get("ethoptions_estimate")[1]['option_id']
+                    self._request_contract_interaction("ethoptions", "exercise", {"option_id": option_id})
+                    
+                elif strategy.deployment_status.get("ethoptions_exercise") is not None and not self.tested_eth:
+                    self.context.logger.info(
+                        f"****Functionality Test of eth contracts complete!")
+                    self.tested_eth = True
+                    
+                
+                # now we test the btc contract. 
+
+                elif strategy.deployment_status.get("btcoptions_estimate")[0] is None:
+                    self.context.logger.info(
+                        f"**** Running Test of contract estimate.")
+                    self._request_contract_state("btcoptions", "estimate", {"period": 24 * 3600 * 1,
+                                                                            "amount": toBTC(0.1),
+                                                                            "strike": self.params["BTCPrice"],
+                                                                            "type": self.params["OptionType"]["Call"]
+                                                                            },
+                                                 )
+
+                elif strategy.deployment_status.get("btcoptions_create_option")[0] is None:
+                    self.context.logger.info(
+                        f"**** Running Test of contract create.")
+                    self._request_contract_interaction("btcoptions", "create_option", {"period": 24 * 3600 * 1,
+                                                                                       "amount": toBTC((0.1)),
+                                                                                       "strike": self.params["BTCPrice"],
+                                                                                       "type": self.params["OptionType"]["Call"]
+                                                                                       },
+                                                       )
+                elif strategy.deployment_status.get("btcoptions_create_option")[0] == "deployed"\
+                        and strategy.deployment_status.get("btcoptions_estimate")[0] == "results" \
+                        and strategy.deployment_status.get("btcoptions_exercise")[0] is None:
+                    self.context.logger.info(
+                        f"**** Running Test of contract excercise.")
+                    option_id = strategy.deployment_status.get("btcoptions_estimate")[1]['option_id']
+                    self._request_contract_interaction("btcoptions", "exercise", {"option_id": option_id})
+                    
+                elif strategy.deployment_status.get("btcoptions_exercise") is not None:
+                    self.context.logger.info(
+                        f"****Functionality Test of btc contracts complete!")
+                    import pdb
+                    pdb.set_trace()
+
+    def _option_interaction(self, option_type: str, act: str,
+                            params: Dict[str,
+                                         Any]) -> bool:
+        assert option_type in ["btc", "eth"]
+        assert act in [
+            "create_option", "exercise", "estimate"
+        ]
+        strategy = cast(Strategy, self.context.strategy)
+        strategy.deployment_status["status"] = "deploying"
+        strategy.is_behaviour_active = False
+        contract_api_dialogues = cast(ContractApiDialogues,
+                                      self.context.contract_api_dialogues)
+        params.update({"deployer_address": self.context.agent_address})
+        contract_api_msg, contract_api_dialogue = contract_api_dialogues.create(
+            counterparty=LEDGER_API_ADDRESS,
+            performative=ContractApiMessage.Performative.GET_RAW_TRANSACTION,
+            ledger_id=strategy.ledger_id,
+            contract_id=f"eightballer/{option_type}options:0.1.0",
+            contract_address=strategy.deployment_status[f"{option_type}options"][1],
+            callable=f"{act}",
+            kwargs=ContractApiMessage.Kwargs(params),
+        )
+        self.context.strategy.deployment_status[f"{option_type}options_{act}"] = (
+            "pending", contract_api_dialogue.dialogue_label.dialogue_reference[0])
+        contract_api_dialogue = cast(
+            ContractApiDialogue, contract_api_dialogue,)
+        contract_api_dialogue.terms = strategy.get_deploy_terms()
+        self.context.outbox.put_message(message=contract_api_msg)
+        self.context.logger.info(
+            f"contract deployer requesting {act} {option_type} transaction...")
+
+   # def _option_interaction(self, option_type: str, act: str,
+   #                        params: Dict[str,
+   #                                     Any], deployment_name: str) -> bool:
+   #    assert option_type in ["call", "put"]
+   #    assert act in [
+   #        "create_call_option", "options_estimate", "exercise_option"
+   #    ]
+
+    def _request_contract_interaction(self, contract_name: str, callable: str, parameters: dict) -> None:
+        """
+        Request contract interaction
+
+        :return: None
+        """
+        params = {"deployer_address": self.context.agent_address}
+        params.update(parameters)
+        strategy = cast(Strategy, self.context.strategy)
+        strategy.is_behaviour_active = False
+        contract_api_dialogues = cast(
+            ContractApiDialogues, self.context.contract_api_dialogues
+        )
+        contract_api_msg, contract_api_dialogue = contract_api_dialogues.create(
+            counterparty=LEDGER_API_ADDRESS,
+            performative=ContractApiMessage.Performative.GET_RAW_TRANSACTION,
+            ledger_id=strategy.ledger_id,
+            contract_id=f"eightballer/{contract_name}:0.1.0",
+            contract_address=strategy.deployment_status[contract_name][1],
+            callable=callable,
+            kwargs=ContractApiMessage.Kwargs(params),
+        )
+        contract_api_dialogue = cast(
+            ContractApiDialogue, contract_api_dialogue,)
+        contract_api_dialogue.terms = strategy.get_deploy_terms()
+        self.context.outbox.put_message(message=contract_api_msg)
+        strategy.deployment_status[f"{contract_name}_{callable}"] = (
+            "pending", contract_api_dialogue.dialogue_label.dialogue_reference[0])
+        strategy.deployment_status["status"] = "deploying"
+        self.context.logger.info(
+            f"**** requesting contract {contract_name} {callable} state transaction...")
 
     def _request_contract_state(self, contract_name: str, callable: str, parameters: dict) -> None:
         """
@@ -158,45 +368,6 @@ class ServiceRegistrationBehaviour(TickerBehaviour):
         strategy.deployment_status["status"] = "deploying"
         self.context.logger.info(
             f"requesting contract {contract_name} state transaction...")
-
-    
-
-    def _option_interaction(self, option_type: str, act: str,
-                            params: Dict[str,
-                                         Any], deployment_name: str) -> bool:
-        assert option_type in ["call", "put"]
-        assert act in [
-            "create_call_option", "options_estimate", "exercise_option"
-        ]
-        self.context.strategy.deployment_status["status"] = "deploying"
-        strategy = cast(Strategy, self.context.strategy)
-        strategy.is_behaviour_active = False
-        contract_api_dialogues = cast(ContractApiDialogues,
-                                      self.context.contract_api_dialogues)
-        deploy_ref = contract_api_dialogues.new_self_initiated_dialogue_reference(
-        )
-        params.update({"deployer_address": self.context.agent_address})
-        contract_api_msg = ContractApiMessage(
-            performative=ContractApiMessage.Performative.GET_RAW_TRANSACTION,
-            dialogue_reference=deploy_ref,
-            ledger_id=strategy.ledger_id,
-            contract_id=f"tomrae/{option_type}options:0.1.0",
-            contract_address=strategy.deployment_status[f"{option_type}options"][1],
-            callable=act,
-            kwargs=ContractApiMessage.Kwargs(params),
-        )
-        contract_api_msg.counterparty = LEDGER_API_ADDRESS
-        contract_api_dialogue = cast(
-            Optional[ContractApiDialogue],
-            contract_api_dialogues.update(contract_api_msg),
-        )
-        self.context.strategy.deployment_status[act] = (
-            "pending", deploy_ref[0])
-        assert contract_api_dialogue is not None, "ContractApiDialogue not generated"
-        contract_api_dialogue.terms = strategy.get_create_token_terms()
-        self.context.outbox.put_message(message=contract_api_msg)
-        self.context.logger.info(
-            f"contract deployer requesting {act} {option_type} transaction...")
 
     def teardown(self) -> None:
         """

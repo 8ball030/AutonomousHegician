@@ -349,10 +349,10 @@ class LedgerApiHandler(Handler):
                 self.context.logger.info("retrieved deployment {contract}".format(contract=contract))
                 strategy.deployment_status[contract] = ("deployed", ledger_api_msg.transaction_receipt.receipt["contractAddress"])
                 self.context.logger.info(f"** {ledger_api_msg.transaction_receipt.receipt['contractAddress']}  Retireved and stored)")
-                if contract in ["options_create_call_option", "options_create_put_option"]:
-                    import pdb;pdb.set_trace()
-                    self.context.strategy.update_option(
-                        self.context.strategy.current_order_id, {"status_code_id": 3})
+  #              if contract in ["ethoptions_create_option", "btcoptions_create_option"]:
+  #                     import pdb;pdb.set_trace()
+  #                  self.context.strategy.update_option(
+  #                     self.context.strategy.current_order_id, {"status_code_id": 3})
                 self.context.strategy.deployment_status["status"] = "pending"
         if is_transaction_successful:
             self.context.logger.info(
@@ -415,6 +415,7 @@ class ContractApiHandler(Handler):
         :param message: the message
         :return: None
         """
+        import pdb;set_trace()
         contract_api_msg = cast(ContractApiMessage, message)
 
         # recover dialogue
@@ -452,7 +453,7 @@ class ContractApiHandler(Handler):
             if status[0] is None:
                 continue
             elif status[1] == contract_reference:
-                self.context.logger.info("retrieved deployment {contract}".format(contract=contract))
+                self.context.logger.info("retrieved deployment {contract} state query".format(contract=contract))
                 strategy.deployment_status[contract] = ("results", contract_api_msg.state.body)
                 self.context.strategy.deployment_status["status"] = "pending"
         

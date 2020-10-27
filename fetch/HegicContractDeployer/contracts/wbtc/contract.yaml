@@ -8,7 +8,7 @@ aea_version: '>=0.6.0, <0.7.0'
 fingerprint:
   __init__.py: QmPBwWhEg3wcH1q9612srZYAYdANVdWLDFWKs7TviZmVj6
   build/contracts/FakeWBTC.json: QmcExLSRtTYtuN6ewHqHEfmMS5cpWVqAQS2ttc21gqjV8r
-  contract.py: QmZ56mUt2d8cuSzzyEmWHLrPzU6s9HmqN4J6cpCAqUC4RM
+  contract.py: QmX6URdFAtXnqqmY6iXiw5HkNv7QSBnMcGKd5QHseVkTnZ
 fingerprint_ignore_patterns: []
 class_name: FakeWBTC
 contract_interface_paths:
