@@ -22,19 +22,27 @@
 import logging
 from typing import Set, Tuple, cast
 
-from aea.configurations.base import ProtocolId
+from aea.configurations.base import PublicId
 from aea.exceptions import AEAEnforceError, enforce
 from aea.protocols.base import Message
-from aea.protocols.signing.custom_types import ErrorCode as CustomErrorCode
-from aea.protocols.signing.custom_types import RawMessage as CustomRawMessage
-from aea.protocols.signing.custom_types import RawTransaction as CustomRawTransaction
-from aea.protocols.signing.custom_types import SignedMessage as CustomSignedMessage
-from aea.protocols.signing.custom_types import (
+
+from packages.fetchai.protocols.signing.custom_types import ErrorCode as CustomErrorCode
+from packages.fetchai.protocols.signing.custom_types import (
+    RawMessage as CustomRawMessage,
+)
+from packages.fetchai.protocols.signing.custom_types import (
+    RawTransaction as CustomRawTransaction,
+)
+from packages.fetchai.protocols.signing.custom_types import (
+    SignedMessage as CustomSignedMessage,
+)
+from packages.fetchai.protocols.signing.custom_types import (
     SignedTransaction as CustomSignedTransaction,
 )
-from aea.protocols.signing.custom_types import Terms as CustomTerms
+from packages.fetchai.protocols.signing.custom_types import Terms as CustomTerms
 
-logger = logging.getLogger("aea.packages.fetchai.protocols.signing.message")
+
+_default_logger = logging.getLogger("aea.packages.fetchai.protocols.signing.message")
 
 DEFAULT_BODY_SIZE = 4
 
@@ -42,7 +50,7 @@ DEFAULT_BODY_SIZE = 4
 class SigningMessage(Message):
     """A protocol for communication between skills and decision maker."""
 
-    protocol_id = ProtocolId.from_str("fetchai/signing:0.3.0")
+    protocol_id = PublicId.from_str("fetchai/signing:0.6.0")
 
     ErrorCode = CustomErrorCode
 
@@ -212,7 +220,7 @@ class SigningMessage(Message):
             )
 
             # Check correct contents
-            actual_nb_of_contents = len(self.body) - DEFAULT_BODY_SIZE
+            actual_nb_of_contents = len(self._body) - DEFAULT_BODY_SIZE
             expected_nb_of_contents = 0
             if self.performative == SigningMessage.Performative.SIGN_TRANSACTION:
                 expected_nb_of_contents = 2
@@ -291,7 +299,7 @@ class SigningMessage(Message):
                     ),
                 )
         except (AEAEnforceError, ValueError, KeyError) as e:
-            logger.error(str(e))
+            _default_logger.error(str(e))
             return False
 
         return True

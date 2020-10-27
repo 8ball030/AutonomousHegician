@@ -19,7 +19,8 @@
 
 """This module contains the support resources for the signing protocol."""
 
-from aea.protocols.signing.message import SigningMessage
-from aea.protocols.signing.serialization import SigningSerializer
+from packages.fetchai.protocols.signing.message import SigningMessage
+from packages.fetchai.protocols.signing.serialization import SigningSerializer
+
 
 SigningMessage.serializer = SigningSerializer

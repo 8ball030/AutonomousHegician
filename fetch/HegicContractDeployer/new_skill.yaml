@@ -1,4 +1,4 @@
-aea_version: '>=0.6.0, <0.7.0'
+aea_version: ==0.7.0
 author: eightballer
 behaviours:
   service_registration:
@@ -6,17 +6,17 @@ behaviours:
       services_interval: 0.0001
     class_name: ServiceRegistrationBehaviour
 contracts:
-- eightballer/hegic:0.1.0
-- eightballer/wbtc:0.1.0
-- eightballer/priceprovider:0.1.0
-- eightballer/btcpriceprovider:0.1.0
-- eightballer/exchange:0.1.0
-- eightballer/ethoptions:0.1.0
 - eightballer/btcoptions:0.1.0
+- eightballer/btcpool:0.1.0
+- eightballer/btcpriceprovider:0.1.0
+- eightballer/ethoptions:0.1.0
+- eightballer/ethpool:0.1.0
+- eightballer/exchange:0.1.0
+- eightballer/hegic:0.1.0
+- eightballer/priceprovider:0.1.0
 - eightballer/stakingeth:0.1.0
 - eightballer/stakingwbtc:0.1.0
-- eightballer/ethpool:0.1.0
-- eightballer/btcpool:0.1.0
+- eightballer/wbtc:0.1.0
 dependencies:
   vyper:
     version: ==0.1.0b12
@@ -25,10 +25,10 @@ description: The hegic deploy skill has the ability to deploy and interact with 
 fingerprint:
   README.md: QmZ7swVkRpmJbJZ2NoLb9CWwH8p3QjnjRJg71UbAXdrKyx
   __init__.py: Qmbm3ZtGpfdvvzqykfRqbaReAK9a16mcyK7qweSfeN5pq1
-  behaviours.py: QmcbdaVyi5EKWsixvu4NoetAeYS52kMQDGfszm3zv53jF8
-  dialogues.py: QmcCbdxFM4SX3MgXDxxbsC66gp8QK3C4W2czniQ5oDNc7G
-  handlers.py: QmNqRH2mBtgUBYubAb3he28kAkgkEUEybN5JbHnunrgCpK
-  strategy.py: QmdNpHfQNbyx9HYjNLzhjPtehTkc9vT24FkaYzBWDpDppB
+  behaviours.py: QmSAgRqhYNfRFwWLhVFX7D4ysNjTEAcQ7vYndpQLqecTkw
+  dialogues.py: QmccbS2ZH32MVSdrxsuqcNBpKKLpdFsKPHzDs4yV8V8nGQ
+  handlers.py: QmV5uxrYj6AHUowrRfYZGDA9Uw2suTCs3JzDPdUmpBAqvQ
+  strategy.py: QmQc5hNVnjLRKs5T9NCTSSBBH8TwyeeHpQZJXmqXEx1Q9q
 fingerprint_ignore_patterns: []
 handlers:
   contract_api:
@@ -84,12 +84,12 @@ models:
     class_name: Strategy
 name: hegic_deployer
 protocols:
-- fetchai/contract_api:0.4.0
-- fetchai/default:0.5.0
-- fetchai/fipa:0.6.0
-- fetchai/ledger_api:0.3.0
-- fetchai/oef_search:0.6.0
-- fetchai/signing:0.3.0
+- fetchai/contract_api:0.7.0
+- fetchai/default:0.8.0
+- fetchai/fipa:0.9.0
+- fetchai/ledger_api:0.6.0
+- fetchai/oef_search:0.9.0
+- fetchai/signing:0.6.0
 skills: []
 type: skill
 version: 0.1.0

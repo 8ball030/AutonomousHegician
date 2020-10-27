@@ -36,6 +36,7 @@ from aea.skills.base import Model
 
 from packages.fetchai.contracts.erc1155.contract import ERC1155Contract
 
+
 DEFAULT_IS_LEDGER_TX = True
 DEFAULT_NFT = 1
 DEFAULT_FT = 2
@@ -83,7 +84,9 @@ class Strategy(Model):
 
         location = kwargs.pop("location", DEFAULT_LOCATION)
         self._agent_location = {
-            "location": Location(location["longitude"], location["latitude"])
+            "location": Location(
+                latitude=location["latitude"], longitude=location["longitude"]
+            )
         }
         self._set_service_data = kwargs.pop("service_data", DEFAULT_SERVICE_DATA)
         enforce(
@@ -98,7 +101,7 @@ class Strategy(Model):
         }
 
         super().__init__(**kwargs)
-
+        self._contract_id = str(ERC1155Contract.contract_id)
         self.is_behaviour_active = True
         self._is_contract_deployed = self._contract_address is not None
         self._is_tokens_created = self._token_ids is not None
@@ -112,6 +115,11 @@ class Strategy(Model):
     def ledger_id(self) -> str:
         """Get the ledger id."""
         return self._ledger_id
+
+    @property
+    def contract_id(self) -> str:
+        """Get the contract id."""
+        return self._contract_id
 
     @property
     def mint_quantities(self) -> List[int]:

@@ -129,15 +129,10 @@ class HegicETHOptions(Contract):
         ).buildTransaction(
             {
                 "from": deployer_address,
-                "gas": gas,
-                "gasPrice": ledger_api.api.toWei("50", "gwei"),
                 "value": fee_estimate[0],
                 "nonce": nonce,
             }
         )
-        import pdb
-#       id_ = instance.functions.create(period, amount, strike, type).transact(
-#           {'to': contract_address, 'from': deployer_address, "value": fee_estimate[0]})
         tx = cls._try_estimate_gas(ledger_api, tx)
         return tx
 

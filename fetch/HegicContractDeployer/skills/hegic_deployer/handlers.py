@@ -21,11 +21,17 @@
 
 from typing import Optional, cast
 
-from aea.configurations.base import ProtocolId
-from aea.crypto.ethereum import EthereumHelper
+# from aea.crypto.ethereum import LedgerApis
+# from aea.protocols.base import Message
+# from aea.protocols.default.message import DefaultMessage
+# from aea.protocols.signing.message import SigningMessage
+# from aea.skills.base import Handler
+
+
+
+from aea.configurations.base import PublicId
+from aea.crypto.ledger_apis import LedgerApis
 from aea.protocols.base import Message
-from aea.protocols.default.message import DefaultMessage
-from aea.protocols.signing.message import SigningMessage
 from aea.skills.base import Handler
 
 from packages.fetchai.protocols.contract_api.message import ContractApiMessage
@@ -47,8 +53,15 @@ from packages.eightballer.skills.hegic_deployer.dialogues import (
 )
 from packages.eightballer.skills.hegic_deployer.strategy import Strategy
 
+from packages.fetchai.protocols.contract_api.message import ContractApiMessage
+from packages.fetchai.protocols.default.message import DefaultMessage
+from packages.fetchai.protocols.fipa.message import FipaMessage
+from packages.fetchai.protocols.ledger_api.message import LedgerApiMessage
+from packages.fetchai.protocols.oef_search.message import OefSearchMessage
+from packages.fetchai.protocols.signing.message import SigningMessage
 
-LEDGER_API_ADDRESS = "fetchai/ledger:0.5.0"
+
+LEDGER_API_ADDRESS = "fetchai/ledger:0.8.0"
 
 
 class FipaHandler(Handler):
@@ -338,7 +351,8 @@ class LedgerApiHandler(Handler):
         :param ledger_api_message: the ledger api message
         """
         strategy = cast(Strategy, self.context.strategy)
-        is_transaction_successful = EthereumHelper.is_transaction_settled(
+        is_transaction_successful = LedgerApis.is_transaction_settled(
+            ledger_api_msg.transaction_receipt.ledger_id,
             ledger_api_msg.transaction_receipt.receipt
         )
         contract_reference = ledger_api_dialogue._associated_signing_dialogue._associated_contract_api_dialogue.dialogue_label.dialogue_reference[0]
@@ -350,7 +364,6 @@ class LedgerApiHandler(Handler):
                 strategy.deployment_status[contract] = ("deployed", ledger_api_msg.transaction_receipt.receipt["contractAddress"])
                 self.context.logger.info(f"** {ledger_api_msg.transaction_receipt.receipt['contractAddress']}  Retireved and stored)")
   #              if contract in ["ethoptions_create_option", "btcoptions_create_option"]:
-  #                     import pdb;pdb.set_trace()
   #                  self.context.strategy.update_option(
   #                     self.context.strategy.current_order_id, {"status_code_id": 3})
                 self.context.strategy.deployment_status["status"] = "pending"
@@ -415,7 +428,6 @@ class ContractApiHandler(Handler):
         :param message: the message
         :return: None
         """
-        import pdb;set_trace()
         contract_api_msg = cast(ContractApiMessage, message)
 
         # recover dialogue

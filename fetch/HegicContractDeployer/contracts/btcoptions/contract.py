@@ -16,7 +16,6 @@
 #   limitations under the License.
 #
 # ------------------------------------------------------------------------------
-
 """This module contains the scaffold contract definition."""
 
 from typing import Any, Dict, Optional
@@ -27,19 +26,18 @@ from aea.crypto.base import LedgerApi
 
 class HegicBTCOptions(Contract):
     """The scaffold contract class for a smart contract."""
-
     @classmethod
     def create_option(
-        cls,
-        ledger_api: LedgerApi,
-        contract_address: str,
-        deployer_address: str,
-        amount: int,
-        period: int,
-        strike: int,
-        type: int,
-        data: Optional[bytes] = b"",
-        gas: int = 300000,
+            cls,
+            ledger_api: LedgerApi,
+            contract_address: str,
+            deployer_address: str,
+            amount: int,
+            period: int,
+            strike: int,
+            type: int,
+            data: Optional[bytes] = b"",
+            gas: int = 300000,
     ) -> Dict[str, Any]:
         """
         Get the transaction to create a single token.
@@ -54,36 +52,32 @@ class HegicBTCOptions(Contract):
         # create the transaction dict
         nonce = ledger_api.api.eth.getTransactionCount(deployer_address)
         instance = cls.get_instance(ledger_api, contract_address)
-        fee_estimate = instance.functions.fees(
-            period, amount, strike, type
-        ).call()
-        import pdb;pdb.set_trace()
-        tx = instance.functions.create(
-            period, amount, strike, type
-        ).buildTransaction(
-            {
-                "from": deployer_address,
-                "value": fee_estimate[1],
-                "gas": gas,
-                "gasPrice": ledger_api.api.toWei("50", "gwei"),
-                "nonce": nonce,
-            }
-        )
+        fee_estimate = instance.functions.fees(period, amount, strike,
+                                               type).call()
+        tx = instance.functions.create(period, amount, strike,
+                                       type).buildTransaction({
+                                           "from":
+                                           deployer_address,
+                                           "value":
+                                           fee_estimate[1],
+                                           "nonce":
+                                           nonce,
+                                       })
         tx = cls._try_estimate_gas(ledger_api, tx)
         return tx
 
     @classmethod
     def estimate(
-        cls,
-        ledger_api: LedgerApi,
-        contract_address: str,
-        deployer_address: str,
-        amount: int,
-        period: int,
-        strike: int,
-        type: int,
-        data: Optional[bytes] = b"",
-        gas: int = 300000,
+            cls,
+            ledger_api: LedgerApi,
+            contract_address: str,
+            deployer_address: str,
+            amount: int,
+            period: int,
+            strike: int,
+            type: int,
+            data: Optional[bytes] = b"",
+            gas: int = 300000,
     ) -> Dict[str, Any]:
         """
         Get the transaction to create a single token.
@@ -98,29 +92,28 @@ class HegicBTCOptions(Contract):
         # create the transaction dict
         nonce = ledger_api.api.eth.getTransactionCount(deployer_address)
         instance = cls.get_instance(ledger_api, contract_address)
-        fee_estimate = instance.functions.fees(
-            period, amount, strike, type
-        ).call()
-        option_id = instance.functions.create(
-            period, amount, strike, type
-        ).call(
-            {
-                "from": deployer_address,
-                "to": contract_address,
-                "value": fee_estimate[1]
-            }
-        )
-        
+        fee_estimate = instance.functions.fees(period, amount, strike,
+                                               type).call()
+        option_id = instance.functions.create(period, amount, strike,
+                                              type).call({
+                                                  "from":
+                                                  deployer_address,
+                                                  "to":
+                                                  contract_address,
+                                                  "value":
+                                                  fee_estimate[1]
+                                              })
+
         return {"option_id": option_id, "fee_estimate": fee_estimate}
 
     @classmethod
     def get_pool(
-        cls,
-        ledger_api: LedgerApi,
-        contract_address: str,
-        deployer_address: str,
-        data: Optional[bytes] = b"",
-        gas: int = 300000,
+            cls,
+            ledger_api: LedgerApi,
+            contract_address: str,
+            deployer_address: str,
+            data: Optional[bytes] = b"",
+            gas: int = 300000,
     ) -> Dict[str, Any]:
         """
         Get the transaction to create a batch of tokens.
@@ -135,8 +128,7 @@ class HegicBTCOptions(Contract):
         # create the transaction dict
         nonce = ledger_api.api.eth.getTransactionCount(deployer_address)
         instance = cls.get_instance(ledger_api, contract_address)
-        tx = instance.functions.pool(
-        ).call()
+        tx = instance.functions.pool().call()
         return tx
 
     @classmethod
@@ -176,9 +168,45 @@ class HegicBTCOptions(Contract):
         return tx
 
     @classmethod
-    def get_raw_transaction(
-        cls, ledger_api: LedgerApi, contract_address: str, **kwargs
+    def exercise(
+        cls,
+        ledger_api: LedgerApi,
+        contract_address: str,
+        deployer_address: str,
+        option_id: int,
+        data: Optional[bytes] = b"",
+        gas: int = 300000,
     ) -> Dict[str, Any]:
+        """
+        Get the transaction to create a single token.
+        :param ledger_api: the ledger API
+        :param contract_address: the address of the contract
+        :param deployer_address: the address of the deployer
+        :param token_id: the token id for creation
+        :param data: the data to include in the transaction
+        :param gas: the gas to be used
+        :return: the transaction object
+        """
+        # create the transaction dict
+        nonce = ledger_api.api.eth.getTransactionCount(deployer_address)
+        instance = cls.get_instance(ledger_api, contract_address)
+        tx = instance.functions.exercise(
+            option_id
+        ).buildTransaction(
+            {
+                "from": deployer_address,
+                "gas": gas,
+                "gasPrice": ledger_api.api.toWei("50", "gwei"),
+                "nonce": nonce,
+                "value": 0
+            }
+        )
+        tx = cls._try_estimate_gas(ledger_api, tx)
+        return tx
+
+    @classmethod
+    def get_raw_transaction(cls, ledger_api: LedgerApi, contract_address: str,
+                            **kwargs) -> Dict[str, Any]:
         """
         Handler method for the 'GET_RAW_TRANSACTION' requests.
 
@@ -192,9 +220,8 @@ class HegicBTCOptions(Contract):
         raise NotImplementedError
 
     @classmethod
-    def get_raw_message(
-        cls, ledger_api: LedgerApi, contract_address: str, **kwargs
-    ) -> Dict[str, Any]:
+    def get_raw_message(cls, ledger_api: LedgerApi, contract_address: str,
+                        **kwargs) -> Dict[str, Any]:
         """
         Handler method for the 'GET_RAW_MESSAGE' requests.
 
@@ -208,9 +235,8 @@ class HegicBTCOptions(Contract):
         raise NotImplementedError
 
     @classmethod
-    def get_state(
-        cls, ledger_api: LedgerApi, contract_address: str, **kwargs
-    ) -> Dict[str, Any]:
+    def get_state(cls, ledger_api: LedgerApi, contract_address: str,
+                  **kwargs) -> Dict[str, Any]:
         """
         Handler method for the 'GET_STATE' requests.
 

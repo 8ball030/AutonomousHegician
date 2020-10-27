@@ -36,7 +36,7 @@ from packages.eightballer.skills.hegic_deployer.dialogues import (
 from packages.eightballer.skills.hegic_deployer.strategy import Strategy
 
 DEFAULT_SERVICES_INTERVAL = 30.0
-LEDGER_API_ADDRESS = "fetchai/ledger:0.5.0"
+LEDGER_API_ADDRESS = "fetchai/ledger:0.8.0"
 
 
 def toBTC(x):
@@ -47,7 +47,7 @@ class ServiceRegistrationBehaviour(TickerBehaviour):
     params = {
         "ETHPrice": 380*10**8,
         "BTCPrice": 1161000000000,
-        "ETHtoBTC": int(((380*10**8) * 10000000000000000000000000000000) / 1161000000000),
+        "ETHtoBTC": 200,
         "OptionType": {"Put": 1, "Call": 2}
     }
     provided_eth = False
@@ -263,8 +263,6 @@ class ServiceRegistrationBehaviour(TickerBehaviour):
                 elif strategy.deployment_status.get("btcoptions_exercise") is not None:
                     self.context.logger.info(
                         f"****Functionality Test of btc contracts complete!")
-                    import pdb
-                    pdb.set_trace()
 
     def _option_interaction(self, option_type: str, act: str,
                             params: Dict[str,
