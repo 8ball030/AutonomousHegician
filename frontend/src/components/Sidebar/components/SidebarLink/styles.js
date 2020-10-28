@@ -1,6 +1,11 @@
 import { makeStyles } from "@material-ui/styles";
 
 export default makeStyles(theme => ({
+  root: {
+    '& .MuiPaper-root': {
+      backgroundColor: '#0a101f',
+    }
+  },
   link: {
     textDecoration: "none",
     "&:hover, &:focus": {

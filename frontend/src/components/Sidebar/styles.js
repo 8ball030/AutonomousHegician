@@ -4,6 +4,11 @@ import tinycolor from "tinycolor2";
 const drawerWidth = 240;
 
 export default makeStyles(theme => ({
+  root: {
+    '& .MuiPaper-root': {
+      backgroundColor: '#0a101f',
+    }
+  },
   menuButton: {
     marginLeft: 12,
     marginRight: 36,
@@ -27,6 +32,9 @@ export default makeStyles(theme => ({
     }),
   },
   drawerClose: {
+    backgroundColor: tinycolor("#121c36")
+        .darken(6)
+        .toHexString(),
     transition: theme.transitions.create("width", {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
@@ -57,7 +65,7 @@ export default makeStyles(theme => ({
       marginTop: theme.spacing(0.625),
     },
     [theme.breakpoints.up("md")]: {
-      display: "none",
+      //display: "none",
     },
   },
 }));

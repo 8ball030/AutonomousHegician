@@ -1,5 +1,6 @@
 import React from "react";
 import { HashRouter, Route, Switch, Redirect } from "react-router-dom";
+import { MobileProvider } from '../context/MobileContext';
 
 // components
 import Layout from "./Layout";
@@ -16,13 +17,15 @@ export default function App() {
   var { isAuthenticated } = useUserState();
 
   return (
-    <HashRouter>
-      <Switch>
-        <Route exact path="/" component={Login} />
-        <PrivateRoute path="/app" component={Layout} />
-        <Route component={Error} />
-      </Switch>
-    </HashRouter>
+    <MobileProvider>
+      <HashRouter>
+        <Switch>
+          <Route exact path="/" component={Login} />
+          <PrivateRoute path="/app" component={Layout} />
+          <Route component={Error} />
+        </Switch>
+      </HashRouter>
+    </MobileProvider>
   );
 
   // #######################################################################

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import useMediaQuery from '@material-ui/core/useMediaQuery';
 import {
   AppBar,
   Toolbar,
@@ -107,7 +108,7 @@ export default function Header(props) {
 
   return (
     <AppBar position="fixed" className={classes.appBar}>
-      <Toolbar className={classes.toolbar}>
+      <Toolbar id="toolbar-1" className={classes.toolbar}>
         <IconButton
           color="inherit"
           onClick={() => toggleSidebar(layoutDispatch)}

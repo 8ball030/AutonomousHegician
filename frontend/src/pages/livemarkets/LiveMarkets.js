@@ -1,9 +1,8 @@
-import { Component } from 'react';
-import React, { useState } from "react";
+import { OptionForm } from '../bot_management/OptionForm';
+import React from "react";
 import {
   Grid,
 } from "@material-ui/core";
-import { useTheme } from "@material-ui/styles";
 
 // styles
 import useStyles from "./styles";
@@ -11,10 +10,6 @@ import useStyles from "./styles";
 // components
 import Widget from "../../components/Widget";
 import PageTitle from "../../components/PageTitle";
-import { Typography } from "../../components/Wrappers";
-
-
-
 import TradingViewWidget, { Themes } from 'react-tradingview-widget';
 // charts
 import OptionList from "./OptionList.js";
@@ -22,16 +17,16 @@ import OptionList from "./OptionList.js";
 
 export default function Dashboard(props) {
   var classes = useStyles();
-  var theme = useTheme();
+  // var theme = useTheme();
 
   // local
-  var [mainChartState, setMainChartState] = useState("monthly");
+  // var [mainChartState, setMainChartState] = useState("monthly");
 
   return (
     <>
       <PageTitle title="Live Markets View" button="Refresh" />
       <Grid container spacing={4}>
-        <Grid item lg={8} md={8} sm={8} xs={8}>
+        <Grid item style={{minHeight: 400}} lg={8} md={12} sm={12} xs={12}>
           <Widget
             title="Live Price Feed"
             upperTitle
@@ -40,14 +35,17 @@ export default function Dashboard(props) {
             <TradingViewWidget
                  symbol="FTX:ETHPERP"
                  theme={Themes.DARK}
-
-//                 width="580"
-//                height="610"
+                 autosize={true}
                  locale="en"
                  />
           </Widget>
         </Grid>
-        <Grid item lg={8} md={8} sm={8} xs={12}>
+        <Grid item lg={4} xs={12}>
+          <Widget title="Submit New Option" upperTitle noBodyPadding>
+            <OptionForm/>
+          </Widget>
+        </Grid>
+        <Grid item lg={12} md={12} sm={12} xs={12}>
           <Widget
             title="Current Options"
             upperTitle

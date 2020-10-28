@@ -104,20 +104,22 @@ function Sidebar({ location }) {
         [classes.drawerOpen]: isSidebarOpened,
         [classes.drawerClose]: !isSidebarOpened,
       })}
-      classes={{
+      classes={{ 
         paper: classNames({
           [classes.drawerOpen]: isSidebarOpened,
           [classes.drawerClose]: !isSidebarOpened,
         }),
       }}
+      styles={theme}
       open={isSidebarOpened}
     >
       <div className={classes.toolbar} />
-      <div className={classes.mobileBackButton}>
+      <div className={classes.mobileBackButton} style={{color: 'white'}}>
         <IconButton onClick={() => toggleSidebar(layoutDispatch)}>
           <ArrowBackIcon
+            style={{color: 'white'}}
             classes={{
-              root: classNames(classes.headerIcon, classes.headerIconCollapse),
+              //root: classNames(classes.headerIcon, classes.headerIconCollapse),
             }}
           />
         </IconButton>
@@ -127,6 +129,7 @@ function Sidebar({ location }) {
           <SidebarLink
             key={link.id}
             location={location}
+            style={{ backgroundColor: 'red'}}
             isSidebarOpened={isSidebarOpened}
             {...link}
           />

@@ -80,7 +80,7 @@ const notifications = [
 
 const Header = ({ classes, isSidebarOpened, toggleSidebar, ...props }) => (
   <AppBar position="fixed" className={classes.appBar}>
-    <Toolbar className={classes.toolbar}>
+    <Toolbar className={classes.toolbar} {...{...(useIsMobile && { variant: 'dense' })}}>
       <IconButton
         color="inherit"
         onClick={toggleSidebar}

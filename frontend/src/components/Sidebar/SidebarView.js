@@ -62,6 +62,7 @@ const SidebarView = ({ classes, theme, toggleSidebar, isSidebarOpened, isPermane
           [classes.drawerClose]: !isSidebarOpened,
         }),
       }}
+      style={{ backgrounedColor: 'red' }}
       open={isSidebarOpened}
     >
       <div className={classes.mobileBackButton}>

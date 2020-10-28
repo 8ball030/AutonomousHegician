@@ -13,12 +13,12 @@ import classnames from "classnames";
 import useStyles from "./styles";
 
 export default function Widget({
-  children,
-  title,
-  noBodyPadding,
-  bodyClass,
-  disableWidgetMenu,
-  header,
+  children = [],
+  title = '',
+  noBodyPadding = '',
+  bodyClass = '',
+  disableWidgetMenu = false,
+  header = '',
   ...props
 }) {
   var classes = useStyles();

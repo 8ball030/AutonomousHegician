@@ -10,7 +10,7 @@ import {
   Slider,
 } from "@material-ui/core";
 import Typography from '@material-ui/core/Typography';
-import axios from 'axios';
+
 import API from '../../api'
 
 class OptionForm extends React.Component {
@@ -168,4 +168,4 @@ class OptionForm extends React.Component {
   }
 }
 
-export default OptionForm;
+export { OptionForm };
