@@ -163,7 +163,6 @@ class Strategy(Model):
         """
         Output the contract config into a skill file
         """
-        agent_skill_path = '../AutonomousHegician/skills/option_monitoring/skill.yaml'
         agent_skill_path = './skills/hegic_deployer/skill.yaml'
         with open(agent_skill_path) as file:
             yaml_file = yaml.load(file, Loader=yaml.FullLoader)
@@ -176,6 +175,18 @@ class Strategy(Model):
             with open(agent_skill_path, 'w') as f:
                 yaml.dump(yaml_file, f)
             
+        # update the AH with the new contract files
+        agent_skill_path = '../AutonomousHegician/skills/option_monitoring/skill.yaml'
+        with open(agent_skill_path) as file:
+            yaml_file = yaml.load(file, Loader=yaml.FullLoader)
+        required = yaml_file['models']['strategy']['args']
+        output = {k: v[1] for k, v in self.deployment_status.items() if k in required.keys()}
+        yaml_file['models']['strategy']['args'].update(output)
+        with open('new_skill.yaml', 'w') as f:
+            yaml.dump(yaml_file, f)
+        if dev_mode:
+            with open(agent_skill_path, 'w') as f:
+                yaml.dump(yaml_file, f)
 
 
     def get_location_description(self) -> Description:

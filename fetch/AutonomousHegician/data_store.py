@@ -40,15 +40,6 @@ class DataStore():
             db.session.merge(StatusCode(id=3, description="open"))
             db.session.merge(StatusCode(id=4, description="closed"))
             db.session.merge(StatusCode(id=5, description="failed"))
-           # db.session.add(Option(amount=web3.Web3.toWei(0.1, "ether"),
-           #                       option_type="call",
-           #                       strike_price=200,
-           #                       status_code_id=0,
-           #                       execution_strategy_id=0,
-           #                       period=24 * 3600 * 2,
-           #                       expiration_date=datetime.now() + timedelta(days=2)
-           #                       ))
-           # delete all exissting orders, as part fo the launch script
             db.session.query(Option).delete()
             db.session.commit()
             db.session.close()

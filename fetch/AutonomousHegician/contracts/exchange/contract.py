@@ -16,39 +16,18 @@
 #   limitations under the License.
 #
 # ------------------------------------------------------------------------------
+
 """This module contains the scaffold contract definition."""
-import logging
+
+from typing import Any, Dict
+
 from aea.contracts.base import Contract
 from aea.crypto.base import LedgerApi
-from typing import List, Dict, Optional, Any
-
-from aea.configurations.base import ContractConfig
-import os
-import json
-
-logger = logging.getLogger("aea.packages.fetchai.contracts.exchange")
 
 
-class MyScaffoldContract(Contract):
-    """
-    The scaffold contract class for an ethereum based smart contract.
 
-    For non-ethereum based contracts import `from aea.contracts.base import Contract` and extend accordingly.
-    """
-    conf = dict(name="exchange",
-                    author="tomrae",
-                    version="0.1.0",
-                    license_="Apache-2.0",
-                    aea_version='>=0.5.0, <0.6.0',
-                    contract_interface_paths={
-                        'ethereum': 'build/contracts/FakeExchange.json'}
-                    )
-
-    @classmethod
-    def _get_abi(cls):
-        with open(os.getcwd() + "/contracts/exchange/" + \
-             cls.conf["contract_interface_paths"]["ethereum"], "r") as f:
-            return json.loads(f.read())
+class FakeExchange(Contract):
+    """The scaffold contract class for a smart contract."""
 
     @classmethod
     def get_deploy_transaction(
@@ -68,18 +47,16 @@ class MyScaffoldContract(Contract):
         :return: the transaction object
         """
 
-        # ContractConfig(**conf).contract_interfaces
-        contract_specs = cls._get_abi()
+        contract_interface = cls.contract_interface.get(
+            ledger_api.identifier, {})
         nonce = ledger_api.api.eth.getTransactionCount(deployer_address)
-        instance = ledger_api.api.eth.contract(
-            abi=contract_specs["abi"], bytecode=contract_specs["bytecode"],
-        )
+        instance = ledger_api.get_contract_instance(contract_interface)
         constructed = instance.constructor(*args)
         data = constructed.buildTransaction()['data']
-
         tx = {
-            "from": deployer_address,  # only 'from' address, don't insert 'to' address!
-            "value":  0,  # transfer as part of deployment
+            "from":
+            deployer_address,  # only 'from' address, don't insert 'to' address!
+            "value": 0,  # transfer as part of deployment
             "gas": gas,
             "gasPrice": gas,  # TODO: refine
             "nonce": nonce,
@@ -88,8 +65,57 @@ class MyScaffoldContract(Contract):
         tx = cls._try_estimate_gas(ledger_api, tx)
         return tx
 
+    @classmethod
+    def get_raw_transaction(
+        cls, ledger_api: LedgerApi, contract_address: str, **kwargs
+    ) -> Dict[str, Any]:
+        """
+        Handler method for the 'GET_RAW_TRANSACTION' requests.
+
+        Implement this method in the sub class if you want
+        to handle the contract requests manually.
+
+        :param ledger_api: the ledger apis.
+        :param contract_address: the contract address.
+        :return: the tx
+        """
+        raise NotImplementedError
+
+    @classmethod
+    def get_raw_message(
+        cls, ledger_api: LedgerApi, contract_address: str, **kwargs
+    ) -> Dict[str, Any]:
+        """
+        Handler method for the 'GET_RAW_MESSAGE' requests.
+
+        Implement this method in the sub class if you want
+        to handle the contract requests manually.
+
+        :param ledger_api: the ledger apis.
+        :param contract_address: the contract address.
+        :return: the tx
+        """
+        raise NotImplementedError
+
+    @classmethod
+    def get_state(
+        cls, ledger_api: LedgerApi, contract_address: str, **kwargs
+    ) -> Dict[str, Any]:
+        """
+        Handler method for the 'GET_STATE' requests.
+
+        Implement this method in the sub class if you want
+        to handle the contract requests manually.
+
+        :param ledger_api: the ledger apis.
+        :param contract_address: the contract address.
+        :return: the tx
+        """
+        raise NotImplementedError
+
     @staticmethod
-    def _try_estimate_gas(ledger_api: LedgerApi, tx: Dict[str, Any]) -> Dict[str, Any]:
+    def _try_estimate_gas(ledger_api: LedgerApi,
+                          tx: Dict[str, Any]) -> Dict[str, Any]:
         """
         Attempts to update the transaction with a gas estimate.
         :param ledger_api: the ledger API
@@ -99,12 +125,8 @@ class MyScaffoldContract(Contract):
         try:
             # try estimate the gas and update the transaction dict
             gas_estimate = ledger_api.api.eth.estimateGas(transaction=tx)
-            logger.info(
-                "[exchange_contract]: gas estimate: {}".format(gas_estimate * 10 ))
-            tx["gas"] = gas_estimate * 10
+            tx["gas"] = gas_estimate
         except Exception as e:  # pylint: disable=broad-except
-            logger.info(
-                "[exchange_contract]: Error when trying to estimate gas: {}".format(
-                    e)
-            )
+            raise 
         return tx
+

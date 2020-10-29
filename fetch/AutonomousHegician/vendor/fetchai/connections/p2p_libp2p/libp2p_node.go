@@ -80,6 +80,9 @@ func main() {
 	// node delegate service address, if set
 	_, nodePortDelegate := agent.DelegateAddress()
 
+	// node monitoring service address, if set
+	_, nodePortMonitoring := agent.MonitoringAddress()
+
 	// node private key
 	key := agent.PrivateKey()
 
@@ -94,8 +97,10 @@ func main() {
 		// if no external address is provided, run as a client
 		opts := []dhtclient.Option{
 			dhtclient.IdentityFromFetchAIKey(key),
-			dhtclient.RegisterAgentAddress(aeaAddr, agent.Connected),
 			dhtclient.BootstrapFrom(entryPeers),
+		}
+		if aeaAddr != "" {
+			opts = append(opts, dhtclient.RegisterAgentAddress(aeaAddr, agent.Connected))
 		}
 		node, err = dhtclient.New(opts...)
 	} else {
@@ -103,10 +108,15 @@ func main() {
 			dhtpeer.LocalURI(nodeHost, nodePort),
 			dhtpeer.PublicURI(nodeHostPublic, nodePortPublic),
 			dhtpeer.IdentityFromFetchAIKey(key),
-			dhtpeer.RegisterAgentAddress(aeaAddr, agent.Connected),
 			dhtpeer.EnableRelayService(),
 			dhtpeer.EnableDelegateService(nodePortDelegate),
 			dhtpeer.BootstrapFrom(entryPeers),
+		}
+		if aeaAddr != "" {
+			opts = append(opts, dhtpeer.RegisterAgentAddress(aeaAddr, agent.Connected))
+		}
+		if nodePortMonitoring != 0 {
+			opts = append(opts, dhtpeer.EnablePrometheusMonitoring(nodePortMonitoring))
 		}
 		node, err = dhtpeer.New(opts...)
 	}
@@ -122,7 +132,9 @@ func main() {
 	fmt.Println(libp2pMultiaddrsListEnd) // keyword
 
 	check(agent.Connect())
-	logger.Info().Msg("successfully connected to AEA!")
+	if aeaAddr != "" {
+		logger.Info().Msg("successfully connected to AEA!")
+	}
 
 	// Receive envelopes from agent and forward to peer
 	go func() {
