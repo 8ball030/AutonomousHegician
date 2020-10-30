@@ -6,23 +6,22 @@ verify_ssl = true
 [dev-packages]
 
 [packages]
-"aea[all]" = "==0.5.4"
-Flask = "==1.0.4"
-Flask-Cors = "==3.0.8"
-flask_restplus = "==0.13.0"
+web3 = "==5.11.1"
+defusedxml = "==0.6.0"
 vyper = "==0.2.4"
-psycopg2-binary = "==2.8.5"
+flask-restplus = "==0.13.0"
 flask-restplus-sqlalchemy = "==0.0.3"
+packages = "==0.1.0"
 protobuf = "==3.13.0"
-SQLAlchemy = "==1.3.19"
-Flask-SQLAlchemy = "==2.3.2"
-Werkzeug = "==0.16.0"
-pyyaml = "*"
-py-solc-x = "*"
-aea = {extras = ["all"], version = "==0.5.4"}
+Flask = "==0.12.2"
+SQLAlchemy = "==1.3.11"
+Flask-Cors = "==3.0.7"
+Flask-SQLAlchemy = "==2.4.4"
+PyYAML = "==5.3.1"
+aea = {extras = ["all"],version = "==0.7.0"}
+requests = "==2.18.4"
+werkzeug = "==0.16.0"
+psycopg2-binary = "==2.8.6"
 
 [requires]
-python_version = "3.7"
-
-[scripts]
-launch_demo = "bash ./scripts/launch_demo.sh"
+python_version = "3.8"

@@ -1,0 +1,90 @@
+aea_version: 0.6.0
+author: tomrae
+behaviours:
+  contract_deployment:
+    args: {}
+    class_name: ContractDeployer
+  option_handler:
+    args:
+      services_interval: 1
+    class_name: OptionMonitor
+  price_ticker:
+    args:
+      services_interval: 15
+    class_name: PriceTicker
+  snapshot:
+    args:
+      services_interval: 60
+    class_name: SnapShot
+  web_server:
+    args: {}
+    class_name: WebServer
+contracts:
+- tomrae/stablecoin:0.1.0
+dependencies:
+  Flask:
+    version: ==1.0.4
+  Flask-Cors:
+    version: ==3.0.8
+  Werkzeug:
+    version: ==0.16.0
+  flask_restplus:
+    version: ==0.13.0
+  psycopg2-binary:
+    version: ==2.8.5
+  vyper:
+    version: ==0.1.0b12
+description: The ERC1155 deploy skill has the ability to deploy and interact with
+  the smart contract.
+fingerprint:
+  __init__.py: Qmbm3ZtGpfdvvzqykfRqbaReAK9a16mcyK7qweSfeN5pq1
+  behaviours.py: QmesMdGUQk4cK2N44FGH46895PUaEyUZaSGaiTEvkq3Pt4
+  db_communication.py: QmbbBqWHsq7dKWrHsdBTQpJgiTyfqDLLrqWBK7mcPxXy5h
+  dex_wrapper.py: QmaPpUySQvS6Kovgg9GgQ8Je2PRc6vDGNBvRpJ6fWrRYTf
+  dialogues.py: QmXeMZdN2fTesDrJ3fpAMj1YT6Z6aGsunXMo6g4DPboMge
+  handlers.py: QmSDQuA7gziZVqZ3woW6UaEE5xnqgBEeobxC3JmKBQXXqG
+  strategy.py: QmUxwnDrJn3yvYAX67DxDcLLmdfU8nNUvNyxH1BmsbrKH7
+  web_server.py: QmcVhWWjndsazQtLfv8jYJg61X8PXnkHv467MQPqabp94g
+fingerprint_ignore_patterns: []
+handlers:
+  contract_api:
+    args: {}
+    class_name: ContractApiHandler
+  ledger_api:
+    args: {}
+    class_name: LedgerApiHandler
+  signing:
+    args: {}
+    class_name: SigningHandler
+license: Apache-2.0
+models:
+  contract_api_dialogues:
+    args: {}
+    class_name: ContractApiDialogues
+  default_dialogues:
+    args: {}
+    class_name: DefaultDialogues
+  ledger_api_dialogues:
+    args: {}
+    class_name: LedgerApiDialogues
+  signing_dialogues:
+    args: {}
+    class_name: SigningDialogues
+  strategy:
+    args:
+      calloptions: '0x7959fB1645F94899D37879C10faA6081803B0762'
+      ercpool: '0xc7C522067aD99973b9856e3E500Ef24576082236'
+      ethpool: '0xb12873c58471d610A09F065391898BaB7A78478D'
+      exchange: '0xabB93815dFC8C62Fe73fFfAD83EA66480D7A2812'
+      ledger_id: ethereum
+      pricefeed: '0xCb15681705864bFf0c108A43862e5dE9a414738A'
+      putoptions: '0x18b093d4982dA433B0DAF897b08Cf107DbE2d792'
+      stablecoin: '0x9EDE3ed7F16B6719CD94209d57f9672FE0e83233'
+    class_name: Strategy
+name: option_monitoring
+protocols:
+- fetchai/contract_api:0.3.0
+- fetchai/ledger_api:0.3.0
+skills: []
+type: skill
+version: 0.1.0

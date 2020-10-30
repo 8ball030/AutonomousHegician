@@ -51,17 +51,18 @@ class Option(db.Model):
     amount = db.Column(db.BigInteger())
     strike_price = db.Column(db.BigInteger())
     fees = db.Column(db.String(255))
-    option_type = db.Column(db.String)
+    option_type = db.Column(db.Integer())
     status_code_id = db.Column(db.ForeignKey('StatusCodes.id'))
     execution_strategy_id = db.Column(db.ForeignKey('ExecutionStrategies.id'))
     date_created = db.Column(db.DateTime)
     date_modified = db.Column(db.DateTime)
     expiration_date = db.Column(db.DateTime)
+    market = db.Column(db.String(255))
 
     execution_strategy = db.relationship(
-        'ExecutionStrategy', primaryjoin='Option.execution_strategy_id == ExecutionStrategy.id', backref='options')
+        'ExecutionStrategy', primaryjoin='Option.execution_strategy_id == ExecutionStrategy.id', backref='options', lazy='joined')
     status_code = db.relationship(
-        'StatusCode', primaryjoin='Option.status_code_id == StatusCode.id', backref='options')
+        'StatusCode', primaryjoin='Option.status_code_id == StatusCode.id', backref='options', lazy='joined')
 
     def as_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}

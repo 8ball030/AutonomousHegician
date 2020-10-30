@@ -1,0 +1,69 @@
+name: tac_control
+author: fetchai
+version: 0.6.0
+type: skill
+description: The tac control skill implements the logic for an AEA to control an instance
+  of the TAC.
+license: Apache-2.0
+aea_version: '>=0.6.0, <0.7.0'
+fingerprint:
+  __init__.py: Qme9YfgfPXymvupw1EHMJWGUSMTT6JQZxk2qaeKE76pgyN
+  behaviours.py: QmTVCXtTpH1A55vWnynz1PjM4VCrQ6EDy5XfcJpT93doEq
+  dialogues.py: QmcVYVTZ95UKBnXzmKyGLo5LwSVcGYUTrifosQMSpzNnCX
+  game.py: QmeAmG3LH1xBFRvUATrWY7spSDmjNeXVD4ZNYrt1BRY3jB
+  handlers.py: QmSjwPKEN83C2gQS4WVH8uaHMv5ze7EJ9S8ugmRcKnSwnW
+  helpers.py: QmdG31YUJakBz8FdNNxU6RxqhWy9iv1BG253PzfxBhzqq2
+  parameters.py: QmQB95beEKzyA8Aa7Y9HTPw6BPEVi6BGkpsUqN4QZ4DcVG
+fingerprint_ignore_patterns: []
+contracts: []
+protocols:
+- fetchai/oef_search:0.5.0
+- fetchai/tac:0.6.0
+skills: []
+behaviours:
+  tac:
+    args: {}
+    class_name: TacBehaviour
+handlers:
+  oef:
+    args: {}
+    class_name: OefSearchHandler
+  tac:
+    args: {}
+    class_name: TacHandler
+models:
+  default_dialogues:
+    args: {}
+    class_name: DefaultDialogues
+  game:
+    args: {}
+    class_name: Game
+  oef_search_dialogues:
+    args: {}
+    class_name: OefSearchDialogues
+  parameters:
+    args:
+      base_good_endowment: 2
+      competition_timeout: 180
+      inactivity_timeout: 60
+      location:
+        latitude: 0.127
+        longitude: 51.5194
+      lower_bound_factor: 1
+      min_nb_agents: 2
+      money_endowment: 2000000
+      nb_goods: 10
+      registration_timeout: 60
+      service_data:
+        key: tac
+        value: v1
+      start_time: 01 01 2020  00:01
+      tx_fee: 1
+      upper_bound_factor: 1
+      whitelist: []
+    class_name: Parameters
+  tac_dialogues:
+    args: {}
+    class_name: TacDialogues
+dependencies:
+  numpy: {}

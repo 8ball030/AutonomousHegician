@@ -1,0 +1,71 @@
+name: ml_data_provider
+author: fetchai
+version: 0.10.0
+type: skill
+description: The ml data provider skill implements a provider for Machine Learning
+  datasets in order to monetize data.
+license: Apache-2.0
+aea_version: '>=0.6.0, <0.7.0'
+fingerprint:
+  __init__.py: QmbQigh7SV7dD2hLTGv3k9tnvpYWN1otG5yjiM7F3bbGEQ
+  behaviours.py: QmWgXU9qgahXwMKNqLLfDiGNYJozSXv2SVMkoPDQncC7ok
+  dialogues.py: QmdFsEXJdTiQo7GSS1U7n9ukd79ZEDVki3ifeYeGsowv2G
+  handlers.py: QmbmS4C1GdumnVkA5dc7czWRkjb9HGzY7YeATrnuMVU2X9
+  strategy.py: QmdPfmAJ9u6VWjvR2x4FBkCyVJ3g3YYSCgwREjC35yvAbL
+fingerprint_ignore_patterns: []
+contracts: []
+protocols:
+- fetchai/default:0.5.0
+- fetchai/ledger_api:0.3.0
+- fetchai/ml_trade:0.5.0
+- fetchai/oef_search:0.5.0
+skills:
+- fetchai/generic_seller:0.11.0
+behaviours:
+  service_registration:
+    args:
+      services_interval: 20
+    class_name: ServiceRegistrationBehaviour
+handlers:
+  ledger_api:
+    args: {}
+    class_name: LedgerApiHandler
+  ml_trade:
+    args: {}
+    class_name: MlTradeHandler
+  oef_search:
+    args: {}
+    class_name: OefSearchHandler
+models:
+  default_dialogues:
+    args: {}
+    class_name: DefaultDialogues
+  ledger_api_dialogues:
+    args: {}
+    class_name: LedgerApiDialogues
+  ml_trade_dialogues:
+    args: {}
+    class_name: MlTradeDialogues
+  oef_search_dialogues:
+    args: {}
+    class_name: OefSearchDialogues
+  strategy:
+    args:
+      batch_size: 2
+      buyer_tx_fee: 10
+      currency_id: FET
+      is_ledger_tx: true
+      ledger_id: fetchai
+      location:
+        latitude: 0.127
+        longitude: 51.5194
+      price_per_data_batch: 100
+      seller_tx_fee: 0
+      service_data:
+        key: dataset_id
+        value: fmnist
+    class_name: Strategy
+dependencies:
+  numpy: {}
+  tensorflow:
+    version: ==1.14.0

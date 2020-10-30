@@ -22,7 +22,6 @@ services:
         POSTGRES_USER: admin
         POSTGRES_PASSWORD: WKLpwoDJd03DJ423DJwlDJlaDJsdDJsdDJlDJsa
   ganachecli:
-#   image: trufflesuite/ganache-cli:latest
     build: 
       context: ./ganachecli/
       dockerfile: Dockerfile
@@ -30,13 +29,6 @@ services:
       - "7545:7545"
     volumes:
       - ./persistant_data/ganache_data:/ganache_data
-        #    entrypoint:
-        #      - node
-        #      - "/app/ganache-core.docker.cli.js"
-        #      - -s
-        #      - "0"
-        #      - -p
-        #      - "7545"
   agents:
     environment:
       TESTS: "False"

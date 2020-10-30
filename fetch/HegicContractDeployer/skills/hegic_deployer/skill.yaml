@@ -1,0 +1,95 @@
+aea_version: ==0.7.0
+author: eightballer
+behaviours:
+  service_registration:
+    args:
+      services_interval: 0.0001
+    class_name: ServiceRegistrationBehaviour
+contracts:
+- eightballer/btcoptions:0.1.0
+- eightballer/btcpool:0.1.0
+- eightballer/btcpriceprovider:0.1.0
+- eightballer/ethoptions:0.1.0
+- eightballer/ethpool:0.1.0
+- eightballer/exchange:0.1.0
+- eightballer/hegic:0.1.0
+- eightballer/priceprovider:0.1.0
+- eightballer/stakingeth:0.1.0
+- eightballer/stakingwbtc:0.1.0
+- eightballer/wbtc:0.1.0
+dependencies:
+  vyper:
+    version: ==0.1.0b12
+description: The hegic deploy skill has the ability to deploy and interact with the
+  smart contracts.
+fingerprint:
+  README.md: QmZ7swVkRpmJbJZ2NoLb9CWwH8p3QjnjRJg71UbAXdrKyx
+  __init__.py: Qmbm3ZtGpfdvvzqykfRqbaReAK9a16mcyK7qweSfeN5pq1
+  behaviours.py: QmSAgRqhYNfRFwWLhVFX7D4ysNjTEAcQ7vYndpQLqecTkw
+  dialogues.py: QmccbS2ZH32MVSdrxsuqcNBpKKLpdFsKPHzDs4yV8V8nGQ
+  handlers.py: QmV5uxrYj6AHUowrRfYZGDA9Uw2suTCs3JzDPdUmpBAqvQ
+  strategy.py: QmQc5hNVnjLRKs5T9NCTSSBBH8TwyeeHpQZJXmqXEx1Q9q
+fingerprint_ignore_patterns: []
+handlers:
+  contract_api:
+    args: {}
+    class_name: ContractApiHandler
+  fipa:
+    args: {}
+    class_name: FipaHandler
+  ledger_api:
+    args: {}
+    class_name: LedgerApiHandler
+  oef_search:
+    args: {}
+    class_name: OefSearchHandler
+  signing:
+    args: {}
+    class_name: SigningHandler
+is_abstract: false
+license: Apache-2.0
+models:
+  contract_api_dialogues:
+    args: {}
+    class_name: ContractApiDialogues
+  default_dialogues:
+    args: {}
+    class_name: DefaultDialogues
+  fipa_dialogues:
+    args: {}
+    class_name: FipaDialogues
+  ledger_api_dialogues:
+    args: {}
+    class_name: LedgerApiDialogues
+  oef_search_dialogues:
+    args: {}
+    class_name: OefSearchDialogues
+  signing_dialogues:
+    args: {}
+    class_name: SigningDialogues
+  strategy:
+    args:
+      btcoptions: '0xcbA5Fc296A194Ac734e4b20Dc8d70B1f89Fab90f'
+      btcpool: '0xBE5115D20ccdf5c041A27030FB3eAbd86C384579'
+      btcpriceprovider: '0xA1a4bfAaF5f3a03e0331d0B74Fba20c17231C926'
+      ethoptions: '0xA2e0251fAe8d5114a4eF4c3d5843283EC55c483a'
+      ethpool: '0x0AF0F591d38670a509D62dC313e82CA66B1D4fB0'
+      exchange: '0xaF6B97125B8238B1df1df0e469b240a59c38C316'
+      hegic: '0xd7EDe5868287411D3e197719dd5F98b74871b3Fd'
+      ledger_id: ethereum
+      priceprovider: '0xBb6038A8609ef8dA2B83C4b729805c12106047ff'
+      stakingeth: '0xD82c9deF6cCE80739EdEC4888d82F4E6866Da1f4'
+      stakingwbtc: '0xfF083E94C29278748D46d6D68e5A56d1380fABb4'
+      wbtc: '0xc0AE00E73928E2A1913a9ea8669F573118D859A8'
+    class_name: Strategy
+name: hegic_deployer
+protocols:
+- fetchai/contract_api:0.7.0
+- fetchai/default:0.8.0
+- fetchai/fipa:0.9.0
+- fetchai/ledger_api:0.6.0
+- fetchai/oef_search:0.9.0
+- fetchai/signing:0.6.0
+skills: []
+type: skill
+version: 0.1.0
