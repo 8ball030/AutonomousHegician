@@ -17,10 +17,6 @@ import OptionList from "./OptionList.js";
 
 export default function Dashboard(props) {
   var classes = useStyles();
-  // var theme = useTheme();
-
-  // local
-  // var [mainChartState, setMainChartState] = useState("monthly");
 
   return (
     <>

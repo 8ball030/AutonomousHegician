@@ -1,13 +1,8 @@
 import React from 'react';
-import { makeStyles } from '@material-ui/core/styles';
 import { CircularProgress, Typography } from '@material-ui/core';
 import MUIDataTable from "mui-datatables";
-import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
+import { MuiThemeProvider } from '@material-ui/core/styles';
 
-
-import Themes from "./../../themes";
-
-import axios from 'axios';
 import API from '../../api'
 
 import Highcharts from 'highcharts';
@@ -15,94 +10,7 @@ import {
   withHighcharts
 } from 'react-jsx-highcharts';
 
-
-
 class OptionList extends React.Component {
-  getMuiTheme = () => createMuiTheme(
-    {...Themes.default, 
-    ...{overrides: {
-      MUIDataTableCell: {
-        root: {
-          backgroundColor: "#121c36"
-      },
-    },
-    MuiTableHead: {
-        root: {
-          backgroundColor: "#121c36"
-      },
-    },
-
-    MUIDataTableHead: {
-        root: {
-          backgroundColor: "#121c36"
-      },
-    },
-    MUIDataTableHeadCell: {
-      root: {
-          backgroundColor: "#0a101f !important"
-      },
-      paper: {
-        backgroundColor: '#0a101f',
-      }
-    },
-      MUIIconButton: {
-        label: {
-          backgroundColor: '#fff',
-          color: '#fff',
-        }
-      },
-
-    MUIDataTable: {
-      root: {
-        backgroundColor: '#121c36',
-      },
-      paper: {
-        boxShadow: 'none',
-        backgroundColor: '#121c36'
-      },
-    },
-    MuiToolbar: {
-      root: {
-        backgroundColor: '#121c36',
-      },
-    },
-    MUITableHeader: {
-      root: {
-        backgroundColor: '#121c36',
-      },
-      paper: {
-        backgroundColor: '#0a101f',
-      },
-    },
-    MUITableHead: {
-      root: {
-        backgroundColor: '#121c36',
-      },
-    },
-    MuiTableCell: {
-      root: {
-        backgroundColor: '#121c36',
-        borderBottom: '1px solid rgba(255,255,255,0.1)',
-      },
-    },
-    MUIDataTableSelectCell: {
-      headerCell: {
-        backgroundColor: '#121c36',
-      },
-    },
-    MuiTableFooter: {
-      root: {
-        '& .MuiToolbar-root': {
-          backgroundColor: '#121c36',
-        },
-      },
-    },
-
-
-
-    }}}
-  )
-
   state = {
     page: 0,
     count: 1,
@@ -114,9 +22,7 @@ class OptionList extends React.Component {
         name: "id",
         label: "Option Id",
         options: {
-          customBodyRender: (value, tableMeta, updateValue) => {
-            return value;
-          }
+          customBodyRender: value => value,
         },
       },
       {
@@ -158,7 +64,6 @@ class OptionList extends React.Component {
     setInterval(() => this.UpdateGraph(), 10000);
   }
 
-
   UpdateGraph() {
     API.get('get_all_options')
       .then(options => options.data)
@@ -166,17 +71,12 @@ class OptionList extends React.Component {
           this.setState({ option_data: optionsList });
       });
   }
-  //componentDidMount() {
-  //  this.UpdateGraph();
-  //}
-
 
   render() {
 
-    const { option_data, count, isLoading, rowsPerPage, sortOrder } = this.state;
+    const { count, isLoading, rowsPerPage } = this.state;
 
     const options = {
-
       filter: false,
       filterType: 'dropdown',
       responsive: 'stacked',
@@ -190,12 +90,10 @@ class OptionList extends React.Component {
 
     return (
       <div>
-        <MuiThemeProvider theme={this.getMuiTheme()}>
-          <MUIDataTable title={<Typography variant="h6">
-            {isLoading && <CircularProgress size={24} style={{marginLeft: 15, position: 'relative', top: 4}} />}
-            </Typography>
-            } data={this.state.option_data} columns={this.state.columns} options={options} />
-        </MuiThemeProvider>
+        <MUIDataTable title={<Typography variant="h6">
+          {isLoading && <CircularProgress size={24} style={{marginLeft: 15, position: 'relative', top: 4}} />}
+          </Typography>
+          } data={this.state.option_data} columns={this.state.columns} options={options} />
       </div>
     );
 

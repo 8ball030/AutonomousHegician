@@ -72,6 +72,7 @@ class Snapshot(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     date_created = db.Column(db.DateTime)
+    date_updated = db.Column(db.DateTime)
     usd_val = db.Column(db.Float)
     eth_val = db.Column(db.Float)
     address = db.Column(db.String(255))
@@ -98,11 +99,26 @@ snapshot_model = api_model_factory.get_entity(Option.__tablename__)
 class HegicOptions(Resource):
     def get(self):
         db.create_all()
-        results = [f.as_dict() for f in db.session.query(Option).all()]
+        results = [f.as_dict() for f in db.session.query(Option).limit(2000).all()]
         for res in results:
             for k, v in res.items():
                 if k.find('date') >= 0:
                     res[k] = str(v)
+        return results
+
+@api.route('/get_all_agents')
+class HegicAgents(Resource):
+    def get(self):
+        db.create_all()
+        results = [f.as_dict() for f in db.session.query(Snapshot).all()]
+        for res in results:
+            for k, v in res.items():
+                if k.find('date') >= 0:
+                    res[k] = str(v)
+            if res.date_updated + timedelta(seconds=30) < datetime.now():
+                res["status"] = "running"
+            else:
+                res["status"] = "paused"
         return results
 
 @api.route('/get_snapshots')

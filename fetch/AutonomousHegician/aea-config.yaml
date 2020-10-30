@@ -38,3 +38,4 @@ registry_path: ../packages
 default_routing:
   fetchai/contract_api:0.2.0: fetchai/ledger:0.3.0
   fetchai/ledger_api:0.2.0: fetchai/ledger:0.3.0
+connection_private_key_paths: {}

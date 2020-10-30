@@ -1,7 +1,11 @@
 import React from "react";
-import { Grid } from "@material-ui/core";
+import useStyles from "../livemarkets/styles";
+import {
+  Grid,
+} from "@material-ui/core";
 // components
 import PageTitle from "../../components/PageTitle/PageTitle";
+import AgentList from "./AgentList.js";
 import Widget from "../../components/Widget/Widget";
 
 // Charts
@@ -47,23 +51,42 @@ const agent_data= [
 
 
 export default function BotManagement() {
+  var classes = useStyles();
   return (
     <>
       <PageTitle title="Agent Management" />
       <Grid container spacing={4}>
-        <Grid item xs={6}>
+        <Grid item xs={12}>
           <Widget title="Agent Equity" upperTitle noBodyPadding>
             <Equity></Equity>
           </Widget>
         </Grid>
       </Grid>
-      <Grid container spacing={4}>
-        <Grid item xs={12}>
-          <Assets data={agent_data}/> 
+
+
+      { false &&
+        <Grid container spacing={4}>
+          <Grid item xs={12}>
+            <Assets data={agent_data}/> 
+          </Grid>
+          <Grid item xs={6}>
+            <Widget title="Equity by Agent" upperTitle noBodyPadding>
+              <Performance />
+            </Widget>
+          </Grid>
         </Grid>
-        <Grid item xs={6}>
-          <Widget title="Equity by Agent" upperTitle noBodyPadding>
-            <Performance />
+      }
+
+      <Grid container spacing={4} >
+        <Grid item xs={12}>
+          <Widget
+            title="Currently running Agents"
+            upperTitle
+            bodyClass={classes.fullHeightBody}
+            className={classes.card}>
+                <div>
+                  <AgentList/>
+                </div>
           </Widget>
         </Grid>
       </Grid>
