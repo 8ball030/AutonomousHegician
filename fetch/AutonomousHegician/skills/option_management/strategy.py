@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2018-2020 Fetch.AI Limited
+#   Copyright 2020 eightballer
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -19,27 +19,17 @@
 
 """This module contains the strategy class."""
 
-import random  # nosec
 from datetime import datetime, timedelta
-from typing import List
-
-import yaml
+from typing import Dict, List, Optional, Tuple, Union
 
 from aea.configurations.constants import DEFAULT_LEDGER
-from aea.exceptions import enforce
-from aea.helpers.search.generic import (
-    AGENT_LOCATION_MODEL,
-    AGENT_REMOVE_SERVICE_MODEL,
-    AGENT_SET_SERVICE_MODEL,
-    SIMPLE_SERVICE_MODEL,
-)
-from aea.helpers.search.models import Description, Location
 from aea.helpers.transaction.base import Terms
 from aea.skills.base import Model
 
 from packages.eightballer.skills.option_management.db_communication import (
     DBCommunication,
 )
+from packages.eightballer.skills.option_management.web_server import Option
 
 
 DEFAULT_LEDGER_ID = DEFAULT_LEDGER
@@ -51,15 +41,15 @@ class Strategy(Model):
 
     @property
     def current_order(self) -> None:
-        """current order being interacted with"""
+        """Get current order being interacted with"""
         return self._current_order
 
     @current_order.setter
     def current_order(self, order) -> None:
-        """current order being interacted with"""
+        """Set current order being interacted with"""
         self._current_order = order
 
-    def gather_pending_orders(self) -> list:
+    def gather_pending_orders(self) -> List[Option]:
         """Here we retrieve all non-executed contracts."""
         return self._database.get_orders()
 
@@ -73,10 +63,8 @@ class Strategy(Model):
                 results.append(order)
         return results
 
-    def check_contract_should_execute(self, contract: dict) -> bool:
-        """Check if the contract is in the money, 
-           and that the expiration date is near
-        """
+    def check_contract_should_execute(self, contract: Option) -> bool:
+        """Check if the contract is in the money, and that the expiration date is near"""
         deadline = contract.expiration_date - timedelta(
             seconds=DEFAULT_TIME_BEFORE_EXECUTION
         )
@@ -127,7 +115,9 @@ class Strategy(Model):
     def __init__(self, **kwargs) -> None:
         """Initialize the strategy of the agent."""
         self._ledger_id = kwargs.pop("ledger_id", DEFAULT_LEDGER_ID)
-        self._deployment_status = {}
+        self._deployment_status: Dict[
+            str, Union[Tuple[Optional[str], Optional[str]], str]
+        ] = {}
         not_deployed = 0
         for contract in [
             "wbtc",

@@ -123,5 +123,5 @@ class FakeExchange(Contract):
             gas_estimate = ledger_api.api.eth.estimateGas(transaction=tx)
             tx["gas"] = gas_estimate
         except Exception as e:  # pylint: disable=broad-except
-            raise
+            raise e
         return tx

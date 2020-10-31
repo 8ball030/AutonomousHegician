@@ -19,7 +19,7 @@
 
 """This module contains the scaffold contract definition."""
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
 
 from aea.contracts.base import Contract
 from aea.crypto.base import LedgerApi
@@ -48,7 +48,6 @@ class HegicETHOptions(Contract):
         """
 
         # create the transaction dict
-        nonce = ledger_api.api.eth.getTransactionCount(deployer_address)
         instance = cls.get_instance(ledger_api, contract_address)
         tx = instance.functions.pool().call()
         return tx
@@ -77,7 +76,6 @@ class HegicETHOptions(Contract):
         :return: the transaction object
         """
         # create the transaction dict
-        nonce = ledger_api.api.eth.getTransactionCount(deployer_address)
         instance = cls.get_instance(ledger_api, contract_address)
         fee_estimate = instance.functions.fees(period, amount, strike, type).call()
         option_id = instance.functions.create(period, amount, strike, type).call(
@@ -113,7 +111,7 @@ class HegicETHOptions(Contract):
         instance = cls.get_instance(ledger_api, contract_address)
         fee_estimate = instance.functions.fees(period, amount, strike, type).call()
         tx = instance.functions.create(period, amount, strike, type).buildTransaction(
-            {"from": deployer_address, "value": fee_estimate[0], "nonce": nonce,}
+            {"from": deployer_address, "value": fee_estimate[0], "nonce": nonce}
         )
         tx = cls._try_estimate_gas(ledger_api, tx)
         return tx
@@ -248,5 +246,5 @@ class HegicETHOptions(Contract):
             gas_estimate = ledger_api.api.eth.estimateGas(transaction=tx)
             tx["gas"] = gas_estimate
         except Exception as e:  # pylint: disable=broad-except
-            raise
+            raise e
         return tx

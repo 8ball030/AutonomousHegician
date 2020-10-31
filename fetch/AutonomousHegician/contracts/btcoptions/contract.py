@@ -55,7 +55,7 @@ class HegicBTCOptions(Contract):
         instance = cls.get_instance(ledger_api, contract_address)
         fee_estimate = instance.functions.fees(period, amount, strike, type).call()
         tx = instance.functions.create(period, amount, strike, type).buildTransaction(
-            {"from": deployer_address, "value": fee_estimate[1], "nonce": nonce,}
+            {"from": deployer_address, "value": fee_estimate[1], "nonce": nonce}
         )
         tx = cls._try_estimate_gas(ledger_api, tx)
         return tx
@@ -84,7 +84,6 @@ class HegicBTCOptions(Contract):
         :return: the transaction object
         """
         # create the transaction dict
-        nonce = ledger_api.api.eth.getTransactionCount(deployer_address)
         instance = cls.get_instance(ledger_api, contract_address)
         fee_estimate = instance.functions.fees(period, amount, strike, type).call()
         option_id = instance.functions.create(period, amount, strike, type).call(
@@ -113,7 +112,6 @@ class HegicBTCOptions(Contract):
         """
 
         # create the transaction dict
-        nonce = ledger_api.api.eth.getTransactionCount(deployer_address)
         instance = cls.get_instance(ledger_api, contract_address)
         tx = instance.functions.pool().call()
         return tx
@@ -248,5 +246,5 @@ class HegicBTCOptions(Contract):
             gas_estimate = ledger_api.api.eth.estimateGas(transaction=tx)
             tx["gas"] = gas_estimate
         except Exception as e:  # pylint: disable=broad-except
-            raise
+            raise e
         return tx

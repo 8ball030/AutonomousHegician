@@ -1,6 +1,26 @@
+# -*- coding: utf-8 -*-
+# ------------------------------------------------------------------------------
+#
+#   Copyright 2020 eightballer
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+#
+# ------------------------------------------------------------------------------
+
+"""This module defines the webserver."""
+
 import json
 import logging
-import os
 from datetime import datetime, timedelta
 
 from flask import Flask, request
@@ -8,9 +28,8 @@ from flask_cors import CORS
 from flask_restplus import Api, Resource
 from flask_restplus_sqlalchemy import ApiModelFactory
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import BigInteger, Column, Date, DateTime, Integer, String, func
+from sqlalchemy import func
 from sqlalchemy.orm import subqueryload
-from web3 import Web3
 
 
 logger = logging.getLogger(__name__)
@@ -35,7 +54,7 @@ cors = CORS(flask_app)
 
 
 # note we need to import from this specific db instance for the api to generate the swagger documents
-class ExecutionStrategy(db.Model):
+class ExecutionStrategy(db.Model):  # type: ignore
 
     __tablename__ = "ExecutionStrategies"
 
@@ -43,7 +62,7 @@ class ExecutionStrategy(db.Model):
     description = db.Column(db.String(255))
 
 
-class Option(db.Model):
+class Option(db.Model):  # type: ignore
     is_submitted_for_estimate = False
     is_estimated = False
     is_submitted_for_deployment = False
@@ -83,7 +102,7 @@ class Option(db.Model):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
 
-class Snapshot(db.Model):
+class Snapshot(db.Model):  # type: ignore
     __tablename__ = "Snapshot"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -97,7 +116,7 @@ class Snapshot(db.Model):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
 
-class StatusCode(db.Model):
+class StatusCode(db.Model):  # type: ignore
     __tablename__ = "StatusCodes"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -118,14 +137,14 @@ class HegicOptions(Resource):
         db.create_all()
         ret = []
 
-        def aggregate(row):
+        def aggregate(row, ret):
             ret = row.as_dict()
             ret["status_code_id"] = row.status_code.description
             ret["option_type"] = "Put" if row.option_type == 1 else "Call"
             return ret
 
         results = [
-            aggregate(f)
+            aggregate(f, ret)
             for f in db.session.query(Option)
             .options(subqueryload(Option.status_code))
             .limit(2000)

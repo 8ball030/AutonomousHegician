@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2018-2020 Fetch.AI Limited
+#   Copyright 2020 eightballer
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 
 import time
 from datetime import datetime
-from typing import Any, Dict, Optional, cast
+from typing import Dict, cast
 
 import web3
 
@@ -32,12 +32,10 @@ from packages.eightballer.skills.option_management.dialogues import (
     ContractApiDialogue,
     ContractApiDialogues,
     LedgerApiDialogues,
-    OefSearchDialogues,
 )
 from packages.eightballer.skills.option_management.strategy import Strategy
 from packages.fetchai.protocols.contract_api.message import ContractApiMessage
 from packages.fetchai.protocols.ledger_api.message import LedgerApiMessage
-from packages.fetchai.protocols.oef_search.message import OefSearchMessage
 
 
 DEFAULT_SERVICES_INTERVAL = 30.0
@@ -178,7 +176,7 @@ class OptionMonitor(TickerBehaviour):
             self._request_contract_interaction(
                 order.market.lower() + "options",
                 "exercise",
-                {"option_id": order.ledger_id,},
+                {"option_id": order.ledger_id},
             )
             strategy.current_order = order
             return
