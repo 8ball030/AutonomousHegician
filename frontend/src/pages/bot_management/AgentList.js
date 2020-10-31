@@ -24,7 +24,11 @@ function createData(name, calories, fat, carbs, protein, status) {
 }
 
 const rows = [
-  createData('', '', '', '', '', '', ''),
+  createData('Frozen yoghurt', 159, 6.0, 24, 4.0, 'paused'),
+  createData('Ice cream sandwich', 237, 9.0, 37, 4.3, 'error'),
+  createData('Eclair', 262, 16.0, 24, 6.0, 'running'),
+  createData('Cupcake', 305, 3.7, 67, 4.3, 'running'),
+  createData('Gingerbread', 356, 16.0, 49, 3.9, 'running'),
 ];
 const states = {
   running: {
@@ -42,7 +46,6 @@ const states = {
 };
 
 class AgentList extends React.Component {
-  state = {agentsData: rows};
 
   constructor (props) {
     super(props);
@@ -54,7 +57,6 @@ class AgentList extends React.Component {
     API.get('get_all_agents')
       .then(agents => agents.data)
       .then(agentsList => {
-          console.log(agentsList)
           this.setState({ agentsData: agentsList });
       });
   }
@@ -65,8 +67,6 @@ class AgentList extends React.Component {
 
   render() {
 
-    const {agentsData} = this.state;
-
 
     return (
         <TableContainer component={Paper}>
@@ -76,22 +76,22 @@ class AgentList extends React.Component {
                 <TableCell>Agent Public Address</TableCell>
                 <TableCell align="right">Date Created</TableCell>
                 <TableCell align="right">Last Updated</TableCell>
+                <TableCell align="right">Status</TableCell>
                 <TableCell align="right">USD Value</TableCell>
                 <TableCell align="right">ETH Value</TableCell>
-                <TableCell align="right">Status</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {agentsData.map((row) => (
+              {rows.map((row) => (
                 <TableRow key={row.address}>
                   <TableCell component="th" scope="row">
-                    {row.address}
+                    {row.name}
                   </TableCell>
                   <TableCell align="right">{row.date_created}</TableCell>
                   <TableCell align="right">{row.date_updated}</TableCell>
                   <TableCell align="right">{row.usd_val}</TableCell>
-                  <TableCell align="right">{row.eth_val}</TableCell>  
-                  <TableCell align="right">  <Button
+                  <TableCell align="right">
+                    <Button
                       style={states[row.status]}
                     >
                       {row.status}

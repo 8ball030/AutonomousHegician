@@ -46,7 +46,7 @@ Once the containers have built and launched, the front end is accessible from;
 
 
 ## Architecture
-![Proposal for Poc of Behavior Auto-Execution](https://github.com/8ball030/hegichelper/blob/master/docs/schema/Architecture.jpg)
+![Proposal for Poc of Behavior Auto-Execution](https://github.com/8ball030/hegichelper/blob/master/schema/Architecture.jpg)
 
 
 
