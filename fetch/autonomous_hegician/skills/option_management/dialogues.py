@@ -28,7 +28,6 @@ from typing import Optional, Type
 
 from aea.common import Address
 from aea.exceptions import enforce
-from aea.helpers.search.models import Description
 from aea.helpers.transaction.base import Terms
 from aea.protocols.base import Message
 from aea.protocols.dialogue.base import Dialogue as BaseDialogue
@@ -42,15 +41,6 @@ from packages.fetchai.protocols.contract_api.dialogues import (
     ContractApiDialogues as BaseContractApiDialogues,
 )
 from packages.fetchai.protocols.contract_api.message import ContractApiMessage
-from packages.fetchai.protocols.default.dialogues import (
-    DefaultDialogue as BaseDefaultDialogue,
-)
-from packages.fetchai.protocols.default.dialogues import (
-    DefaultDialogues as BaseDefaultDialogues,
-)
-from packages.fetchai.protocols.fipa.dialogues import FipaDialogue as BaseFipaDialogue
-from packages.fetchai.protocols.fipa.dialogues import FipaDialogues as BaseFipaDialogues
-from packages.fetchai.protocols.fipa.message import FipaMessage
 from packages.fetchai.protocols.ledger_api.dialogues import (
     LedgerApiDialogue as BaseLedgerApiDialogue,
 )
@@ -58,12 +48,6 @@ from packages.fetchai.protocols.ledger_api.dialogues import (
     LedgerApiDialogues as BaseLedgerApiDialogues,
 )
 from packages.fetchai.protocols.ledger_api.message import LedgerApiMessage
-from packages.fetchai.protocols.oef_search.dialogues import (
-    OefSearchDialogue as BaseOefSearchDialogue,
-)
-from packages.fetchai.protocols.oef_search.dialogues import (
-    OefSearchDialogues as BaseOefSearchDialogues,
-)
 from packages.fetchai.protocols.signing.dialogues import (
     SigningDialogue as BaseSigningDialogue,
 )
@@ -145,110 +129,6 @@ class ContractApiDialogues(Model, BaseContractApiDialogues):
         )
 
 
-DefaultDialogue = BaseDefaultDialogue
-
-
-class DefaultDialogues(Model, BaseDefaultDialogues):
-    """The dialogues class keeps track of all dialogues."""
-
-    def __init__(self, **kwargs) -> None:
-        """
-        Initialize dialogues.
-
-        :return: None
-        """
-        Model.__init__(self, **kwargs)
-
-        def role_from_first_message(  # pylint: disable=unused-argument
-            message: Message, receiver_address: Address
-        ) -> BaseDialogue.Role:
-            """Infer the role of the agent from an incoming/outgoing first message
-
-            :param message: an incoming/outgoing first message
-            :param receiver_address: the address of the receiving agent
-            :return: The role of the agent
-            """
-            return DefaultDialogue.Role.AGENT
-
-        BaseDefaultDialogues.__init__(
-            self,
-            self_address=self.context.agent_address,
-            role_from_first_message=role_from_first_message,
-        )
-
-
-class FipaDialogue(BaseFipaDialogue):
-    """The dialogue class maintains state of a dialogue and manages it."""
-
-    def __init__(
-        self,
-        dialogue_label: BaseDialogueLabel,
-        self_address: Address,
-        role: BaseDialogue.Role,
-        message_class: Type[FipaMessage] = FipaMessage,
-    ) -> None:
-        """
-        Initialize a dialogue.
-
-        :param dialogue_label: the identifier of the dialogue
-        :param self_address: the address of the entity for whom this dialogue is maintained
-        :param role: the role of the agent this dialogue is maintained for
-
-        :return: None
-        """
-        BaseFipaDialogue.__init__(
-            self,
-            dialogue_label=dialogue_label,
-            self_address=self_address,
-            role=role,
-            message_class=message_class,
-        )
-        self._proposal = None  # type: Optional[Description]
-
-    @property
-    def proposal(self) -> Description:
-        """Get the proposal."""
-        if self._proposal is None:
-            raise ValueError("Proposal not set!")
-        return self._proposal
-
-    @proposal.setter
-    def proposal(self, proposal: Description) -> None:
-        """Set the proposal."""
-        enforce(self._proposal is None, "Proposal already set!")
-        self._proposal = proposal
-
-
-class FipaDialogues(Model, BaseFipaDialogues):
-    """The dialogues class keeps track of all dialogues."""
-
-    def __init__(self, **kwargs) -> None:
-        """
-        Initialize dialogues.
-
-        :return: None
-        """
-        Model.__init__(self, **kwargs)
-
-        def role_from_first_message(  # pylint: disable=unused-argument
-            message: Message, receiver_address: Address
-        ) -> BaseDialogue.Role:
-            """Infer the role of the agent from an incoming/outgoing first message
-
-            :param message: an incoming/outgoing first message
-            :param receiver_address: the address of the receiving agent
-            :return: The role of the agent
-            """
-            return BaseFipaDialogue.Role.SELLER
-
-        BaseFipaDialogues.__init__(
-            self,
-            self_address=self.context.agent_address,
-            role_from_first_message=role_from_first_message,
-            dialogue_class=FipaDialogue,
-        )
-
-
 class LedgerApiDialogue(BaseLedgerApiDialogue):
     """The dialogue class maintains state of a dialogue and manages it."""
 
@@ -323,39 +203,6 @@ class LedgerApiDialogues(Model, BaseLedgerApiDialogues):
             self_address=self.context.agent_address,
             role_from_first_message=role_from_first_message,
             dialogue_class=LedgerApiDialogue,
-        )
-
-
-OefSearchDialogue = BaseOefSearchDialogue
-
-
-class OefSearchDialogues(Model, BaseOefSearchDialogues):
-    """This class keeps track of all oef_search dialogues."""
-
-    def __init__(self, **kwargs) -> None:
-        """
-        Initialize dialogues.
-
-        :param agent_address: the address of the agent for whom dialogues are maintained
-        :return: None
-        """
-        Model.__init__(self, **kwargs)
-
-        def role_from_first_message(  # pylint: disable=unused-argument
-            message: Message, receiver_address: Address
-        ) -> BaseDialogue.Role:
-            """Infer the role of the agent from an incoming/outgoing first message
-
-            :param message: an incoming/outgoing first message
-            :param receiver_address: the address of the receiving agent
-            :return: The role of the agent
-            """
-            return BaseOefSearchDialogue.Role.AGENT
-
-        BaseOefSearchDialogues.__init__(
-            self,
-            self_address=self.context.agent_address,
-            role_from_first_message=role_from_first_message,
         )
 
 

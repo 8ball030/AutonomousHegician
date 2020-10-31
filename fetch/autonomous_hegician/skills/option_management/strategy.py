@@ -39,6 +39,47 @@ DEFAULT_TIME_BEFORE_EXECUTION = 600
 class Strategy(Model):
     """This class defines a strategy for the agent."""
 
+    def __init__(self, **kwargs) -> None:
+        """Initialize the strategy of the agent."""
+        self._ledger_id = kwargs.pop("ledger_id", DEFAULT_LEDGER_ID)
+        self._deployment_status: Dict[
+            str, Union[Tuple[Optional[str], Optional[str]], str]
+        ] = {}
+        not_deployed = 0
+        for contract in [
+            "wbtc",
+            "hegic",
+            "priceprovider",
+            "btcpriceprovider",
+            "ethoptions",
+            "btcoptions",
+            "exchange",
+            "stakingwbtc",
+            "stakingeth",
+            "liquidity",
+            "ethpool",
+            "btcpool",
+            "ethoptions_estimate",
+            "ethoptions_create_option",
+            "ethoptions_exercise",
+            "btcoptions_estimate",
+            "btcoptions_create_option",
+            "btcoptions_exercise",
+        ]:  # post test remove
+            param = kwargs.pop(contract, None)
+            if param == "" or param is None:
+                not_deployed += 1
+                self._deployment_status[contract] = (None, None)
+            else:
+                self._deployment_status[contract] = ("deployed", param)
+            self._database = DBCommunication()
+
+        if not_deployed >= 0:
+            self._deployment_status["status"] = "pending"
+        self.eth_balance = None
+        super().__init__(**kwargs)
+        self.context.logger.info(f"Deployment paramets {self.deployment_status}")
+
     @property
     def current_order(self) -> None:
         """Get current order being interacted with"""
@@ -112,47 +153,6 @@ class Strategy(Model):
         else:
             raise ValueError(f"Invalid status code {status_code}")
 
-    def __init__(self, **kwargs) -> None:
-        """Initialize the strategy of the agent."""
-        self._ledger_id = kwargs.pop("ledger_id", DEFAULT_LEDGER_ID)
-        self._deployment_status: Dict[
-            str, Union[Tuple[Optional[str], Optional[str]], str]
-        ] = {}
-        not_deployed = 0
-        for contract in [
-            "wbtc",
-            "hegic",
-            "priceprovider",
-            "btcpriceprovider",
-            "ethoptions",
-            "btcoptions",
-            "exchange",
-            "stakingwbtc",
-            "stakingeth",
-            "liquidity",
-            "ethpool",
-            "btcpool",
-            "ethoptions_estimate",
-            "ethoptions_create_option",
-            "ethoptions_exercise",
-            "btcoptions_estimate",
-            "btcoptions_create_option",
-            "btcoptions_exercise",
-        ]:  # post test remove
-            param = kwargs.pop(contract, None)
-            if param == "" or param is None:
-                not_deployed += 1
-                self._deployment_status[contract] = (None, None)
-            else:
-                self._deployment_status[contract] = ("deployed", param)
-            self._database = DBCommunication()
-
-        if not_deployed >= 0:
-            self._deployment_status["status"] = "pending"
-        self.eth_balance = None
-        super().__init__(**kwargs)
-        self.context.logger.info(f"Deployment paramets {self.deployment_status}")
-
     @property
     def deployment_status(self) -> dict:
         """Return the deployment status."""
@@ -178,21 +178,3 @@ class Strategy(Model):
             nonce="",
         )
         return terms
-
-
-#    def get_create_token_terms(self) -> Terms:
-#        """
-#        Get create token terms of deployment.
-#
-#        :return: terms
-#        """
-#        terms = Terms(
-#            ledger_id=self.ledger_id,
-#            sender_address=self.context.agent_address,
-#            counterparty_address=self.context.agent_address,
-#            amount_by_currency_id={},
-#            quantities_by_good_id={},
-#            nonce="",
-#        )
-#        return terms
-#
