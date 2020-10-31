@@ -4,31 +4,57 @@ The aim of this project is to provide an agent based approach to managing Hegic 
 
 The project uses Fetch.ai as a base and consists of an agent with a skills to provide different functionality.
 
-The first skill to implement is ITM option expiration auto-execution behaviour,  the implementation of this behaviour will be allow us to move forwards in a very swift manner.
+The behviour  implemented is ITM option expiration auto-execution behaviour,  the implementation of this behaviour which will swiftly be augmented with additional advanced order types.
 
-This skill provides the functionality of
-
-- Excercising ITM Hegic contracts.
-The user can configure the exact parameters for the exercision of a contract.
-
-  - ITM at expiration
-
-  - Stop loss
-
-  - Take Profit
+Presently, the Autonomous Hegician provides the functionality of
+	- Excercising ITM Hegic contracts.
+	- Auto Excercising ITM contacts with *no* user interaction
 
 
 ## Instructions
 Please build the documents using the following commands to set the documentation up.
 
-## Architecture
-![Proposal for Poc of Behavior Auto-Execution](https://github.com/8ball030/hegichelper/blob/master/schema/Architecture.jpg)
 
 ## Clone repo
 
 ``` bash
 git clone git@github.com:8ball030/hegichelper.git
 ```
+
+
+## Installation of User Application
+The Autonomous Hegician has been designed to be as easy to use as possible. The application is designed to run on a raspberry pi to allow for users to remain fully in control of their keys.
+
+The easiest/fastest way to install the application is to use the soon to come pre-built Raspberry Pi images. In the interim, the application can be launched using docker-compose as so;
+```
+docker-compose up -d
+```
+
+This will launch 4 containers
+
+- *Postgres database* - For storage of option parameters
+- *Swagger api* - To allow interaction with the database 
+- *React Front end* - To allow user interaction with the AH.
+- *Live Autonomous Hegician* - Connected to the Mainnet.
+
+Once the containers have built and launched, the front end is accessible from;
+
+[Autonomous Hegician](http://0.0.0.0:3001) 
+
+
+
+
+
+## Architecture
+![Proposal for Poc of Behavior Auto-Execution](https://github.com/8ball030/hegichelper/blob/master/schema/Architecture.jpg)
+
+
+
+
+
+## Development Environment Installation
+
+To develop the agent independently, it is useful to refer to the docs to understand how the exisiting behaviours are interacting with each other.
 
 ## Set up and Docs
 
@@ -38,7 +64,7 @@ mkdocs serve
 exit
 ```
 
-## Installing
+## Dev Env
 
 First, make sure ganache is installed:
 ``` bash
@@ -53,7 +79,6 @@ cd ..
 ```
 
 ## Running the agent as a AEA
-
 
 First, run a local ganache client (with seed so we get same private keys each time):
 ``` bash
@@ -83,14 +108,6 @@ cd frontend/
 npm install
 npm start
 ```
-
-Navigate to localhost:3000 to see the front end
-
-##TODO
-- Complete contract - Excersise and create pending.
-- Create pleasent way to add new contracts to the sqllite db
-
-
 
 
 ## Contributors
