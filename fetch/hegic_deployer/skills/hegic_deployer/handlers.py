@@ -28,204 +28,18 @@ from aea.skills.base import Handler
 from packages.eightballer.skills.hegic_deployer.dialogues import (
     ContractApiDialogue,
     ContractApiDialogues,
-    DefaultDialogues,
-    FipaDialogue,
-    FipaDialogues,
     LedgerApiDialogue,
     LedgerApiDialogues,
-    OefSearchDialogue,
-    OefSearchDialogues,
     SigningDialogue,
     SigningDialogues,
 )
 from packages.eightballer.skills.hegic_deployer.strategy import Strategy
 from packages.fetchai.protocols.contract_api.message import ContractApiMessage
-from packages.fetchai.protocols.default.message import DefaultMessage
-from packages.fetchai.protocols.fipa.message import FipaMessage
 from packages.fetchai.protocols.ledger_api.message import LedgerApiMessage
-from packages.fetchai.protocols.oef_search.message import OefSearchMessage
 from packages.fetchai.protocols.signing.message import SigningMessage
 
 
-# from aea.crypto.ethereum import LedgerApis
-# from aea.protocols.base import Message
-# from aea.protocols.default.message import DefaultMessage
-# from aea.protocols.signing.message import SigningMessage
-# from aea.skills.base import Handler
-
-
 LEDGER_API_ADDRESS = "fetchai/ledger:0.8.0"
-
-
-class FipaHandler(Handler):
-    """This class implements a FIPA handler."""
-
-    SUPPORTED_PROTOCOL = FipaMessage.protocol_id
-
-    def setup(self) -> None:
-        """Implement the setup for the handler."""
-        pass
-
-    def handle(self, message: Message) -> None:
-        """
-        Implement the reaction to a message.
-
-        :param message: the message
-        :return: None
-        """
-        fipa_msg = cast(FipaMessage, message)
-
-        # recover dialogue
-        fipa_dialogues = cast(FipaDialogues, self.context.fipa_dialogues)
-        fipa_dialogue = cast(FipaDialogue, fipa_dialogues.update(fipa_msg))
-        if fipa_dialogue is None:
-            self._handle_unidentified_dialogue(fipa_msg)
-            return
-
-        if fipa_msg.performative == FipaMessage.Performative.CFP:
-            self._handle_cfp(fipa_msg, fipa_dialogue)
-        elif fipa_msg.performative == FipaMessage.Performative.ACCEPT_W_INFORM:
-            self._handle_accept_w_inform(fipa_msg, fipa_dialogue)
-        else:
-            self._handle_invalid(fipa_msg, fipa_dialogue)
-
-    def teardown(self) -> None:
-        """
-        Implement the handler teardown.
-
-        :return: None
-        """
-        pass
-
-    def _handle_unidentified_dialogue(self, fipa_msg: FipaMessage) -> None:
-        """
-        Handle an unidentified dialogue.
-
-        Respond to the sender with a default message containing the appropriate error information.
-
-        :param fipa_msg: the message
-        :return: None
-        """
-        self.context.logger.info(
-            "unidentified dialogue for message={}.".format(fipa_msg)
-        )
-        default_dialogues = cast(DefaultDialogues, self.context.default_dialogues)
-        default_msg, _ = default_dialogues.create(
-            counterparty=fipa_msg.sender,
-            performative=DefaultMessage.Performative.ERROR,
-            error_code=DefaultMessage.ErrorCode.INVALID_DIALOGUE,
-            error_msg="Invalid dialogue.",
-            error_data={"fipa_message": fipa_msg.encode()},
-        )
-        self.context.outbox.put_message(message=default_msg)
-
-    def _handle_cfp(self, fipa_msg: FipaMessage, fipa_dialogue: FipaDialogue) -> None:
-        """
-        Handle the CFP.
-
-        If the CFP matches the supplied services then send a PROPOSE, otherwise send a DECLINE.
-
-        :param fipa_msg: the message
-        :param fipa_dialogue: the dialogue object
-        :return: None
-        """
-        strategy = cast(Strategy, self.context.strategy)
-        self.context.logger.info(
-            "received CFP from sender={}".format(fipa_msg.sender[-5:])
-        )
-        if not strategy.is_tokens_minted:
-            self.context.logger.info("Contract items not minted yet. Try again later.")
-            return
-
-        # simply send the same proposal, independent of the query
-        fipa_dialogue.proposal = strategy.get_proposal()
-        proposal_msg = fipa_dialogue.reply(
-            performative=FipaMessage.Performative.PROPOSE,
-            target_message=fipa_msg,
-            proposal=fipa_dialogue.proposal,
-        )
-        self.context.logger.info(
-            "sending PROPOSE to agent={}: proposal={}".format(
-                fipa_msg.sender[-5:], fipa_dialogue.proposal.values,
-            )
-        )
-        self.context.outbox.put_message(message=proposal_msg)
-
-    def _handle_accept_w_inform(
-        self, fipa_msg: FipaMessage, fipa_dialogue: FipaDialogue
-    ) -> None:
-        """
-        Handle the ACCEPT_W_INFORM.
-
-        If the ACCEPT_W_INFORM message contains the signed transaction, sign it too, otherwise do nothing.
-
-        :param fipa_msg: the message
-        :param fipa_dialogue: the dialogue object
-        :return: None
-        """
-        tx_signature = fipa_msg.info.get("tx_signature", None)
-        if tx_signature is not None:
-            self.context.logger.info(
-                "received ACCEPT_W_INFORM from sender={}: tx_signature={}".format(
-                    fipa_msg.sender[-5:], tx_signature
-                )
-            )
-            strategy = cast(Strategy, self.context.strategy)
-            contract_api_dialogues = cast(
-                ContractApiDialogues, self.context.contract_api_dialogues
-            )
-            contract_api_msg, contract_api_dialogue = contract_api_dialogues.create(
-                counterparty=LEDGER_API_ADDRESS,
-                performative=ContractApiMessage.Performative.GET_RAW_TRANSACTION,
-                ledger_id=strategy.ledger_id,
-                contract_id="fetchai/erc1155:0.9.0",
-                contract_address=strategy.contract_address,
-                callable="get_atomic_swap_single_transaction",
-                kwargs=ContractApiMessage.Kwargs(
-                    {
-                        "from_address": self.context.agent_address,
-                        "to_address": fipa_msg.sender,
-                        "token_id": int(fipa_dialogue.proposal.values["token_id"]),
-                        "from_supply": int(
-                            fipa_dialogue.proposal.values["from_supply"]
-                        ),
-                        "to_supply": int(fipa_dialogue.proposal.values["to_supply"]),
-                        "value": int(fipa_dialogue.proposal.values["value"]),
-                        "trade_nonce": int(
-                            fipa_dialogue.proposal.values["trade_nonce"]
-                        ),
-                        "signature": tx_signature,
-                    }
-                ),
-            )
-            contract_api_dialogue = cast(ContractApiDialogue, contract_api_dialogue)
-            contract_api_dialogue.terms = strategy.get_single_swap_terms(
-                fipa_dialogue.proposal, fipa_msg.sender
-            )
-            self.context.outbox.put_message(message=contract_api_msg)
-            self.context.logger.info("requesting single atomic swap transaction...")
-        else:
-            self.context.logger.info(
-                "received ACCEPT_W_INFORM from sender={} with no signature.".format(
-                    fipa_msg.sender[-5:]
-                )
-            )
-
-    def _handle_invalid(
-        self, fipa_msg: FipaMessage, fipa_dialogue: FipaDialogue
-    ) -> None:
-        """
-        Handle a fipa message of invalid performative.
-
-        :param fipa_msg: the message
-        :param fipa_dialogue: the dialogue object
-        :return: None
-        """
-        self.context.logger.warning(
-            "cannot handle fipa message of performative={} in dialogue={}.".format(
-                fipa_msg.performative, fipa_dialogue
-            )
-        )
 
 
 class LedgerApiHandler(Handler):
@@ -345,7 +159,7 @@ class LedgerApiHandler(Handler):
         contract_reference = ledger_api_dialogue._associated_signing_dialogue._associated_contract_api_dialogue.dialogue_label.dialogue_reference[
             0
         ]
-        for contract, status in self.context.strategy._deployment_status.items():
+        for contract, status in strategy._deployment_status.items():
             if status[0] is None:
                 continue
             elif status[1] == contract_reference:
@@ -360,9 +174,9 @@ class LedgerApiHandler(Handler):
                     f"** {ledger_api_msg.transaction_receipt.receipt['contractAddress']}  Retireved and stored)"
                 )
                 #              if contract in ["ethoptions_create_option", "btcoptions_create_option"]:
-                #                  self.context.strategy.update_option(
-                #                     self.context.strategy.current_order_id, {"status_code_id": 3})
-                self.context.strategy.deployment_status["status"] = "pending"
+                #                  strategy.update_option(
+                #                     strategy.current_order_id, {"status_code_id": 3})
+                strategy.deployment_status["status"] = "pending"
         if is_transaction_successful:
             self.context.logger.info(
                 "transaction was successfully settled. Transaction receipt={}".format(
@@ -459,7 +273,7 @@ class ContractApiHandler(Handler):
         """Handle state reading of the contract apis."""
         strategy = cast(Strategy, self.context.strategy)
         contract_reference = contract_api_dialogue.dialogue_label.dialogue_reference[0]
-        for contract, status in self.context.strategy._deployment_status.items():
+        for contract, status in strategy._deployment_status.items():
             if status[0] is None:
                 continue
             elif status[1] == contract_reference:
@@ -472,7 +286,7 @@ class ContractApiHandler(Handler):
                     "results",
                     contract_api_msg.state.body,
                 )
-                self.context.strategy.deployment_status["status"] = "pending"
+                strategy.deployment_status["status"] = "pending"
 
     def teardown(self) -> None:
         """
@@ -667,93 +481,5 @@ class SigningHandler(Handler):
         self.context.logger.warning(
             "cannot handle signing message of performative={} in dialogue={}.".format(
                 signing_msg.performative, signing_dialogue
-            )
-        )
-
-
-class OefSearchHandler(Handler):
-    """This class implements an OEF search handler."""
-
-    SUPPORTED_PROTOCOL = OefSearchMessage.protocol_id
-
-    def setup(self) -> None:
-        """Call to setup the handler."""
-        pass
-
-    def handle(self, message: Message) -> None:
-        """
-        Implement the reaction to a message.
-
-        :param message: the message
-        :return: None
-        """
-        oef_search_msg = cast(OefSearchMessage, message)
-
-        # recover dialogue
-        oef_search_dialogues = cast(
-            OefSearchDialogues, self.context.oef_search_dialogues
-        )
-        oef_search_dialogue = cast(
-            Optional[OefSearchDialogue], oef_search_dialogues.update(oef_search_msg)
-        )
-        if oef_search_dialogue is None:
-            self._handle_unidentified_dialogue(oef_search_msg)
-            return
-
-        # handle message
-        if oef_search_msg.performative is OefSearchMessage.Performative.OEF_ERROR:
-            self._handle_error(oef_search_msg, oef_search_dialogue)
-        else:
-            self._handle_invalid(oef_search_msg, oef_search_dialogue)
-
-    def teardown(self) -> None:
-        """
-        Implement the handler teardown.
-
-        :return: None
-        """
-        pass
-
-    def _handle_unidentified_dialogue(self, oef_search_msg: OefSearchMessage) -> None:
-        """
-        Handle an unidentified dialogue.
-
-        :param msg: the message
-        """
-        self.context.logger.info(
-            "received invalid oef_search message={}, unidentified dialogue.".format(
-                oef_search_msg
-            )
-        )
-
-    def _handle_error(
-        self, oef_search_msg: OefSearchMessage, oef_search_dialogue: OefSearchDialogue
-    ) -> None:
-        """
-        Handle an oef search message.
-
-        :param oef_search_msg: the oef search message
-        :param oef_search_dialogue: the dialogue
-        :return: None
-        """
-        self.context.logger.info(
-            "received oef_search error message={} in dialogue={}.".format(
-                oef_search_msg, oef_search_dialogue
-            )
-        )
-
-    def _handle_invalid(
-        self, oef_search_msg: OefSearchMessage, oef_search_dialogue: OefSearchDialogue
-    ) -> None:
-        """
-        Handle an oef search message.
-
-        :param oef_search_msg: the oef search message
-        :param oef_search_dialogue: the dialogue
-        :return: None
-        """
-        self.context.logger.warning(
-            "cannot handle oef_search message of performative={} in dialogue={}.".format(
-                oef_search_msg.performative, oef_search_dialogue,
             )
         )
