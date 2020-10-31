@@ -1,4 +1,4 @@
-Hegic Helper
+Autonomous Hegician
 ======
 
 The aim of this project is to provide an agent based approach to managing Hegic decentralised options contracts.
@@ -8,8 +8,9 @@ The project uses Fetch.ai's [AEA framework](https://github.com/fetchai/agents-ae
 The behviour  implemented is an ITM option expiration auto-execution behaviour,  the implementation of this behaviour will eventually be augmented with additional advanced order types.
 
 Presently, the Autonomous Hegician (AH) provides the functionality of
-	- Excercising ITM Hegic contracts, and
-	- Auto Excercising ITM contacts with *no* user interaction.
+
+- Excercising ITM Hegic contracts, and
+- Auto Excercising ITM contacts with *no* user interaction.
 
 
 ## Instructions for Users
@@ -19,7 +20,7 @@ To use the AH follow these steps.
 ### 1. Clone repo
 
 ``` bash
-git clone git@github.com:8ball030/hegichelper.git
+git clone git@github.com:8ball030/AutonomousHegician.git
 ```
 
 
@@ -50,7 +51,7 @@ Once the containers have built and launched, the front end is accessible from;
 
 ## 3. Optionally learn about the Architecture
 
-![Proposal for Poc of Behavior Auto-Execution](https://github.com/8ball030/hegichelper/blob/master/schema/Architecture.jpg)
+![Proposal for Poc of Behavior Auto-Execution](https://github.com/8ball030/AutonomousHegician/blob/master/schema/Architecture.jpg)
 
 
 ## Instructions for Developers
