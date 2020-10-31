@@ -6,12 +6,12 @@ from typing import Dict, cast
 
 try:
     from packages.eightballer.skills.option_management.web_server import (
+        ExecutionStrategy,
         Option,
         Snapshot,
         StatusCode,
-        ExecutionStrategy,
         db,
-        flask_app
+        flask_app,
     )
 except:
     from .web_server import (
@@ -20,8 +20,9 @@ except:
         StatusCode,
         ExecutionStrategy,
         db,
-        flask_app
+        flask_app,
     )
+
 from datetime import datetime, timedelta
 
 
@@ -56,8 +57,7 @@ class DBCommunication:
     def create_new_option(amount, strike_price, period, option_type, market) -> Dict:
         with flask_app.app_context():
             execution_strategy = db.session.query(ExecutionStrategy).one()
-            status_code = db.session.query(
-                StatusCode).filter(StatusCode.id == 1).one()
+            status_code = db.session.query(StatusCode).filter(StatusCode.id == 1).one()
             option = Option(
                 amount=amount,
                 strike_price=strike_price,
@@ -74,13 +74,20 @@ class DBCommunication:
             db.session.commit()
             _id = option.id
             db.session.close()
-        return {"option_id": _id, "amount": amount, "strike_price": strike_price, "period": period, "option_type": option_type, "market": market, "status_code": 1}
+        return {
+            "option_id": _id,
+            "amount": amount,
+            "strike_price": strike_price,
+            "period": period,
+            "option_type": option_type,
+            "market": market,
+            "status_code": 1,
+        }
 
     @staticmethod
     def update_option(option_db_id, params) -> Option:
         with flask_app.app_context():
-            option = db.session.query(Option).filter(
-                Option.id == option_db_id).one()
+            option = db.session.query(Option).filter(Option.id == option_db_id).one()
             for key, value in params.items():
                 setattr(option, key, value)
             db.session.merge(option)

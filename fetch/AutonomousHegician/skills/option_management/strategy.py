@@ -19,10 +19,11 @@
 
 """This module contains the strategy class."""
 
-import yaml
 import random  # nosec
+from datetime import datetime, timedelta
 from typing import List
-from datetime import timedelta, datetime
+
+import yaml
 
 from aea.configurations.constants import DEFAULT_LEDGER
 from aea.exceptions import enforce
@@ -36,7 +37,10 @@ from aea.helpers.search.models import Description, Location
 from aea.helpers.transaction.base import Terms
 from aea.skills.base import Model
 
-from packages.eightballer.skills.option_management.db_communication import DBCommunication
+from packages.eightballer.skills.option_management.db_communication import (
+    DBCommunication,
+)
+
 
 DEFAULT_LEDGER_ID = DEFAULT_LEDGER
 DEFAULT_TIME_BEFORE_EXECUTION = 600
@@ -44,7 +48,7 @@ DEFAULT_TIME_BEFORE_EXECUTION = 600
 
 class Strategy(Model):
     """This class defines a strategy for the agent."""
-        
+
     @property
     def current_order(self) -> None:
         """current order being interacted with"""
@@ -62,28 +66,35 @@ class Strategy(Model):
     def get_contracts_to_execute(self) -> list:
         orders = [f for f in self.gather_pending_orders() if f.status_code_id == 3]
         results = []
-     #  self.context.logger.info(
-     #      f"Monitoring {len(orders)} orders for execution.")
+        #  self.context.logger.info(
+        #      f"Monitoring {len(orders)} orders for execution.")
         for order in orders:
             if self.check_contract_should_execute(order):
                 results.append(order)
         return results
-
 
     def check_contract_should_execute(self, contract: dict) -> bool:
         """Check if the contract is in the money, 
            and that the expiration date is near
         """
         deadline = contract.expiration_date - timedelta(
-                seconds=DEFAULT_TIME_BEFORE_EXECUTION)
-
+            seconds=DEFAULT_TIME_BEFORE_EXECUTION
+        )
 
         if contract.status_code_id == 3 and datetime.now() > deadline:
             price = self.context.behaviours.price_ticker.current_price[contract.market]
-            if any([(contract.option_type == 1 # put option
-                     and contract.strike_price > price),
-                    (contract.option_type == 2 # call option
-                     and contract.strike_price < price)]):
+            if any(
+                [
+                    (
+                        contract.option_type == 1  # put option
+                        and contract.strike_price > price
+                    ),
+                    (
+                        contract.option_type == 2  # call option
+                        and contract.strike_price < price
+                    ),
+                ]
+            ):
                 self.context.logger.info(f"Order is ready to execute!")
                 return True
         return False
@@ -105,35 +116,39 @@ class Strategy(Model):
         if status_code == 3:
             return self.get_contracts_to_execute()
         elif status_code == 1 or status_code == 0:
-            return [f for f in self.gather_pending_orders() if f.status_code_id == status_code]
-        else: 
+            return [
+                f
+                for f in self.gather_pending_orders()
+                if f.status_code_id == status_code
+            ]
+        else:
             raise ValueError(f"Invalid status code {status_code}")
 
     def __init__(self, **kwargs) -> None:
         """Initialize the strategy of the agent."""
         self._ledger_id = kwargs.pop("ledger_id", DEFAULT_LEDGER_ID)
-        self._deployment_status = {
-        }
+        self._deployment_status = {}
         not_deployed = 0
-        for contract in ["wbtc",
-                         "hegic",
-                         "priceprovider",
-                         "btcpriceprovider",
-                         "ethoptions",
-                         "btcoptions",
-                         "exchange",
-                         "stakingwbtc",
-                         "stakingeth",
-                         "liquidity",
-                         "ethpool",
-                         "btcpool",
-                         "ethoptions_estimate",
-                         "ethoptions_create_option",
-                         "ethoptions_exercise",
-                         "btcoptions_estimate",
-                         "btcoptions_create_option",
-                         "btcoptions_exercise"
-                         ]:  # post test remove
+        for contract in [
+            "wbtc",
+            "hegic",
+            "priceprovider",
+            "btcpriceprovider",
+            "ethoptions",
+            "btcoptions",
+            "exchange",
+            "stakingwbtc",
+            "stakingeth",
+            "liquidity",
+            "ethpool",
+            "btcpool",
+            "ethoptions_estimate",
+            "ethoptions_create_option",
+            "ethoptions_exercise",
+            "btcoptions_estimate",
+            "btcoptions_create_option",
+            "btcoptions_exercise",
+        ]:  # post test remove
             param = kwargs.pop(contract, None)
             if param == "" or param is None:
                 not_deployed += 1
@@ -146,8 +161,7 @@ class Strategy(Model):
             self._deployment_status["status"] = "pending"
         self.eth_balance = None
         super().__init__(**kwargs)
-        self.context.logger.info(
-            f"Deployment paramets {self.deployment_status}")
+        self.context.logger.info(f"Deployment paramets {self.deployment_status}")
 
     @property
     def deployment_status(self) -> dict:
@@ -158,7 +172,6 @@ class Strategy(Model):
     def ledger_id(self) -> str:
         """Get the ledger id."""
         return self._ledger_id
-
 
     def get_deploy_terms(self) -> Terms:
         """
@@ -175,6 +188,7 @@ class Strategy(Model):
             nonce="",
         )
         return terms
+
 
 #    def get_create_token_terms(self) -> Terms:
 #        """
