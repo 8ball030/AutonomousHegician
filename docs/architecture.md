@@ -5,7 +5,7 @@ The intial strategy we have implemented as a proof of concept is design to monit
  - B) within 5 minutes of execution.
 
 
-![image](../schema/strategy_behaviour.png)
+![image](schema/strategy_behaviour.png)
 
 # Behaviours
 We have implmented 4 behaviours.
@@ -49,7 +49,7 @@ Format: ![Alt Text](url)
 
 # Architecture schema
 
-![image](../schema/Architecture.jpg)
+![image](schema/Architecture.jpg)
 
 
 

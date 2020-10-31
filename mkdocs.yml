@@ -12,6 +12,8 @@ theme:
 
 nav:
   - Index: 'index.md'
+  - Setup: 'setup.md'
+  - Strategy: 'strategy.md'
   - Architecture: 'architecture.md'
 
 plugins: []

@@ -1,0 +1,86 @@
+author: eightballer
+name: option_management
+version: 0.1.0
+license: Apache-2.0
+aea_version: '>=0.7.0, <0.8.0'
+type: skill
+description: The hegic deploy skill has the ability to deploy and interact with the
+  smart contracts.
+fingerprint:
+  README.md: QmZ7swVkRpmJbJZ2NoLb9CWwH8p3QjnjRJg71UbAXdrKyx
+  __init__.py: QmanmQfdWSEPtEKJCt6sz6S13ju3o7D7oSzriBkVABAARj
+  behaviours.py: QmP5SfYSbUesVrKQ9E1wG1Y8nqo6yiERgCbaYPjWrZ2HuZ
+  db_communication.py: QmTB27cFomsabeEzqe8PCmVre7jgdf2A7DiYJZFmcBJKWJ
+  dex_wrapper.py: QmZM19jvfPL9uTCdENY56uhUPxwj1VDM1TzuRMSPemepnP
+  dialogues.py: QmfCY3h2CXTryfRrLFt4oeDBTS2AMBbbNyVMJKoWtt93Mt
+  handlers.py: QmeiSALAdiDXRCpFyRh3z7Pk1w7tDcAgo92RNcvJ4qSa1h
+  strategy.py: QmWkbvbysSX2ERKSjL7p1NMwJTT4or4SVkKZS37gsbBEBU
+  web_server.py: QmNVFe5mCy9WsWY8gYnq88aEdj6nQVBWWshxijXGYpk5Ty
+fingerprint_ignore_patterns: []
+contracts:
+- eightballer/btcoptions:0.1.0
+- eightballer/btcpool:0.1.0
+- eightballer/btcpriceprovider:0.1.0
+- eightballer/ethoptions:0.1.0
+- eightballer/ethpool:0.1.0
+- eightballer/exchange:0.1.0
+- eightballer/hegic:0.1.0
+- eightballer/priceprovider:0.1.0
+- eightballer/stakingeth:0.1.0
+- eightballer/stakingwbtc:0.1.0
+- eightballer/wbtc:0.1.0
+protocols:
+- fetchai/contract_api:0.7.0
+- fetchai/ledger_api:0.6.0
+- fetchai/signing:0.6.0
+skills: []
+is_abstract: false
+behaviours:
+  option_management:
+    args:
+      services_interval: 0.0001
+    class_name: OptionMonitor
+  price_ticker:
+    args:
+      services_interval: 10
+    class_name: PriceTicker
+  snapshot:
+    args:
+      services_interval: 30
+    class_name: SnapShot
+handlers:
+  contract_api:
+    args: {}
+    class_name: ContractApiHandler
+  ledger_api:
+    args: {}
+    class_name: LedgerApiHandler
+  signing:
+    args: {}
+    class_name: SigningHandler
+models:
+  contract_api_dialogues:
+    args: {}
+    class_name: ContractApiDialogues
+  ledger_api_dialogues:
+    args: {}
+    class_name: LedgerApiDialogues
+  signing_dialogues:
+    args: {}
+    class_name: SigningDialogues
+  strategy:
+    args:
+      btcoptions: '0x62d6fE05a72DfB4D7cD64FB1C0bc7C7f0046DCD6'
+      btcpool: '0x9CfC3e29dC0533A1DE541fF52b698f691aEB3de1'
+      btcpriceprovider: '0x7E504C3857c7CE996C11182f193b0Fbf3f758fc6'
+      ethoptions: '0x95887F193527e6944d0Df99801eDe4682e810245'
+      ethpool: '0xfe46bbD3cA1fa7Ac078bCeb451F9Da8312517084'
+      exchange: '0xeC69b15c8C1B2E9a2a883aB9c392aBc5f33DBBbf'
+      hegic: '0x11445FfA4Fb92d64634640dc9D644C1fe1a8125A'
+      ledger_id: ethereum
+      priceprovider: '0x3f8401267cf876e08173825Fcd61D56fc17dC926'
+      stakingeth: '0x4c3B3A3715c768D379E83627b465ebE7642670D3'
+      stakingwbtc: '0xB9e5A909d8Ae521F723EC6b13228B297F49a56CA'
+      wbtc: '0x7D7284Ab794d75F2F989Ed1CACAAb5ABf589cbA8'
+    class_name: Strategy
+dependencies: {}
