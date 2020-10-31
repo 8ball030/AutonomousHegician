@@ -391,8 +391,10 @@ class ServiceRegistrationBehaviour(TickerBehaviour):
     def _option_interaction(
         self, option_type: str, act: str, params: Dict[str, Any]
     ) -> None:
-        assert option_type in ["btc", "eth"]
-        assert act in ["create_option", "exercise", "estimate"]
+        if option_type not in ["btc", "eth"]:
+            raise ValueError("Missing option types!")
+        if act not in ["create_option", "exercise", "estimate"]:
+            raise ValueError("Missing act types!")
         strategy = cast(Strategy, self.context.strategy)
         strategy.deployment_status["status"] = "deploying"
         strategy.is_behaviour_active = False
