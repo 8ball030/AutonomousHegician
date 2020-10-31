@@ -39,7 +39,7 @@ services:
       DEBUG: "False"
       RUN_CMD: "pipenv run launch_demo"
     build:
-      context: ./fetch
+      context: ./agents
       dockerfile: Dockerfile
     depends_on:
       - postgresdb
@@ -47,6 +47,6 @@ services:
     ports:
       - '8080:8080'
     volumes:
-      - './fetch:/app'
+      - './agents:/app'
       - './hegic_contracts/:/app/hegic_contracts'
     restart: always
