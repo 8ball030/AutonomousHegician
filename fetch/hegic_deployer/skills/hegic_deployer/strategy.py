@@ -173,32 +173,17 @@ class Strategy(Model):
             return
         agent_skill_path = "./skills/hegic_deployer/skill.yaml"
         with open(agent_skill_path) as file:
-            yaml_file = yaml.load(file, Loader=yaml.FullLoader)
+            yaml_file = yaml.safe_load(file)
         required = yaml_file["models"]["strategy"]["args"]
         output = {
             k: v[1] for k, v in self.deployment_status.items() if k in required.keys()
         }
-        yaml_file["models"]["strategy"]["args"].update(output)
-        with open("new_skill.yaml", "w") as f:
-            yaml.dump(yaml_file, f)
-        if dev_mode:
-            with open(agent_skill_path, "w") as f:
-                yaml.dump(yaml_file, f)
+        with open("contract_config.yaml", "w") as f:
+            yaml.dump(output, f)
 
         # update the AH with the new contract files
-        agent_skill_path = "../AutonomousHegician/skills/option_management/skill.yaml"
-        with open(agent_skill_path) as file:
-            yaml_file = yaml.load(file, Loader=yaml.FullLoader)
-        required = yaml_file["models"]["strategy"]["args"]
-        output = {
-            k: v[1] for k, v in self.deployment_status.items() if k in required.keys()
-        }
-        yaml_file["models"]["strategy"]["args"].update(output)
-        with open("new_skill.yaml", "w") as f:
+        with open("../autonomous_hegician/contract_config.yaml", "w") as f:
             yaml.dump(yaml_file, f)
-        if dev_mode:
-            with open(agent_skill_path, "w") as f:
-                yaml.dump(yaml_file, f)
 
     def get_location_description(self) -> Description:
         """
@@ -332,7 +317,7 @@ class Strategy(Model):
     def clear_contracts(self):
         path = "./skills/hegic_deployer/skill.yaml"
         with open(path) as f:
-            i = yaml.load(f.read())
+            i = yaml.safe_load(f.read())
 
         to_clear = [
             "btcoptions",
@@ -352,7 +337,6 @@ class Strategy(Model):
             k: "" for k, v in i["models"]["strategy"]["args"].items() if k in to_clear
         }
 
-        i["models"]["strategy"]["args"].update(new_params)
-
+        path = "contract_config.yaml"
         with open(path, "w") as f:
-            yaml.dump(i, f)
+            yaml.dump(new_params, f)
