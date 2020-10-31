@@ -99,6 +99,6 @@ class DBCommunication:
     @staticmethod
     def get_option(option_id) -> Option:
         with flask_app.app_context():
-            option = db.session.query(option_id).fetchone()
+            option = db.session.query(Option).filter(Option.id == option_id).one()
             db.session.close()
         return option

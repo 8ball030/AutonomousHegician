@@ -22,7 +22,7 @@
 import web3
 from typing import cast, Dict, Any, Optional
 from datetime import datetime
-
+import time
 from aea.skills.behaviours import TickerBehaviour
 
 from packages.fetchai.protocols.contract_api.message import ContractApiMessage
@@ -44,17 +44,19 @@ LEDGER_API_ADDRESS = "fetchai/ledger:0.8.0"
 def toBTC(x):
     return int(web3.Web3.toWei(x, "ether") / 1e10)
 
+
 class SnapShot(TickerBehaviour):
     """This class monitors the balance of agent and takes snapshots to the db."""
-        
+
     def act(self) -> None:
         if self.context.strategy.eth_balance is None:
             return
-        self._request_balance() 
-        eth_val=web3.Web3.fromWei(self.context.strategy.eth_balance, "ether")
+        self._request_balance()
+        eth_val = web3.Web3.fromWei(self.context.strategy.eth_balance, "ether")
         snapshot_params = dict(
             eth_val=eth_val,
-            usd_val= float(eth_val) * float(self.context.behaviours.price_ticker.current_price),
+            usd_val=float(
+                eth_val) * float(self.context.behaviours.price_ticker.current_price["ETH"]),
             date_created=datetime.now(),
             date_updated=datetime.now(),
             address=self.context.agent_address,
@@ -94,7 +96,7 @@ class SnapShot(TickerBehaviour):
 class PriceTicker(TickerBehaviour):
     """This class monitors the price"""
     @property
-    def current_price(self) -> str:
+    def current_price(self) -> Dict:
         """Get the last recorded price from Uniswap."""
         return self._current_price
 
@@ -115,7 +117,9 @@ class PriceTicker(TickerBehaviour):
     def _set_current_price(self) -> None:
         """Retrieve the current Eth dai price from the Dex."""
         try:
-            self._current_price = self.dex.get_ticker("DAI", "ETH")
+            prices = {k: 100  # self.dex.get_ticker("DAI", k)
+                      for k in ["ETH", "WBTC"]}
+            self._current_price = prices
         except Exception as e:
             self.context.logger.info(f"Error getting price!\n{e}")
             time.sleep(15)
@@ -128,6 +132,7 @@ class PriceTicker(TickerBehaviour):
         """
         self._set_current_price()
 #        self.context.logger.info(f"Rate : {round(self.current_price, 2)}")
+
 
 class OptionMonitor(TickerBehaviour):
     """This class scaffolds a behaviour."""
@@ -157,20 +162,18 @@ class OptionMonitor(TickerBehaviour):
         orders_to_create = strategy.retrieve_orders(status_code=1)
         orders_to_execise = strategy.retrieve_orders(status_code=3)
 
-
         for order_batch in [orders_to_create, orders_to_estimate, orders_to_execise]:
-            if len(order_batch) == 0: continue
+            if len(order_batch) == 0:
+                continue
             self.context.logger.info(
                 f"Orders to action! : {len(order_batch)}")
 
-        for order in orders_to_estimate:
-            self._request_contract_state(contract_name=f"{order.market.lower()}options",
-                                     callable="estimate",
-                                     parameters={"amount": order.amount,
-                                             "period": order.period,
-                                             "strike": order.strike_price,
-                                             "type": order.option_type,
-                                             })
+        for order in orders_to_execise:
+            self._request_contract_interaction(
+                order.market.lower()+"options", "exercise", {
+                                     "option_id": order.ledger_id,
+                }
+            )
             strategy.current_order = order
             return
         for order in orders_to_create:
@@ -182,16 +185,19 @@ class OptionMonitor(TickerBehaviour):
                     "type": order.option_type
                 }
             )
-            strategy.update_order(order.id, {"status_code_id": 2}) # now we mark as pending placement while we submit
+            # now we mark as pending placement while we submit
             strategy.current_order = order
+            strategy.update_current_order(order, {"status_code_id": 2})
             return
-        for order in orders_to_execise:
-            self._option_interaction(option_type=order.option_type,
-                                     act="options_exercise",
-                                     params={"option_ledger_id": order.ledger_id,
-                                             "option_db_id": order.id,
-                                             }
-                                     )
+
+        for order in orders_to_estimate:
+            self._request_contract_state(contract_name=f"{order.market.lower()}options",
+                                         callable="estimate",
+                                         parameters={"amount": order.amount,
+                                                     "period": order.period,
+                                                     "strike": order.strike_price,
+                                                     "type": order.option_type,
+                                                     })
             strategy.current_order = order
             return
 
@@ -275,7 +281,7 @@ class OptionMonitor(TickerBehaviour):
 #     btc_approved = False
 #     run_contract_tests = False
 #     monitoring = False
-# 
+#
 #     def __init__(self, **kwargs):
 #         """Initialise the behaviour."""
 #         services_interval = kwargs.pop(
@@ -283,20 +289,20 @@ class OptionMonitor(TickerBehaviour):
 #         )  # type: int
 #         super().__init__(tick_interval=services_interval, **kwargs)
 #         self.is_service_registered = False
-# 
+#
 #     def setup(self) -> None:
 #         """
 #         Implement the setup.
-# 
+#
 #         :return: None
 #         """
 #         self._request_balance()
 #         strategy = cast(Strategy, self.context.strategy)
-# 
+#
 #     def act(self) -> None:
 #         """
 #         Implement the act.
-# 
+#
 #         :return: None
 #         """
 #         strategy = cast(Strategy, self.context.strategy)
@@ -306,20 +312,20 @@ class OptionMonitor(TickerBehaviour):
 #             return
 # #         self.context.logger.info(f"strategy.deployment_status['status']")
 #         strategy = cast(Strategy, self.context.strategy)
-# 
+#
 #         if strategy.deployment_status["wbtc"][0] is None:
 #             self._request_contract_deploy_transaction("wbtc", {})
-# 
+#
 #         elif strategy.deployment_status["wbtc"][0] == "deployed" and \
 #                 strategy.deployment_status["hegic"][0] is None:
 #             self._request_contract_deploy_transaction("hegic", {})
-# 
+#
 #         elif strategy.deployment_status["wbtc"][0] == "deployed" and \
 #                 strategy.deployment_status["priceprovider"][0] is None:
 #             self._request_contract_deploy_transaction(
 #                 "priceprovider", {"args": [self.params["ETHPrice"]]}
 #             )
-# 
+#
 #         elif strategy.deployment_status["priceprovider"][0] == "deployed" and \
 #                 strategy.deployment_status["btcpriceprovider"][0] is None:
 #             self._request_contract_deploy_transaction(
@@ -331,7 +337,7 @@ class OptionMonitor(TickerBehaviour):
 #                 strategy.deployment_status["wbtc"][1],
 #                 self.params["ETHtoBTC"],
 #             ]})
-# 
+#
 #         # we additionally need to deploy the staking contracts
 #         elif strategy.deployment_status["exchange"][0] == "deployed" and \
 #                 strategy.deployment_status["stakingwbtc"][0] is None:
@@ -339,20 +345,20 @@ class OptionMonitor(TickerBehaviour):
 #                 strategy.deployment_status["hegic"][1],
 #                 strategy.deployment_status["wbtc"][1],
 #             ]})
-# 
+#
 #         elif strategy.deployment_status["stakingwbtc"][0] == "deployed" and \
 #                 strategy.deployment_status["stakingeth"][0] is None:
 #             self._request_contract_deploy_transaction("stakingeth", {"args": [
 #                 strategy.deployment_status["hegic"][1],
 #             ]})
-# 
+#
 #         elif strategy.deployment_status["exchange"][0] == "deployed" and \
 #                 strategy.deployment_status["ethoptions"][0] is None:
 #             self._request_contract_deploy_transaction("ethoptions", {"args": [
 #                 strategy.deployment_status["priceprovider"][1],
 #                 strategy.deployment_status["stakingeth"][1],
 #             ]})
-# 
+#
 #         elif strategy.deployment_status["ethoptions"][0] == "deployed" and \
 #                 strategy.deployment_status["btcoptions"][0] is None:
 #             self._request_contract_deploy_transaction("btcoptions", {"args": [
@@ -361,18 +367,18 @@ class OptionMonitor(TickerBehaviour):
 #                 strategy.deployment_status["wbtc"][1],
 #                 strategy.deployment_status["stakingwbtc"][1],
 #             ]})
-# 
+#
 #         else:
-# 
+#
 #             # we now know that our base contracts are deployed, so we can retrieve state to the params to continue
-# 
+#
 #             if strategy.deployment_status.get("ethoptions_get_pool", None) is None:
 #                 self._request_contract_state("ethoptions", "get_pool", {})
 #             elif strategy.deployment_status.get("ethpool")[0] is None \
 #                     and strategy.deployment_status["ethoptions_get_pool"][0] == "results":
 #                 strategy.deployment_status["ethpool"] = [
 #                     "deployed", strategy.deployment_status["ethoptions_get_pool"][1]]
-# 
+#
 #             elif strategy.deployment_status.get("btcoptions_get_pool", None) is None and \
 #                     strategy.deployment_status.get("ethpool",)[0] is not None:
 #                 self._request_contract_state("btcoptions", "get_pool", {})
@@ -380,19 +386,19 @@ class OptionMonitor(TickerBehaviour):
 #                     and strategy.deployment_status["btcoptions_get_pool"][0] == "results":
 #                 strategy.deployment_status["btcpool"] = [
 #                     "deployed", strategy.deployment_status["btcoptions_get_pool"][1]]
-# 
+#
 #             elif self.run_contract_tests is False and self.monitoring is False:
 #                 # now we provide liquidity to the pool
 #                 if self.provided_eth is False:
 #                     self._request_contract_interaction("ethpool", "provide_liquidity", {
 #                                                        "args": [web3.Web3.toWei(1, "ether")]})
 #                     self.provided_eth = True
-# 
+#
 #                 elif self.provided_eth is True and self.btc_minted is False and self.provided_btc is False:
 #                     self._request_contract_interaction(
 #                         "wbtc", "mint", {"args": [100000000000]})
 #                     self.btc_minted = True
-# 
+#
 #                 elif self.btc_minted is True and self.btc_approved is False:
 #                     self._request_contract_interaction("wbtc", "approve",
 #                                                        {"args": [strategy.deployment_status["btcpool"][1],
@@ -400,20 +406,20 @@ class OptionMonitor(TickerBehaviour):
 #                                                         }
 #                                                        )
 #                     self.btc_approved = True
-# 
+#
 #                 elif self.provided_eth is True and self.btc_minted is True and self.provided_btc is False:
 #                     self._request_contract_interaction("btcpool", "provide_liquidity",
 #                                                        {"args": [100000000000, 0]
 #                                                         })
 #                     self.provided_btc = True
-# 
+#
 #                 elif self.provided_btc is True:
 #                     self.run_contract_tests = True
 #                     # here we should call the function to generate the new skill for the AH
 #                     self.context.logger.info(
 #                         f"Deployment complete! {self.context.strategy.deployment_status}")
 #                     strategy.create_config_yaml()
-# 
+#
 #             elif self.run_contract_tests is True and self.monitoring is False:
 #                 if strategy.deployment_status.get("ethoptions_estimate")[0] is None:
 #                     self.context.logger.info(
@@ -424,7 +430,7 @@ class OptionMonitor(TickerBehaviour):
 #                                                                             "type": self.params["OptionType"]["Call"]
 #                                                                             },
 #                                                  )
-# 
+#
 #                 elif strategy.deployment_status.get("ethoptions_create_option")[0] is None:
 #                     self.context.logger.info(
 #                         f"**** Running Test of contract create.")
@@ -441,15 +447,15 @@ class OptionMonitor(TickerBehaviour):
 #                         f"**** Running Test of contract excercise.")
 #                     option_id = strategy.deployment_status.get("ethoptions_estimate")[1]['option_id']
 #                     self._request_contract_interaction("ethoptions", "exercise", {"option_id": option_id})
-#                     
+#
 #                 elif strategy.deployment_status.get("ethoptions_exercise") is not None and not self.tested_eth:
 #                     self.context.logger.info(
 #                         f"****Functionality Test of eth contracts complete!")
 #                     self.tested_eth = True
-#                     
-#                 
-#                 # now we test the btc contract. 
-# 
+#
+#
+#                 # now we test the btc contract.
+#
 #                 elif strategy.deployment_status.get("btcoptions_estimate")[0] is None:
 #                     self.context.logger.info(
 #                         f"**** Running Test of contract estimate.")
@@ -459,7 +465,7 @@ class OptionMonitor(TickerBehaviour):
 #                                                                             "type": self.params["OptionType"]["Call"]
 #                                                                             },
 #                                                  )
-# 
+#
 #                 elif strategy.deployment_status.get("btcoptions_create_option")[0] is None:
 #                     self.context.logger.info(
 #                         f"**** Running Test of contract create.")
@@ -476,11 +482,11 @@ class OptionMonitor(TickerBehaviour):
 #                         f"**** Running Test of contract excercise.")
 #                     option_id = strategy.deployment_status.get("btcoptions_estimate")[1]['option_id']
 #                     self._request_contract_interaction("btcoptions", "exercise", {"option_id": option_id})
-#                     
+#
 #                 elif strategy.deployment_status.get("btcoptions_exercise") is not None:
 #                     self.context.logger.info(
 #                         f"****Functionality Test of btc contracts complete!")
-# 
+#
 #     def _option_interaction(self, option_type: str, act: str,
 #                             params: Dict[str,
 #                                          Any]) -> bool:
@@ -511,12 +517,12 @@ class OptionMonitor(TickerBehaviour):
 #         self.context.outbox.put_message(message=contract_api_msg)
 #         self.context.logger.info(
 #             f"contract deployer requesting {act} {option_type} transaction...")
-# 
-# 
+#
+#
 #     def _request_contract_interaction(self, contract_name: str, callable: str, parameters: dict) -> None:
 #         """
 #         Request contract interaction
-# 
+#
 #         :return: None
 #         """
 #         params = {"deployer_address": self.context.agent_address}
@@ -544,11 +550,11 @@ class OptionMonitor(TickerBehaviour):
 #         strategy.deployment_status["status"] = "deploying"
 #         self.context.logger.info(
 #             f"**** requesting contract {contract_name} {callable} state transaction...")
-# 
+#
 #     def _request_contract_state(self, contract_name: str, callable: str, parameters: dict) -> None:
 #         """
 #         Request contract deploy transaction
-# 
+#
 #         :return: None
 #         """
 #         params = {"deployer_address": self.context.agent_address}
@@ -576,20 +582,20 @@ class OptionMonitor(TickerBehaviour):
 #         strategy.deployment_status["status"] = "deploying"
 #         self.context.logger.info(
 #             f"requesting contract {contract_name} state transaction...")
-# 
+#
 #     def teardown(self) -> None:
 #         """
 #         Implement the task teardown.
-# 
+#
 #         :return: None
 #         """
 #         self._unregister_service()
 #         self._unregister_agent()
-# 
+#
 #     def _request_balance(self) -> None:
 #         """
 #         Request ledger balance.
-# 
+#
 #         :return: None
 #         """
 #         strategy = cast(Strategy, self.context.strategy)
@@ -605,11 +611,11 @@ class OptionMonitor(TickerBehaviour):
 #         )
 #         self.context.outbox.put_message(message=ledger_api_msg)
 #         self.context.logger.info(f"Balance Requested {ledger_api_msg}")
-# 
+#
 #     def _request_contract_deploy_transaction(self, contract_name: str, parameters: dict) -> None:
 #         """
 #         Request contract deploy transaction
-# 
+#
 #         :return: None
 #         """
 #         params = {"deployer_address": self.context.agent_address}
@@ -638,11 +644,11 @@ class OptionMonitor(TickerBehaviour):
 #         strategy.deployment_status["status"] = "deploying"
 #         self.context.logger.info(
 #             f"requesting contract {contract_name} deployment transaction...")
-# 
+#
 #     def _request_token_create_transaction(self) -> None:
 #         """
 #         Request token create transaction
-# 
+#
 #         :return: None
 #         """
 #         strategy = cast(Strategy, self.context.strategy)
@@ -669,11 +675,11 @@ class OptionMonitor(TickerBehaviour):
 #         contract_api_dialogue.terms = strategy.get_create_token_terms()
 #         self.context.outbox.put_message(message=contract_api_msg)
 #         self.context.logger.info("requesting create batch transaction...")
-# 
+#
 #     def _request_token_mint_transaction(self) -> None:
 #         """
 #         Request token mint transaction
-# 
+#
 #         :return: None
 #         """
 #         strategy = cast(Strategy, self.context.strategy)
@@ -702,11 +708,11 @@ class OptionMonitor(TickerBehaviour):
 #         contract_api_dialogue.terms = strategy.get_mint_token_terms()
 #         self.context.outbox.put_message(message=contract_api_msg)
 #         self.context.logger.info("requesting mint batch transaction...")
-# 
+#
 #     def _register_agent(self) -> None:
 #         """
 #         Register the agent's location.
-# 
+#
 #         :return: None
 #         """
 #         strategy = cast(Strategy, self.context.strategy)
@@ -721,11 +727,11 @@ class OptionMonitor(TickerBehaviour):
 #         )
 #         self.context.outbox.put_message(message=oef_search_msg)
 #         self.context.logger.info("registering agent on SOEF.")
-# 
+#
 #     def _register_service(self) -> None:
 #         """
 #         Register the agent's service.
-# 
+#
 #         :return: None
 #         """
 #         strategy = cast(Strategy, self.context.strategy)
@@ -740,11 +746,11 @@ class OptionMonitor(TickerBehaviour):
 #         )
 #         self.context.outbox.put_message(message=oef_search_msg)
 #         self.context.logger.info("registering service on SOEF.")
-# 
+#
 #     def _unregister_service(self) -> None:
 #         """
 #         Unregister service from the SOEF.
-# 
+#
 #         :return: None
 #         """
 #         strategy = cast(Strategy, self.context.strategy)
@@ -759,11 +765,11 @@ class OptionMonitor(TickerBehaviour):
 #         )
 #         self.context.outbox.put_message(message=oef_search_msg)
 #         self.context.logger.info("unregistering service from SOEF.")
-# 
+#
 #     def _unregister_agent(self) -> None:
 #         """
 #         Unregister agent from the SOEF.
-# 
+#
 #         :return: None
 #         """
 #         strategy = cast(Strategy, self.context.strategy)
@@ -778,4 +784,4 @@ class OptionMonitor(TickerBehaviour):
 #         )
 #         self.context.outbox.put_message(message=oef_search_msg)
 #         self.context.logger.info("unregistering agent from SOEF.")
-# 
+#

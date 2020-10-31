@@ -362,16 +362,20 @@ class LedgerApiHandler(Handler):
   #              if contract in ["ethoptions_create_option", "btcoptions_create_option"]:
   #                  self.context.strategy.update_option(
   #                     self.context.strategy.current_order_id, {"status_code_id": 3})
-        order = strategy.current_order
+        order = strategy.get_order(strategy.current_order.id)
         if is_transaction_successful:
-            if order.status_code_id == 2: # we have receievd our estimates
-                self.context.strategy.update_order(order.id, {"status_code_id": 3}) # now we mark for placement
+            if order.status_code_id == 2: # we have created our order
+                self.context.strategy.update_current_order(order, {"status_code_id": 3}) # now we mark for placement
+            elif order.status_code_id == 3: # we have  excercised
+                self.context.strategy.update_current_order(order, {"status_code_id": 4}) # now we mark for placement
+                
             self.context.logger.info(
                 "transaction was successfully settled. Transaction receipt={}".format(
                     "ledger_api_msg.transaction_receipt"
                 )
             )
         else:
+            self.context.strategy.update_current_order(order, {"status_code_id": 5}) # now we mark for placement
             self.context.logger.error(
                 "transaction failed. Transaction receipt={}".format(
                     ledger_api_msg.transaction_receipt
@@ -467,9 +471,13 @@ class ContractApiHandler(Handler):
                 self.context.logger.info("retrieved deployment {contract} state query".format(contract=contract))
                 strategy.deployment_status[contract] = ("results", contract_api_msg.state.body)
                 self.context.strategy.deployment_status["status"] = "pending"
-        order = strategy.current_order
-        if order.status_code_id == 0: # we have receievd our estimates
-            self.context.strategy.update_order(order.id, {"status_code_id": 1}) # now we mark for placement
+                break
+        if contract in ["btcoptions_estimate", "ethoptions_estimate"]:
+            order = strategy.get_order(strategy.current_order.id)
+            if order.status_code_id == 0: # we have receievd our estimates
+                self.context.strategy.update_current_order(order, {"status_code_id": 1, 
+                                                                   "ledger_id": contract_api_msg.state.body["option_id"],
+                                                                   "fees": contract_api_msg.state.body['fee_estimate']}) # now we mark for placement
         
     def teardown(self) -> None:
         """
@@ -538,7 +546,7 @@ class ContractApiHandler(Handler):
             )
         )
         order = self.context.strategy.current_order
-        self.context.strategy.update_order(order.id, {"status_code_id": 5})
+        self.context.strategy.update_current_order(order.id, {"status_code_id": 5})
         
 
     def _handle_invalid(

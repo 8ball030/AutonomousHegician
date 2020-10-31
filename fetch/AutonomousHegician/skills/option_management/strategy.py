@@ -22,6 +22,7 @@
 import yaml
 import random  # nosec
 from typing import List
+from datetime import timedelta, datetime
 
 from aea.configurations.constants import DEFAULT_LEDGER
 from aea.exceptions import enforce
@@ -44,6 +45,15 @@ DEFAULT_TIME_BEFORE_EXECUTION = 600
 class Strategy(Model):
     """This class defines a strategy for the agent."""
         
+    @property
+    def current_order(self) -> None:
+        """current order being interacted with"""
+        return self._current_order
+
+    @current_order.setter
+    def current_order(self, order) -> None:
+        """current order being interacted with"""
+        self._current_order = order
 
     def gather_pending_orders(self) -> list:
         """Here we retrieve all non-executed contracts."""
@@ -67,12 +77,12 @@ class Strategy(Model):
         deadline = contract.expiration_date - timedelta(
                 seconds=DEFAULT_TIME_BEFORE_EXECUTION)
 
-        price = self.context.behaviours.price_ticker.current_price
 
         if contract.status_code_id == 3 and datetime.now() > deadline:
-            if any([(contract.option_type == "put"
+            price = self.context.behaviours.price_ticker.current_price[contract.market]
+            if any([(contract.option_type == 1 # put option
                      and contract.strike_price > price),
-                    (contract.option_type == "call"
+                    (contract.option_type == 2 # call option
                      and contract.strike_price < price)]):
                 self.context.logger.info(f"Order is ready to execute!")
                 return True
@@ -84,9 +94,12 @@ class Strategy(Model):
     def create_new_snapshot(self, params):
         return self._database.create_new_snapshot(params)
 
-    def update_order(self, option_db_id, params):
-        self.context.logger.info(f"Updating order {option_db_id} with {params}")
-        self._database.update_option(option_db_id, params)
+    def get_order(self, option_id):
+        return self._database.get_option(option_id)
+
+    def update_current_order(self, option, params):
+        self.context.logger.info(f"Updating order {option.id} with {params}")
+        return self._database.update_option(option.id, params)
 
     def retrieve_orders(self, status_code) -> list:
         if status_code == 3:

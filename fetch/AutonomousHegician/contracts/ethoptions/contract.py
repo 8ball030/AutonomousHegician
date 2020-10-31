@@ -92,7 +92,6 @@ class HegicETHOptions(Contract):
                 "value": fee_estimate[0]
             }
         )
-
         return {"option_id": option_id, "fee_estimate": fee_estimate}
 
     @classmethod

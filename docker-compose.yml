@@ -56,5 +56,4 @@ services:
       - ganachecli
     volumes:
       - './fetch:/app'
-      - './hegic_contracts/:/app/hegic_contracts'
     restart: always
