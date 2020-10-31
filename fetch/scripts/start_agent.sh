@@ -1,2 +1,2 @@
 #!/bin/bash
-cd AutonomousHegician/ ; aea --skip-consistency-check install; aea --skip-consistency-check run
+cd autonomous_hegician/ ; aea --skip-consistency-check install; aea --skip-consistency-check run
