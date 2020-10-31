@@ -51,9 +51,7 @@ class FakeWBTC(Contract):
         # create the transaction dict
         nonce = ledger_api.api.eth.getTransactionCount(deployer_address)
         instance = cls.get_instance(ledger_api, contract_address)
-        tx = instance.functions.mint(
-            *args
-        ).buildTransaction(
+        tx = instance.functions.mint(*args).buildTransaction(
             {
                 "from": deployer_address,
                 "value": 0,
@@ -63,9 +61,7 @@ class FakeWBTC(Contract):
             }
         )
 
-        instance.functions.mint(
-           *args 
-        ).call({"value": 0})
+        instance.functions.mint(*args).call({"value": 0})
         tx = cls._try_estimate_gas(ledger_api, tx)
         return tx
 
@@ -92,14 +88,8 @@ class FakeWBTC(Contract):
         # create the transaction dict
         nonce = ledger_api.api.eth.getTransactionCount(deployer_address)
         instance = cls.get_instance(ledger_api, contract_address)
-        tx = instance.functions.approve(
-            *args
-        ).buildTransaction(
-            {
-                "from": deployer_address,
-                "value": 0,
-                "nonce": nonce ,
-            }
+        tx = instance.functions.approve(*args).buildTransaction(
+            {"from": deployer_address, "value": 0, "nonce": nonce,}
         )
 
         tx = cls._try_estimate_gas(ledger_api, tx)
@@ -107,11 +97,11 @@ class FakeWBTC(Contract):
 
     @classmethod
     def get_deploy_transaction(
-            cls,
-            ledger_api: LedgerApi,
-            deployer_address: str,
-            args: list,
-            gas: int = 60000000,
+        cls,
+        ledger_api: LedgerApi,
+        deployer_address: str,
+        args: list,
+        gas: int = 60000000,
     ) -> Dict[str, Any]:
         """
         Get the transaction to create a batch of tokens.
@@ -123,15 +113,13 @@ class FakeWBTC(Contract):
         :return: the transaction object
         """
 
-        contract_interface = cls.contract_interface.get(
-            ledger_api.identifier, {})
+        contract_interface = cls.contract_interface.get(ledger_api.identifier, {})
         nonce = ledger_api.api.eth.getTransactionCount(deployer_address)
         instance = ledger_api.get_contract_instance(contract_interface)
         constructed = instance.constructor(*args)
-        data = constructed.buildTransaction()['data']
+        data = constructed.buildTransaction()["data"]
         tx = {
-            "from":
-            deployer_address,  # only 'from' address, don't insert 'to' address!
+            "from": deployer_address,  # only 'from' address, don't insert 'to' address!
             "value": 0,  # transfer as part of deployment
             "gas": gas,
             "gasPrice": gas,  # TODO: refine
@@ -190,8 +178,7 @@ class FakeWBTC(Contract):
         raise NotImplementedError
 
     @staticmethod
-    def _try_estimate_gas(ledger_api: LedgerApi,
-                          tx: Dict[str, Any]) -> Dict[str, Any]:
+    def _try_estimate_gas(ledger_api: LedgerApi, tx: Dict[str, Any]) -> Dict[str, Any]:
         """
         Attempts to update the transaction with a gas estimate.
         :param ledger_api: the ledger API
@@ -203,6 +190,5 @@ class FakeWBTC(Contract):
             gas_estimate = ledger_api.api.eth.estimateGas(transaction=tx)
             tx["gas"] = gas_estimate
         except Exception as e:  # pylint: disable=broad-except
-            raise 
+            raise
         return tx
-

@@ -4,8 +4,9 @@
 Author: Tom Rae
 Authorised use only
 """
-import requests
 import json
+
+import requests
 
 
 class DexWrapper:
@@ -16,10 +17,12 @@ class DexWrapper:
         amt = 10000_000_000_000_000_000_000
         path = f"quote?fromTokenSymbol={base}&toTokenSymbol={counter}&amount={amt}"
         res = json.loads(requests.get(self.BASE_URL + path).content)
-        buy_amount = float(int(
-            res['fromTokenAmount'])) / (10**res['fromToken']['decimals'])
-        to_amount = float(int(
-            res['toTokenAmount'])) / (10**res['toToken']['decimals'])
+        buy_amount = float(int(res["fromTokenAmount"])) / (
+            10 ** res["fromToken"]["decimals"]
+        )
+        to_amount = float(int(res["toTokenAmount"])) / (
+            10 ** res["toToken"]["decimals"]
+        )
         r1 = buy_amount / to_amount
         return r1
 

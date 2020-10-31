@@ -19,15 +19,15 @@
 
 """This package contains the behaviour of a erc1155 deploy skill AEA."""
 
-import web3
-from typing import cast, Dict, Any, Optional
-from datetime import datetime
 import time
+from datetime import datetime
+from typing import Any, Dict, Optional, cast
+
+import web3
+
 from aea.skills.behaviours import TickerBehaviour
 
-from packages.fetchai.protocols.contract_api.message import ContractApiMessage
-from packages.fetchai.protocols.ledger_api.message import LedgerApiMessage
-from packages.fetchai.protocols.oef_search.message import OefSearchMessage
+from packages.eightballer.skills.option_management.dex_wrapper import DexWrapper
 from packages.eightballer.skills.option_management.dialogues import (
     ContractApiDialogue,
     ContractApiDialogues,
@@ -35,7 +35,10 @@ from packages.eightballer.skills.option_management.dialogues import (
     OefSearchDialogues,
 )
 from packages.eightballer.skills.option_management.strategy import Strategy
-from packages.eightballer.skills.option_management.dex_wrapper import DexWrapper
+from packages.fetchai.protocols.contract_api.message import ContractApiMessage
+from packages.fetchai.protocols.ledger_api.message import LedgerApiMessage
+from packages.fetchai.protocols.oef_search.message import OefSearchMessage
+
 
 DEFAULT_SERVICES_INTERVAL = 30.0
 LEDGER_API_ADDRESS = "fetchai/ledger:0.8.0"
@@ -55,8 +58,8 @@ class SnapShot(TickerBehaviour):
         eth_val = web3.Web3.fromWei(self.context.strategy.eth_balance, "ether")
         snapshot_params = dict(
             eth_val=eth_val,
-            usd_val=float(
-                eth_val) * float(self.context.behaviours.price_ticker.current_price["ETH"]),
+            usd_val=float(eth_val)
+            * float(self.context.behaviours.price_ticker.current_price["ETH"]),
             date_created=datetime.now(),
             date_updated=datetime.now(),
             address=self.context.agent_address,
@@ -65,8 +68,9 @@ class SnapShot(TickerBehaviour):
 
     def __init__(self, **kwargs):
         """Initialise the behaviour."""
-        services_interval = kwargs.pop("services_interval",
-                                       DEFAULT_SERVICES_INTERVAL)  # type: int
+        services_interval = kwargs.pop(
+            "services_interval", DEFAULT_SERVICES_INTERVAL
+        )  # type: int
         super().__init__(tick_interval=services_interval, **kwargs)
 
     def setup(self) -> None:
@@ -87,14 +91,14 @@ class SnapShot(TickerBehaviour):
             counterparty=LEDGER_API_ADDRESS,
             performative=LedgerApiMessage.Performative.GET_BALANCE,
             ledger_id=strategy.ledger_id,
-            address=cast(str, self.context.agent_addresses.get(
-                strategy.ledger_id)),
+            address=cast(str, self.context.agent_addresses.get(strategy.ledger_id)),
         )
         self.context.outbox.put_message(message=ledger_api_msg)
 
 
 class PriceTicker(TickerBehaviour):
     """This class monitors the price"""
+
     @property
     def current_price(self) -> Dict:
         """Get the last recorded price from Uniswap."""
@@ -102,8 +106,9 @@ class PriceTicker(TickerBehaviour):
 
     def __init__(self, **kwargs):
         """Initialise the behaviour."""
-        services_interval = kwargs.pop("services_interval",
-                                       DEFAULT_SERVICES_INTERVAL)  # type: int
+        services_interval = kwargs.pop(
+            "services_interval", DEFAULT_SERVICES_INTERVAL
+        )  # type: int
         super().__init__(tick_interval=services_interval, **kwargs)
 
     def setup(self) -> None:
@@ -117,8 +122,7 @@ class PriceTicker(TickerBehaviour):
     def _set_current_price(self) -> None:
         """Retrieve the current Eth dai price from the Dex."""
         try:
-            prices = {k: 100  # self.dex.get_ticker("DAI", k)
-                      for k in ["ETH", "WBTC"]}
+            prices = {k: 100 for k in ["ETH", "WBTC"]}  # self.dex.get_ticker("DAI", k)
             self._current_price = prices
         except Exception as e:
             self.context.logger.info(f"Error getting price!\n{e}")
@@ -131,6 +135,8 @@ class PriceTicker(TickerBehaviour):
         :return: None
         """
         self._set_current_price()
+
+
 #        self.context.logger.info(f"Rate : {round(self.current_price, 2)}")
 
 
@@ -139,8 +145,9 @@ class OptionMonitor(TickerBehaviour):
 
     def __init__(self, **kwargs):
         """Initialise the behaviour."""
-        services_interval = kwargs.pop("services_interval",
-                                       DEFAULT_SERVICES_INTERVAL)  # type: int
+        services_interval = kwargs.pop(
+            "services_interval", DEFAULT_SERVICES_INTERVAL
+        )  # type: int
         super().__init__(tick_interval=services_interval, **kwargs)
         self.is_service_registered = False
 
@@ -165,25 +172,26 @@ class OptionMonitor(TickerBehaviour):
         for order_batch in [orders_to_create, orders_to_estimate, orders_to_execise]:
             if len(order_batch) == 0:
                 continue
-            self.context.logger.info(
-                f"Orders to action! : {len(order_batch)}")
+            self.context.logger.info(f"Orders to action! : {len(order_batch)}")
 
         for order in orders_to_execise:
             self._request_contract_interaction(
-                order.market.lower()+"options", "exercise", {
-                                     "option_id": order.ledger_id,
-                }
+                order.market.lower() + "options",
+                "exercise",
+                {"option_id": order.ledger_id,},
             )
             strategy.current_order = order
             return
         for order in orders_to_create:
             self._request_contract_interaction(
-                order.market.lower()+"options", "create_option", {
+                order.market.lower() + "options",
+                "create_option",
+                {
                     "period": order.period,
                     "amount": order.amount,
                     "strike": order.strike_price,
-                    "type": order.option_type
-                }
+                    "type": order.option_type,
+                },
             )
             # now we mark as pending placement while we submit
             strategy.current_order = order
@@ -191,17 +199,22 @@ class OptionMonitor(TickerBehaviour):
             return
 
         for order in orders_to_estimate:
-            self._request_contract_state(contract_name=f"{order.market.lower()}options",
-                                         callable="estimate",
-                                         parameters={"amount": order.amount,
-                                                     "period": order.period,
-                                                     "strike": order.strike_price,
-                                                     "type": order.option_type,
-                                                     })
+            self._request_contract_state(
+                contract_name=f"{order.market.lower()}options",
+                callable="estimate",
+                parameters={
+                    "amount": order.amount,
+                    "period": order.period,
+                    "strike": order.strike_price,
+                    "type": order.option_type,
+                },
+            )
             strategy.current_order = order
             return
 
-    def _request_contract_interaction(self, contract_name: str, callable: str, parameters: dict) -> None:
+    def _request_contract_interaction(
+        self, contract_name: str, callable: str, parameters: dict
+    ) -> None:
         """
         Request contract interaction
 
@@ -223,17 +236,21 @@ class OptionMonitor(TickerBehaviour):
             callable=callable,
             kwargs=ContractApiMessage.Kwargs(params),
         )
-        contract_api_dialogue = cast(
-            ContractApiDialogue, contract_api_dialogue,)
+        contract_api_dialogue = cast(ContractApiDialogue, contract_api_dialogue,)
         contract_api_dialogue.terms = strategy.get_deploy_terms()
         self.context.outbox.put_message(message=contract_api_msg)
         strategy.deployment_status[f"{contract_name}_{callable}"] = (
-            "pending", contract_api_dialogue.dialogue_label.dialogue_reference[0])
+            "pending",
+            contract_api_dialogue.dialogue_label.dialogue_reference[0],
+        )
         strategy.deployment_status["status"] = ["deploying", contract_name]
         self.context.logger.info(
-            f"**** requesting contract {contract_name} {callable} state transaction...")
+            f"**** requesting contract {contract_name} {callable} state transaction..."
+        )
 
-    def _request_contract_state(self, contract_name: str, callable: str, parameters: dict) -> None:
+    def _request_contract_state(
+        self, contract_name: str, callable: str, parameters: dict
+    ) -> None:
         """
         Request contract deploy transaction
 
@@ -255,15 +272,18 @@ class OptionMonitor(TickerBehaviour):
             callable=callable,
             kwargs=ContractApiMessage.Kwargs(params),
         )
-        contract_api_dialogue = cast(
-            ContractApiDialogue, contract_api_dialogue,)
+        contract_api_dialogue = cast(ContractApiDialogue, contract_api_dialogue,)
         contract_api_dialogue.terms = strategy.get_deploy_terms()
         self.context.outbox.put_message(message=contract_api_msg)
         strategy.deployment_status[f"{contract_name}_{callable}"] = (
-            "pending", contract_api_dialogue.dialogue_label.dialogue_reference[0])
+            "pending",
+            contract_api_dialogue.dialogue_label.dialogue_reference[0],
+        )
         strategy.deployment_status["status"] = ["deploying", contract_name]
         self.context.logger.info(
-            f"requesting contract {contract_name} state transaction...")
+            f"requesting contract {contract_name} state transaction..."
+        )
+
 
 # class ServiceRegistrationBehaviour(TickerBehaviour):
 #     """This class implements a behaviour."""

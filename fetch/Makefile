@@ -40,19 +40,18 @@ clean-test:
 
 .PHONY: lint
 lint:
-	black aea benchmark examples packages scripts tests
-	isort aea benchmark examples packages scripts tests
-	flake8 aea benchmark examples packages scripts tests
+	black AutonomousHegician/contracts AutonomousHegician/skills
+	isort AutonomousHegician/contracts AutonomousHegician/skills
+	flake8 AutonomousHegician/contracts AutonomousHegician/skills
 
 .PHONY: security
 security:
-	bandit -r aea benchmark examples packages
-	bandit -s B101 -r tests scripts
+	bandit -r AutonomousHegician/contracts AutonomousHegician/skills
 	safety check -i 37524 -i 38038 -i 37776 -i 38039
 
 .PHONY: static
 static:
-	mypy aea benchmark examples packages scripts tests
+	mypy AutonomousHegician/contracts AutonomousHegician/skills
 
 .PHONY: new_env
 new_env: clean
