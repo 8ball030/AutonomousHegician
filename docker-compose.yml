@@ -46,7 +46,7 @@ services:
   agents:
     environment:
       TESTS: "False"
-      DEBUG: "False"
+      DEBUG: "True"
       RUN_CMD: "pipenv run start_agent"
     build:
       context: ./fetch

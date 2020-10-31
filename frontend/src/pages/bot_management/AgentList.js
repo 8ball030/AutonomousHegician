@@ -83,14 +83,13 @@ class AgentList extends React.Component {
             </TableHead>
             <TableBody>
               {rows.map((row) => (
-                <TableRow key={row.name}>
+                <TableRow key={row.address}>
                   <TableCell component="th" scope="row">
                     {row.name}
                   </TableCell>
-                  <TableCell align="right">{row.calories}</TableCell>
-                  <TableCell align="right">{row.fat}</TableCell>
-                  <TableCell align="right">{row.carbs}</TableCell>
-                  <TableCell align="right">{row.protein}</TableCell>
+                  <TableCell align="right">{row.date_created}</TableCell>
+                  <TableCell align="right">{row.date_updated}</TableCell>
+                  <TableCell align="right">{row.usd_val}</TableCell>
                   <TableCell align="right">
                     <Button
                       style={states[row.status]}

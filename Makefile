@@ -19,6 +19,7 @@ clean-docs:
 clean-pyc:
 	find . -name '*.vscode' -exec rm -fr {} +
 	find . -name '*.ipynb_checkpoints' -exec rm -fr {} +
+	find . -name '*.ipynb*' -exec rm -fr {} +
 	find . -name '*.pyo' -exec rm -f {} +
 	find . -name '*~' -exec rm -f {} +
 	find . -name '__pycache__' -exec rm -fr {} +
