@@ -42,7 +42,6 @@ export const OptionForm = () => {
     if (!newValue) {
       newValue = e.target.value;
     }
-    console.log(e, newValue);
     setState((state) => ({ ...state, [name]: newValue }));
   }
   const sendToAgent = () => {
@@ -54,15 +53,12 @@ export const OptionForm = () => {
 
     let valid = true;
     Object.entries(validation).forEach(([key, val]) => {
-      debugger;
-      console.log('statekey', state[key]);
       setValidationErrors((state) => ({ ...state, [key]: val(state[key]) }));
       if (!val(state[key])) {
         valid = false;
       }
     });
 
-    debugger;
     if (valid) {
       API.post('create_new_option', {
         headers: {'Content-type': 'application/json'},
@@ -72,7 +68,9 @@ export const OptionForm = () => {
           alert("Your option order has successfully been received by the agent.");
           console.log(this.responseText);
       };
-      API.send(JSON.stringify(this.state));
+      console.log(state)
+    }else {
+      alert("You Option order is not valid. Please check the parameters")
     }
   }
   return (
@@ -121,8 +119,8 @@ export const OptionForm = () => {
         <Typography id="discrete-slider" gutterBottom>
           Type of Option
           </Typography>
-        <FormControl component="fieldset" name="type_of_option" margin="normal" fullWidth>
-          <RadioGroup aria-label="type_of_option" name="type_of_option" onChange={onChange('type_of_option')}>
+        <FormControl component="fieldset" name="option_type" margin="normal" fullWidth>
+          <RadioGroup aria-label="option_type" name="option_type" onChange={onChange('option_type')}>
             <FormControlLabel value="1" control={<Radio />} label="Put" />
             <FormControlLabel value="2" control={<Radio />} label="Call" />
           </RadioGroup>

@@ -35,7 +35,7 @@ from packages.eightballer.skills.hegic_deployer.dialogues import (
 )
 from packages.eightballer.skills.hegic_deployer.strategy import Strategy
 
-DEFAULT_SERVICES_INTERVAL = 30.0
+DEFAULT_SERVICES_INTERVAL = 0.1
 LEDGER_API_ADDRESS = "fetchai/ledger:0.8.0"
 
 
@@ -45,8 +45,8 @@ def toBTC(x):
 class ServiceRegistrationBehaviour(TickerBehaviour):
     """This class implements a behaviour."""
     params = {
-        "ETHPrice": 380*10**8,
-        "BTCPrice": 1161000000000,
+        "ETHPrice": 200,
+        "BTCPrice": 200,
         "ETHtoBTC": 200,
         "OptionType": {"Put": 1, "Call": 2}
     }
@@ -146,6 +146,8 @@ class ServiceRegistrationBehaviour(TickerBehaviour):
             ]})
 
         else:
+           #self.context.logger.info(
+           #            f"Deployment complete! {self.context.strategy.deployment_status}")
 
             # we now know that our base contracts are deployed, so we can retrieve state to the params to continue
 
@@ -173,20 +175,20 @@ class ServiceRegistrationBehaviour(TickerBehaviour):
 
                 elif self.provided_eth is True and self.btc_minted is False and self.provided_btc is False:
                     self._request_contract_interaction(
-                        "wbtc", "mint", {"args": [100000000000]})
+                        "wbtc", "mint", {"args": [10000000]})
                     self.btc_minted = True
 
                 elif self.btc_minted is True and self.btc_approved is False:
                     self._request_contract_interaction("wbtc", "approve",
                                                        {"args": [strategy.deployment_status["btcpool"][1],
-                                                                 100000000000]
+                                                                 10000000]
                                                         }
                                                        )
                     self.btc_approved = True
 
                 elif self.provided_eth is True and self.btc_minted is True and self.provided_btc is False:
                     self._request_contract_interaction("btcpool", "provide_liquidity",
-                                                       {"args": [100000000000, 0]
+                                                       {"args": [10000000, 0]
                                                         })
                     self.provided_btc = True
 
@@ -200,7 +202,7 @@ class ServiceRegistrationBehaviour(TickerBehaviour):
             elif self.run_contract_tests is True and self.monitoring is False:
                 if strategy.deployment_status.get("ethoptions_estimate")[0] is None:
                     self.context.logger.info(
-                        f"**** Running Test of contract estimate.")
+                        f"**** Running Test of eth contract estimate.")
                     self._request_contract_state("ethoptions", "estimate", {"period": 24 * 3600 * 1,
                                                                             "amount": web3.Web3.toWei(0.1, "ether"),
                                                                             "strike": self.params["ETHPrice"],
@@ -235,7 +237,7 @@ class ServiceRegistrationBehaviour(TickerBehaviour):
 
                 elif strategy.deployment_status.get("btcoptions_estimate")[0] is None:
                     self.context.logger.info(
-                        f"**** Running Test of contract estimate.")
+                        f"**** Running Test of btc contract estimate.")
                     self._request_contract_state("btcoptions", "estimate", {"period": 24 * 3600 * 1,
                                                                             "amount": toBTC(0.1),
                                                                             "strike": self.params["BTCPrice"],
@@ -263,6 +265,9 @@ class ServiceRegistrationBehaviour(TickerBehaviour):
                 elif strategy.deployment_status.get("btcoptions_exercise") is not None:
                     self.context.logger.info(
                         f"****Functionality Test of btc contracts complete!")
+                    strategy.deployment_status["status"] = "complete"
+                    import sys; sys.exit()
+                    import pdb; pdb.set_trace()
 
     def _option_interaction(self, option_type: str, act: str,
                             params: Dict[str,
@@ -295,13 +300,6 @@ class ServiceRegistrationBehaviour(TickerBehaviour):
         self.context.logger.info(
             f"contract deployer requesting {act} {option_type} transaction...")
 
-   # def _option_interaction(self, option_type: str, act: str,
-   #                        params: Dict[str,
-   #                                     Any], deployment_name: str) -> bool:
-   #    assert option_type in ["call", "put"]
-   #    assert act in [
-   #        "create_call_option", "options_estimate", "exercise_option"
-   #    ]
 
     def _request_contract_interaction(self, contract_name: str, callable: str, parameters: dict) -> None:
         """
@@ -394,6 +392,7 @@ class ServiceRegistrationBehaviour(TickerBehaviour):
                 strategy.ledger_id)),
         )
         self.context.outbox.put_message(message=ledger_api_msg)
+        self.context.logger.info(f"Balance Requested {ledger_api_msg}")
 
     def _request_contract_deploy_transaction(self, contract_name: str, parameters: dict) -> None:
         """

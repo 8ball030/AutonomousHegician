@@ -29,19 +29,31 @@ services:
       - "7545:7545"
     volumes:
       - ./persistant_data/ganache_data:/ganache_data
+  api:
+    environment:
+      TESTS: "False"
+      DEBUG: "False"
+      RUN_CMD: "pipenv run start_api" 
+    build:
+      context: ./fetch
+      dockerfile: Dockerfile
+    depends_on:
+      - postgresdb
+    ports:
+      - '8080:8080'
+    restart: always
+
   agents:
     environment:
       TESTS: "False"
       DEBUG: "False"
-      RUN_CMD: "pipenv run launch_demo"
+      RUN_CMD: "pipenv run start_agent"
     build:
       context: ./fetch
       dockerfile: Dockerfile
     depends_on:
       - postgresdb
       - ganachecli
-    ports:
-      - '8080:8080'
     volumes:
       - './fetch:/app'
       - './hegic_contracts/:/app/hegic_contracts'

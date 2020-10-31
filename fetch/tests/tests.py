@@ -11,10 +11,11 @@ import time
 
 sys.path += [os.path.sep.join(os.getcwd().split(os.path.sep)[:-1])]
 
-from AutonomousHegician.skills.option_monitoring.db_communication import DBCommunication
+from AutonomousHegician.skills.option_management.db_communication import DBCommunication
+import data_store
 # the ah must be run in demo mode after the hegicContractDeployer has deployed the contracts to a local ganache cli
 
-# we first cerate an option within the database
+# we first create an option within the database
 
 
 
@@ -23,7 +24,7 @@ from AutonomousHegician.skills.option_monitoring.db_communication import DBCommu
 
 
 class TestOptionExecutionTester(TestCase):
-    order_params = {"amount": web3.Web3.toWei("0.1", "ether"),         
+    order_params = {"amount": 0.1,         
          "strike_price": 200, 
          "period": 60 * 60 * 24 * 2,
          "option_type": 1,
@@ -37,13 +38,23 @@ class TestOptionExecutionTester(TestCase):
     def tearDownClass(cls):
         # clear all orders from the database
         DBCommunication.delete_options()
+        
+    @classmethod
+    def tearDownClass(cls):
+        # clear all orders from the database
+        pass
+#        DBCommunication.delete_options()
     
+    def tearDown(self):
+        pass
+#        DBCommunication.delete_options()
 
     @classmethod
     def setUpClass(cls):
         # clear all orders from the database
         DBCommunication.delete_options()
     
+
     def test_does_ah_create_eth_call_option(self):
         # now the ah will retrieve this order from the db an execute it.
         new_order = DBCommunication.create_new_option(**self.order_params)

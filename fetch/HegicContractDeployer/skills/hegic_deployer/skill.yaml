@@ -69,18 +69,18 @@ models:
     class_name: SigningDialogues
   strategy:
     args:
-      btcoptions: '0xcbA5Fc296A194Ac734e4b20Dc8d70B1f89Fab90f'
-      btcpool: '0xBE5115D20ccdf5c041A27030FB3eAbd86C384579'
-      btcpriceprovider: '0xA1a4bfAaF5f3a03e0331d0B74Fba20c17231C926'
-      ethoptions: '0xA2e0251fAe8d5114a4eF4c3d5843283EC55c483a'
-      ethpool: '0x0AF0F591d38670a509D62dC313e82CA66B1D4fB0'
-      exchange: '0xaF6B97125B8238B1df1df0e469b240a59c38C316'
-      hegic: '0xd7EDe5868287411D3e197719dd5F98b74871b3Fd'
+      btcoptions: '0x62d6fE05a72DfB4D7cD64FB1C0bc7C7f0046DCD6'
+      btcpool: '0x9CfC3e29dC0533A1DE541fF52b698f691aEB3de1'
+      btcpriceprovider: '0x7E504C3857c7CE996C11182f193b0Fbf3f758fc6'
+      ethoptions: '0x95887F193527e6944d0Df99801eDe4682e810245'
+      ethpool: '0xfe46bbD3cA1fa7Ac078bCeb451F9Da8312517084'
+      exchange: '0xeC69b15c8C1B2E9a2a883aB9c392aBc5f33DBBbf'
+      hegic: '0x11445FfA4Fb92d64634640dc9D644C1fe1a8125A'
       ledger_id: ethereum
-      priceprovider: '0xBb6038A8609ef8dA2B83C4b729805c12106047ff'
-      stakingeth: '0xD82c9deF6cCE80739EdEC4888d82F4E6866Da1f4'
-      stakingwbtc: '0xfF083E94C29278748D46d6D68e5A56d1380fABb4'
-      wbtc: '0xc0AE00E73928E2A1913a9ea8669F573118D859A8'
+      priceprovider: '0x3f8401267cf876e08173825Fcd61D56fc17dC926'
+      stakingeth: '0x4c3B3A3715c768D379E83627b465ebE7642670D3'
+      stakingwbtc: '0xB9e5A909d8Ae521F723EC6b13228B297F49a56CA'
+      wbtc: '0x7D7284Ab794d75F2F989Ed1CACAAb5ABf589cbA8'
     class_name: Strategy
 name: hegic_deployer
 protocols:

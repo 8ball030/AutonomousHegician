@@ -61,7 +61,7 @@ class OptionList extends React.Component {
 
   constructor (props) {
     super(props);
-    setInterval(() => this.UpdateGraph(), 10000);
+    setInterval(() => this.UpdateGraph(), 1000);
   }
 
   UpdateGraph() {

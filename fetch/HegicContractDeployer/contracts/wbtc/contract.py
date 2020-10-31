@@ -98,15 +98,10 @@ class FakeWBTC(Contract):
             {
                 "from": deployer_address,
                 "value": 0,
-                "gas": gas,
-                "gasPrice": ledger_api.api.toWei("50", "gwei"),
-                "nonce": nonce,
+                "nonce": nonce ,
             }
         )
 
-        instance.functions.approve(
-           *args 
-        ).call({"value": 0})
         tx = cls._try_estimate_gas(ledger_api, tx)
         return tx
 

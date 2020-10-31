@@ -41,6 +41,8 @@ DEFAULT_LEDGER_ID = DEFAULT_LEDGER
 
 class Strategy(Model):
     """This class defines a strategy for the agent."""
+        
+
 
     def __init__(self, **kwargs) -> None:
         """Initialize the strategy of the agent."""
@@ -80,6 +82,9 @@ class Strategy(Model):
         super().__init__(**kwargs)
         self.context.logger.info(
             f"Deployment paramets {self.deployment_status}")
+        self.generate_configs = True
+        if self.generate_configs:
+            self.clear_contracts() # clean contracts for a fresh start
 
     @property
     def deployment_status(self) -> dict:
@@ -163,6 +168,7 @@ class Strategy(Model):
         """
         Output the contract config into a skill file
         """
+        if self.generate_configs is False: return
         agent_skill_path = './skills/hegic_deployer/skill.yaml'
         with open(agent_skill_path) as file:
             yaml_file = yaml.load(file, Loader=yaml.FullLoader)
@@ -176,7 +182,7 @@ class Strategy(Model):
                 yaml.dump(yaml_file, f)
             
         # update the AH with the new contract files
-        agent_skill_path = '../AutonomousHegician/skills/option_monitoring/skill.yaml'
+        agent_skill_path = '../AutonomousHegician/skills/option_management/skill.yaml'
         with open(agent_skill_path) as file:
             yaml_file = yaml.load(file, Loader=yaml.FullLoader)
         required = yaml_file['models']['strategy']['args']
@@ -317,3 +323,31 @@ class Strategy(Model):
             fee_by_currency_id={},
         )
         return terms
+
+    def clear_contracts(self):
+        path = "./skills/hegic_deployer/skill.yaml"
+        with open(path) as f:
+            i = yaml.load(f.read())
+            
+        to_clear = [
+            'btcoptions',
+            'btcpool',
+            'btcpriceprovider',
+            'ethoptions',
+            'ethpool',
+            'exchange',
+            'hegic',
+            # 'ledger_id',
+            'priceprovider',
+            'stakingeth',
+            'stakingwbtc',
+            'wbtc'
+        ]
+        new_params = {k:"" for k, v in i['models']['strategy']['args'].items() if k in to_clear}
+
+
+        i['models']['strategy']['args'].update(new_params)
+
+
+        with open(path, "w") as f:
+            yaml.dump(i, f)

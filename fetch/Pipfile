@@ -25,3 +25,7 @@ psycopg2-binary = "==2.8.6"
 
 [requires]
 python_version = "3.8"
+
+[scripts]
+start_api = "python AutonomousHegician/skills/option_management/web_server.py"
+
