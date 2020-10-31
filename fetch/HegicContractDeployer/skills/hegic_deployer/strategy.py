@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2018-2020 Fetch.AI Limited
+#   Copyright 2020 eightballer
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -19,9 +19,10 @@
 
 """This module contains the strategy class."""
 
-import yaml
 import random  # nosec
-from typing import List
+from typing import Dict, List, Optional, Tuple, Union
+
+import yaml
 
 from aea.configurations.constants import DEFAULT_LEDGER
 from aea.exceptions import enforce
@@ -31,7 +32,7 @@ from aea.helpers.search.generic import (
     AGENT_SET_SERVICE_MODEL,
     SIMPLE_SERVICE_MODEL,
 )
-from aea.helpers.search.models import Description, Location
+from aea.helpers.search.models import Description
 from aea.helpers.transaction.base import Terms
 from aea.skills.base import Model
 
@@ -41,36 +42,36 @@ DEFAULT_LEDGER_ID = DEFAULT_LEDGER
 
 class Strategy(Model):
     """This class defines a strategy for the agent."""
-        
-
 
     def __init__(self, **kwargs) -> None:
         """Initialize the strategy of the agent."""
         self._ledger_id = kwargs.pop("ledger_id", DEFAULT_LEDGER_ID)
-        self._deployment_status = {
-        }
+        self._deployment_status: Dict[
+            str, Union[Tuple[Optional[str], Optional[str]], str]
+        ] = {}
         not_deployed = 0
-        for contract in ["wbtc",
-                         "hegic",
-                         "priceprovider",
-                         "btcpriceprovider",
-                         "ethoptions",
-                         "btcoptions",
-                         "exchange",
-                         "stakingwbtc",
-                         "stakingeth",
-                         "liquidity",
-                         "ethpool",
-                         "btcpool",
-                         "ethoptions_estimate",
-                         "ethoptions_create_option",
-                         "ethoptions_exercise",
-                         "btcoptions_estimate",
-                         "btcoptions_create_option",
-                         "btcoptions_exercise"
-                         ]:  # post test remove
+        for contract in [
+            "wbtc",
+            "hegic",
+            "priceprovider",
+            "btcpriceprovider",
+            "ethoptions",
+            "btcoptions",
+            "exchange",
+            "stakingwbtc",
+            "stakingeth",
+            "liquidity",
+            "ethpool",
+            "btcpool",
+            "ethoptions_estimate",
+            "ethoptions_create_option",
+            "ethoptions_exercise",
+            "btcoptions_estimate",
+            "btcoptions_create_option",
+            "btcoptions_exercise",
+        ]:  # post test remove
             param = kwargs.pop(contract, None)
-            if param is "" or param is None:
+            if param == "" or param is None:
                 not_deployed += 1
                 self._deployment_status[contract] = (None, None)
             else:
@@ -80,11 +81,14 @@ class Strategy(Model):
             self._deployment_status["status"] = "pending"
         self.eth_balance = None
         super().__init__(**kwargs)
-        self.context.logger.info(
-            f"Deployment paramets {self.deployment_status}")
+        self.context.logger.info(f"Deployment paramets {self.deployment_status}")
         self.generate_configs = True
+        self._contract_address: Optional[str] = None
+        self._is_contract_deployed: bool = False
+        self._is_tokens_created: bool = False
+        self._is_tokens_minted: bool = False
         if self.generate_configs:
-            self.clear_contracts() # clean contracts for a fresh start
+            self.clear_contracts()  # clean contracts for a fresh start
 
     @property
     def deployment_status(self) -> dict:
@@ -118,8 +122,7 @@ class Strategy(Model):
     @contract_address.setter
     def contract_address(self, contract_address: str) -> None:
         """Set the contract address."""
-        enforce(self._contract_address is None,
-                "Contract address already set!")
+        enforce(self._contract_address is None, "Contract address already set!")
         self._contract_address = contract_address
 
     @property
@@ -164,36 +167,38 @@ class Strategy(Model):
         )
         self._is_tokens_minted = is_tokens_minted
 
-    def create_config_yaml(self, dev_mode: bool=True) -> None:
-        """
-        Output the contract config into a skill file
-        """
-        if self.generate_configs is False: return
-        agent_skill_path = './skills/hegic_deployer/skill.yaml'
+    def create_config_yaml(self, dev_mode: bool = True) -> None:
+        """Output the contract config into a skill file."""
+        if self.generate_configs is False:
+            return
+        agent_skill_path = "./skills/hegic_deployer/skill.yaml"
         with open(agent_skill_path) as file:
             yaml_file = yaml.load(file, Loader=yaml.FullLoader)
-        required = yaml_file['models']['strategy']['args']
-        output = {k: v[1] for k, v in self.deployment_status.items() if k in required.keys()}
-        yaml_file['models']['strategy']['args'].update(output)
-        with open('new_skill.yaml', 'w') as f:
+        required = yaml_file["models"]["strategy"]["args"]
+        output = {
+            k: v[1] for k, v in self.deployment_status.items() if k in required.keys()
+        }
+        yaml_file["models"]["strategy"]["args"].update(output)
+        with open("new_skill.yaml", "w") as f:
             yaml.dump(yaml_file, f)
         if dev_mode:
-            with open(agent_skill_path, 'w') as f:
-                yaml.dump(yaml_file, f)
-            
-        # update the AH with the new contract files
-        agent_skill_path = '../AutonomousHegician/skills/option_management/skill.yaml'
-        with open(agent_skill_path) as file:
-            yaml_file = yaml.load(file, Loader=yaml.FullLoader)
-        required = yaml_file['models']['strategy']['args']
-        output = {k: v[1] for k, v in self.deployment_status.items() if k in required.keys()}
-        yaml_file['models']['strategy']['args'].update(output)
-        with open('new_skill.yaml', 'w') as f:
-            yaml.dump(yaml_file, f)
-        if dev_mode:
-            with open(agent_skill_path, 'w') as f:
+            with open(agent_skill_path, "w") as f:
                 yaml.dump(yaml_file, f)
 
+        # update the AH with the new contract files
+        agent_skill_path = "../AutonomousHegician/skills/option_management/skill.yaml"
+        with open(agent_skill_path) as file:
+            yaml_file = yaml.load(file, Loader=yaml.FullLoader)
+        required = yaml_file["models"]["strategy"]["args"]
+        output = {
+            k: v[1] for k, v in self.deployment_status.items() if k in required.keys()
+        }
+        yaml_file["models"]["strategy"]["args"].update(output)
+        with open("new_skill.yaml", "w") as f:
+            yaml.dump(yaml_file, f)
+        if dev_mode:
+            with open(agent_skill_path, "w") as f:
+                yaml.dump(yaml_file, f)
 
     def get_location_description(self) -> Description:
         """
@@ -328,26 +333,26 @@ class Strategy(Model):
         path = "./skills/hegic_deployer/skill.yaml"
         with open(path) as f:
             i = yaml.load(f.read())
-            
+
         to_clear = [
-            'btcoptions',
-            'btcpool',
-            'btcpriceprovider',
-            'ethoptions',
-            'ethpool',
-            'exchange',
-            'hegic',
+            "btcoptions",
+            "btcpool",
+            "btcpriceprovider",
+            "ethoptions",
+            "ethpool",
+            "exchange",
+            "hegic",
             # 'ledger_id',
-            'priceprovider',
-            'stakingeth',
-            'stakingwbtc',
-            'wbtc'
+            "priceprovider",
+            "stakingeth",
+            "stakingwbtc",
+            "wbtc",
         ]
-        new_params = {k:"" for k, v in i['models']['strategy']['args'].items() if k in to_clear}
+        new_params = {
+            k: "" for k, v in i["models"]["strategy"]["args"].items() if k in to_clear
+        }
 
-
-        i['models']['strategy']['args'].update(new_params)
-
+        i["models"]["strategy"]["args"].update(new_params)
 
         with open(path, "w") as f:
             yaml.dump(i, f)

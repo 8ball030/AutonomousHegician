@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2018-2020 Fetch.AI Limited
+#   Copyright 2020 eightballer
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@
 
 from typing import Optional, cast
 
-from aea.configurations.base import PublicId
 from aea.crypto.ledger_apis import LedgerApis
 from aea.protocols.base import Message
 from aea.skills.base import Handler
@@ -46,13 +45,6 @@ from packages.fetchai.protocols.fipa.message import FipaMessage
 from packages.fetchai.protocols.ledger_api.message import LedgerApiMessage
 from packages.fetchai.protocols.oef_search.message import OefSearchMessage
 from packages.fetchai.protocols.signing.message import SigningMessage
-
-
-# from aea.crypto.ethereum import LedgerApis
-# from aea.protocols.base import Message
-# from aea.protocols.default.message import DefaultMessage
-# from aea.protocols.signing.message import SigningMessage
-# from aea.skills.base import Handler
 
 
 LEDGER_API_ADDRESS = "fetchai/ledger:0.8.0"

@@ -40,18 +40,19 @@ clean-test:
 
 .PHONY: lint
 lint:
-	black AutonomousHegician/contracts AutonomousHegician/skills
-	isort AutonomousHegician/contracts AutonomousHegician/skills
-	flake8 AutonomousHegician/contracts AutonomousHegician/skills
+	black AutonomousHegician/contracts AutonomousHegician/skills HegicContractDeployer/contracts HegicContractDeployer/skills
+	isort AutonomousHegician/contracts AutonomousHegician/skills HegicContractDeployer/contracts HegicContractDeployer/skills
+	flake8 AutonomousHegician/contracts AutonomousHegician/skills HegicContractDeployer/contracts HegicContractDeployer/skills
 
 .PHONY: security
 security:
-	bandit -r AutonomousHegician/contracts AutonomousHegician/skills
+	bandit -r AutonomousHegician/contracts AutonomousHegician/skills HegicContractDeployer/contracts HegicContractDeployer/skills
 	safety check -i 37524 -i 38038 -i 37776 -i 38039
 
 .PHONY: static
 static:
 	mypy AutonomousHegician/contracts AutonomousHegician/skills
+	mypy HegicContractDeployer/contracts HegicContractDeployer/skills
 
 .PHONY: new_env
 new_env: clean

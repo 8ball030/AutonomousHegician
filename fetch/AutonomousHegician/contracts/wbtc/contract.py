@@ -89,7 +89,7 @@ class FakeWBTC(Contract):
         nonce = ledger_api.api.eth.getTransactionCount(deployer_address)
         instance = cls.get_instance(ledger_api, contract_address)
         tx = instance.functions.approve(*args).buildTransaction(
-            {"from": deployer_address, "value": 0, "nonce": nonce,}
+            {"from": deployer_address, "value": 0, "nonce": nonce}
         )
 
         tx = cls._try_estimate_gas(ledger_api, tx)
@@ -190,5 +190,5 @@ class FakeWBTC(Contract):
             gas_estimate = ledger_api.api.eth.estimateGas(transaction=tx)
             tx["gas"] = gas_estimate
         except Exception as e:  # pylint: disable=broad-except
-            raise
+            raise e
         return tx
