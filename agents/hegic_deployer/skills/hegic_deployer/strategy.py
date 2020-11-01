@@ -38,6 +38,7 @@ class Strategy(Model):
         """Initialize the strategy of the agent."""
         self._ledger_id = kwargs.pop("ledger_id", DEFAULT_LEDGER_ID)
         self.generate_configs = kwargs.pop("generate_configs", True)
+        self.clear_configs = kwargs.pop("clear_configs", False)
         self._deployment_status: Dict[
             str, Union[Tuple[Optional[str], Optional[str]], str]
         ] = {}
@@ -74,7 +75,7 @@ class Strategy(Model):
         self.eth_balance = None
         super().__init__(**kwargs)
         self.context.logger.info(f"Deployment paramets {self.deployment_status}")
-        if self.generate_configs:
+        if self.clear_configs:
             self.clear_contracts()  # clean contracts for a fresh start
 
     @property
@@ -93,6 +94,9 @@ class Strategy(Model):
         """Output the contract config into a skill file."""
         if self.generate_configs is False:
             return
+        self.context.logger.info(
+            f"Writing the newly deployed contracts to file configs"
+        )
         agent_skill_path = "./skills/hegic_deployer/skill.yaml"
         with open(agent_skill_path) as file:
             yaml_file = yaml.safe_load(file)

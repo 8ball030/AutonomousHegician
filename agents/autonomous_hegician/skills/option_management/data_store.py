@@ -1,9 +1,28 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Author: Tom Rae
+Author: 8baller
 Authorised use only
 """
+import os
+try:
+    from .web_server import (
+        Option,
+        Snapshot,
+        StatusCode,
+        ExecutionStrategy,
+        db,
+        flask_app
+    )
+except ImportError as e:
+    from packages.eightballer.skills.option_management.web_server import (
+        Option,
+        Snapshot,
+        StatusCode,
+        ExecutionStrategy,
+        db,
+        flask_app
+    )
 import web3
 from datetime import datetime, timedelta
 import logging
@@ -14,20 +33,11 @@ import time
 from typing import Dict, Union
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-import sys, os
+import sys
+import os
 
 sys.path += [os.path.sep.join(os.getcwd().split(os.path.sep)[:-1])]
 
-from AutonomousHegician.skills.option_management.web_server import (
-    Option,
-    Snapshot,
-    StatusCode,
-    ExecutionStrategy,
-    db,
-    flask_app
-)
-
-import os
 
 logging.basicConfig()
 logger = logging.getLogger(

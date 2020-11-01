@@ -1,7 +1,10 @@
-from unittest import TestCase
+from multiprocessing import Process
+import subprocess
+import unittest
 from copy import deepcopy
 
-import os, sys
+import os
+import sys
 import web3
 import time
 
@@ -9,51 +12,52 @@ import time
 # we need access to the database, so we will piggy back off the option monitoring skill
 
 
-sys.path += [os.path.sep.join(os.getcwd().split(os.path.sep)[:-1])]
+try:
+    sys.path += [os.path.sep.join(os.getcwd().split(os.path.sep)[:-1])]
+    from agents.autonomous_hegician.skills.option_management.data_store import DataStore
+    from agents.autonomous_hegician.skills.option_management.db_communication import DBCommunication
+except ImportError as e:
+    raise
 
-from AutonomousHegician.skills.option_management.db_communication import DBCommunication
-import data_store
+def setup_db():
+    ds = DataStore()
+    ds.add_data()
+    return ds
+
 # the ah must be run in demo mode after the hegicContractDeployer has deployed the contracts to a local ganache cli
 
-# we first create an option within the database
+
+def launch_autonomous_hegician():
+    """Emulate the AH launch."""
+    command = "cd autonomous_hegician/; aea -s run"
+    Process(target=subprocess.run, args=[command], kwargs={'shell': True}).start()
+    time.sleep(5)  # give it time to start up
 
 
-
-
-
-
-
-class TestOptionExecutionTester(TestCase):
-    order_params = {"amount": 0.1,         
-         "strike_price": 200, 
-         "period": 60 * 60 * 24 * 2,
-         "option_type": 1,
-         "market": "ETH"
-    }
+class TestOptionExecutionTester(unittest.TestCase):
+    order_params = {"amount": 0.1,
+                    "strike_price": 200,
+                    "period": 60 * 60 * 24 * 2,
+                    "option_type": 1,
+                    "market": "ETH"
+                    }
 
     def setUp(self):
-        pass
+        setup_db()
 
     @classmethod
     def tearDownClass(cls):
         # clear all orders from the database
         DBCommunication.delete_options()
-        
-    @classmethod
-    def tearDownClass(cls):
-        # clear all orders from the database
-        pass
-#        DBCommunication.delete_options()
-    
+
     def tearDown(self):
         pass
 #        DBCommunication.delete_options()
 
     @classmethod
     def setUpClass(cls):
-        # clear all orders from the database
-        DBCommunication.delete_options()
-    
+        setup_db()
+        launch_autonomous_hegician()
 
     def test_does_ah_create_eth_call_option(self):
         # now the ah will retrieve this order from the db an execute it.
@@ -64,17 +68,17 @@ class TestOptionExecutionTester(TestCase):
         self.assertEqual(len(orders), 1, "Only 1 order expected as in testing!")
         print(dir(orders[0]))
         # we are expecting the status code to be in 2 (pending placement)
-        self.assertEquals(orders[0].status_code.id, 2, "the option has not been been acted upon by the agent!")
+        self.assertEquals(orders[0].status_code.id, 2,
+                          "the option has not been been acted upon by the agent!")
         time.sleep(5)
         # we now expect the agent to have created the call option.
         orders = DBCommunication.get_orders()
         self.assertEqual(len(orders), 1, "Only 1 order expected as in testing!")
         print(dir(orders[0]))
         # we are expecting the status code to be in 3 (open)
-        self.assertEquals(orders[0].status_code.id, 3, "the option has not been been acted upon by the agent!")
+        self.assertEquals(orders[0].status_code.id, 3,
+                          "the option has not been been acted upon by the agent!")
 
-        
-    
     def test_does_ah_create_btc_call_option(self):
         # now the ah will retrieve this order from the db an execute it.
         order_params = deepcopy(self.order_params)
@@ -86,29 +90,46 @@ class TestOptionExecutionTester(TestCase):
         self.assertEqual(len(orders), 1, "Only 1 order expected as in testing!")
         print(dir(orders[0]))
         # we are expecting the status code to be in 3 (open)
-        self.assertEquals(orders[0].status_code.id, 3, "the option has not been been acted upon by the agent!")
-        
+        self.assertEquals(orders[0].status_code.id, 3,
+                          "the option has not been been acted upon by the agent!")
+
         pass
-    
+
     def test_does_ah_create_eth_put_option(self):
         pass
-    
+
     def test_does_ah_create_btc_put_option(self):
         pass
-    
+
     def test_does_ah_excercise_eth_call_option(self):
         pass
-    
+
     def test_does_ah_excercise_btc_call_option(self):
         pass
-    
+
     def test_does_ah_excercise_eth_put_option(self):
         pass
-    
+
     def test_does_ah_excercise_btc_put_option(self):
         pass
-    
+
+
+def deploy_test_net_contract_via_ah():
+    import sys
+    import os
+    import shutil
+
+
+def tear_down_deployer():
+    # after we have conducted our tests, we can revert the deployer to null state ready for the next tests
+
+    pass
+
+
+def setup_deployer_from_config():
+    pass
+    # shutil.copyfile("../hegic_deployer/contract_config.yaml", "../hegic_deployer/skills/hegic_deployer/skill.yaml")
+
 
 if __name__ == '__main__':
-    pass
-    
+    unittest.main()

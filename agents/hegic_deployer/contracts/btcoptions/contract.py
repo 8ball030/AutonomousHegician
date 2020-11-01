@@ -86,9 +86,7 @@ class HegicBTCOptions(Contract):
         # create the transaction dict
         instance = cls.get_instance(ledger_api, contract_address)
         fee_estimate = instance.functions.fees(period, amount, strike, type).call()
-        option_id = instance.functions.create(period, amount, strike, type).call(
-            {"from": deployer_address, "to": contract_address, "value": fee_estimate[1]}
-        )
+        option_id = instance.functions.create(period, amount, strike, type).call()
 
         return {"option_id": option_id, "fee_estimate": fee_estimate}
 

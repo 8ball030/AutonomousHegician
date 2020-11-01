@@ -52,6 +52,12 @@ class ServiceRegistrationBehaviour(TickerBehaviour):
         "ETHtoBTC": 200,
         "OptionType": {"Put": 1, "Call": 2},
     }
+    test_option_btc_params = {
+        "period": 86400,
+        "amount": toBTC(0.1),
+        "strike": 200,
+        "type": 1,
+    }
     provided_eth = False
     tested_eth = False
     tested_btc = False
@@ -228,7 +234,9 @@ class ServiceRegistrationBehaviour(TickerBehaviour):
                     and self.provided_btc is False
                 ):
                     self._request_contract_interaction(
-                        "wbtc", "mint", {"args": [10000000]}
+                        "wbtc",
+                        "mint",
+                        {"args": [int(self.test_option_btc_params["amount"] * 1e10)]},
                     )
                     self.btc_minted = True
 
@@ -236,7 +244,12 @@ class ServiceRegistrationBehaviour(TickerBehaviour):
                     self._request_contract_interaction(
                         "wbtc",
                         "approve",
-                        {"args": [strategy.deployment_status["btcpool"][1], 10000000]},
+                        {
+                            "args": [
+                                strategy.deployment_status["btcpool"][1],
+                                int(self.test_option_btc_params["amount"] * 1e10),
+                            ]
+                        },
                     )
                     self.btc_approved = True
 
@@ -246,7 +259,14 @@ class ServiceRegistrationBehaviour(TickerBehaviour):
                     and self.provided_btc is False
                 ):
                     self._request_contract_interaction(
-                        "btcpool", "provide_liquidity", {"args": [10000000, 0]}
+                        "btcpool",
+                        "provide_liquidity",
+                        {
+                            "args": [
+                                int(self.test_option_btc_params["amount"] * 1e10),
+                                0,
+                            ]
+                        },
                     )
                     self.provided_btc = True
 
@@ -326,16 +346,7 @@ class ServiceRegistrationBehaviour(TickerBehaviour):
                         f"**** Running Test of btc contract estimate."
                     )
                     self._request_contract_state(
-                        "btcoptions",
-                        "estimate",
-                        {
-                            "period": 24 * 3600 * 1,
-                            "amount": toBTC(0.1),
-                            "strike": self.params["BTCPrice"],
-                            "type": self.params["OptionType"]["Call"]
-                            if isinstance(self.params["OptionType"], dict)
-                            else "",
-                        },
+                        "btcoptions", "estimate", self.test_option_btc_params
                     )
 
                 elif (
@@ -346,14 +357,15 @@ class ServiceRegistrationBehaviour(TickerBehaviour):
                     self._request_contract_interaction(
                         "btcoptions",
                         "create_option",
-                        {
-                            "period": 24 * 3600 * 1,
-                            "amount": toBTC((0.1)),
-                            "strike": self.params["BTCPrice"],
-                            "type": self.params["OptionType"]["Call"]
-                            if isinstance(self.params["OptionType"], dict)
-                            else "",
-                        },
+                        self.test_option_btc_params,
+                        # {
+                        #     "period": 24 * 3600 * 1,
+                        #     "amount": toBTC((0.1)),
+                        #     "strike": self.params["BTCPrice"],
+                        #     "type": self.params["OptionType"]["Call"]
+                        #     if isinstance(self.params["OptionType"], dict)
+                        #     else "",
+                        # },
                     )
                 elif (
                     strategy.deployment_status.get("btcoptions_create_option")[0]

@@ -82,6 +82,42 @@ npm install -g ganache-cli
 
 The directories `hegic_contracts` and `scripts` are kept for reference.
 
+## Tests
+To run tests, the Hegic contracts must first be deployed.
+
+In order to deploy the contracts, first launch the underlying containers for the local blockchain;
+
+```bash
+docker-compose up -d api postgresdb ganachecli
+```
+
+Once these containers have launched, the hegic contracts can be deployed using the deployer agent as so;
+
+```bash
+cd agents
+pipenv shell
+cd hegic_deployer
+aea -s run
+```
+Once the contracts have been successfully deployed, the deployer agent will stop running. 
+The deployer agent will have created a new contract_configuration file which contains the addresses for the newly deployed contracts.
+
+The autonomous_hegician agents aea-config.yaml must be updated with the generated addresses.
+
+Now we can launch the test suite available;
+
+```bash
+cd agents
+pipenv shell
+python tests/
+```
+
+
+## Running on Mainnet
+
+Update the connection.yaml for the Ledger connection.
+
+
 ## Contributors
 
 ### Contributors on GitHub

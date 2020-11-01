@@ -1,19 +1,10 @@
-author: eightballer
-name: hegic_deployer
-version: 0.1.0
-license: Apache-2.0
 aea_version: '>=0.7.0, <0.8.0'
-type: skill
-description: The hegic deploy skill has the ability to deploy and interact with the
-  smart contracts.
-fingerprint:
-  README.md: QmZ7swVkRpmJbJZ2NoLb9CWwH8p3QjnjRJg71UbAXdrKyx
-  __init__.py: QmanmQfdWSEPtEKJCt6sz6S13ju3o7D7oSzriBkVABAARj
-  behaviours.py: QmaC3uUxHSFFn8ZnLXaUXJDnxWaE9gFa3V39uas2gKNG8d
-  dialogues.py: QmfCY3h2CXTryfRrLFt4oeDBTS2AMBbbNyVMJKoWtt93Mt
-  handlers.py: QmbF5R3XSPCQP8UH5KJryUhbnhRL73NMGKd9C77BN76Zk2
-  strategy.py: QmYcHfitHbYEMsiffAFTxVaWNrS8ToNLyUw8H3zsoiG33m
-fingerprint_ignore_patterns: []
+author: eightballer
+behaviours:
+  service_registration:
+    args:
+      services_interval: 0.0001
+    class_name: ServiceRegistrationBehaviour
 contracts:
 - eightballer/btcoptions:0.1.0
 - eightballer/btcpool:0.1.0
@@ -26,17 +17,17 @@ contracts:
 - eightballer/stakingeth:0.1.0
 - eightballer/stakingwbtc:0.1.0
 - eightballer/wbtc:0.1.0
-protocols:
-- fetchai/contract_api:0.7.0
-- fetchai/ledger_api:0.6.0
-- fetchai/signing:0.6.0
-skills: []
-is_abstract: false
-behaviours:
-  service_registration:
-    args:
-      services_interval: 0.0001
-    class_name: ServiceRegistrationBehaviour
+dependencies: {}
+description: The hegic deploy skill has the ability to deploy and interact with the
+  smart contracts.
+fingerprint:
+  README.md: QmZ7swVkRpmJbJZ2NoLb9CWwH8p3QjnjRJg71UbAXdrKyx
+  __init__.py: QmanmQfdWSEPtEKJCt6sz6S13ju3o7D7oSzriBkVABAARj
+  behaviours.py: QmaC3uUxHSFFn8ZnLXaUXJDnxWaE9gFa3V39uas2gKNG8d
+  dialogues.py: QmfCY3h2CXTryfRrLFt4oeDBTS2AMBbbNyVMJKoWtt93Mt
+  handlers.py: QmbF5R3XSPCQP8UH5KJryUhbnhRL73NMGKd9C77BN76Zk2
+  strategy.py: QmYcHfitHbYEMsiffAFTxVaWNrS8ToNLyUw8H3zsoiG33m
+fingerprint_ignore_patterns: []
 handlers:
   contract_api:
     args: {}
@@ -47,6 +38,8 @@ handlers:
   signing:
     args: {}
     class_name: SigningHandler
+is_abstract: false
+license: Apache-2.0
 models:
   contract_api_dialogues:
     args: {}
@@ -59,7 +52,6 @@ models:
     class_name: SigningDialogues
   strategy:
     args:
-      ledger_id: ethereum
       btcoptions: ''
       btcpool: ''
       btcpriceprovider: ''
@@ -67,9 +59,17 @@ models:
       ethpool: ''
       exchange: ''
       hegic: ''
+      ledger_id: ethereum
       priceprovider: ''
       stakingeth: ''
       stakingwbtc: ''
       wbtc: ''
     class_name: Strategy
-dependencies: {}
+name: hegic_deployer
+protocols:
+- fetchai/contract_api:0.7.0
+- fetchai/ledger_api:0.6.0
+- fetchai/signing:0.6.0
+skills: []
+type: skill
+version: 0.1.0

@@ -75,7 +75,6 @@ class DBCommunication:
     def create_new_option(amount, strike_price, period, option_type, market) -> Dict:
         with flask_app.app_context():
             execution_strategy = db.session.query(ExecutionStrategy).one()
-            status_code = db.session.query(StatusCode).filter(StatusCode.id == 1).one()
             option = Option(
                 amount=amount,
                 strike_price=strike_price,
@@ -86,7 +85,7 @@ class DBCommunication:
                 option_type=option_type,
                 expiration_date=datetime.now() + timedelta(seconds=period),
                 execution_strategy_id=execution_strategy.id,
-                status_code_id=status_code.id,
+                status_code_id=0,
             )
             db.session.add(option)
             db.session.commit()
