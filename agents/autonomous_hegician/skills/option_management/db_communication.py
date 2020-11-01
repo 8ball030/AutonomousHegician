@@ -44,6 +44,14 @@ except Exception:
 from datetime import datetime, timedelta
 
 
+OPTIONS_ESTIMATE = 0
+PENDING_PLACEMENT = 1
+PLACING = 2
+OPEN = 3
+CLOSED = 4
+FAILED = 5
+
+
 class DBCommunication:
     """A class to communicate with a database."""
 
@@ -133,12 +141,16 @@ class DBCommunication:
         with flask_app.app_context():
             db.create_all()
             db.session.merge(ExecutionStrategy(id=0, description="auto_itm_execution"))
-            db.session.merge(StatusCode(id=0, description="options_estimate"))
-            db.session.merge(StatusCode(id=1, description="pending_placement"))
-            db.session.merge(StatusCode(id=2, description="placing"))
-            db.session.merge(StatusCode(id=3, description="open"))
-            db.session.merge(StatusCode(id=4, description="closed"))
-            db.session.merge(StatusCode(id=5, description="failed"))
+            db.session.merge(
+                StatusCode(id=OPTIONS_ESTIMATE, description="options_estimate")
+            )
+            db.session.merge(
+                StatusCode(id=PENDING_PLACEMENT, description="pending_placement")
+            )
+            db.session.merge(StatusCode(id=PLACING, description="placing"))
+            db.session.merge(StatusCode(id=OPEN, description="open"))
+            db.session.merge(StatusCode(id=CLOSED, description="closed"))
+            db.session.merge(StatusCode(id=FAILED, description="failed"))
             db.session.query(Option).delete()
             db.session.commit()
             db.session.close()

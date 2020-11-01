@@ -94,9 +94,7 @@ class Strategy(Model):
         """Output the contract config into a skill file."""
         if self.generate_configs is False:
             return
-        self.context.logger.info(
-            f"Writing the newly deployed contracts to file configs"
-        )
+        self.context.logger.info("Writing the newly deployed contracts to file configs")
         agent_skill_path = "./skills/hegic_deployer/skill.yaml"
         with open(agent_skill_path) as file:
             yaml_file = yaml.safe_load(file)

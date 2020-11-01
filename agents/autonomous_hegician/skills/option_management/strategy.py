@@ -20,7 +20,7 @@
 """This module contains the strategy class."""
 
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Tuple
 
 from aea.configurations.constants import DEFAULT_LEDGER
 from aea.helpers.transaction.base import Terms
@@ -28,6 +28,9 @@ from aea.skills.base import Model
 
 from packages.eightballer.skills.option_management.db_communication import (
     DBCommunication,
+    OPEN,
+    OPTIONS_ESTIMATE,
+    PENDING_PLACEMENT,
 )
 from packages.eightballer.skills.option_management.web_server import Option
 
@@ -42,9 +45,8 @@ class Strategy(Model):
     def __init__(self, **kwargs) -> None:
         """Initialize the strategy of the agent."""
         self._ledger_id = kwargs.pop("ledger_id", DEFAULT_LEDGER_ID)
-        self._deployment_status: Dict[
-            str, Union[Tuple[Optional[str], Optional[str]], str]
-        ] = {}
+        self.deployment_status: str = "deployed"
+        self._contract_status: Dict[str, Tuple[Optional[str], Optional[str]]] = {}
         not_deployed = 0
         for contract in [
             "wbtc",
@@ -66,16 +68,16 @@ class Strategy(Model):
             "btcoptions_create_option",
             "btcoptions_exercise",
         ]:  # post test remove
-            param = kwargs.pop(contract, None)
-            if param == "" or param is None:
+            address = kwargs.pop(contract, None)
+            if address == "" or address is None:
                 not_deployed += 1
-                self._deployment_status[contract] = (None, None)
+                self._contract_status[contract] = (None, None)
             else:
-                self._deployment_status[contract] = ("deployed", param)
+                self._contract_status[contract] = ("deployed", address)
             self._database = DBCommunication()
 
         if not_deployed >= 0:
-            self._deployment_status["status"] = "pending"
+            self.deployment_status = "pending"
         self._current_order = None
         self.eth_balance = None
         super().__init__(**kwargs)
@@ -125,7 +127,7 @@ class Strategy(Model):
                     ),
                 ]
             ):
-                self.context.logger.info(f"Order is ready to execute!")
+                self.context.logger.info("Order is ready to execute!")
                 return True
         return False
 
@@ -143,9 +145,9 @@ class Strategy(Model):
         return self._database.update_option(option.id, params)
 
     def retrieve_orders(self, status_code) -> list:
-        if status_code == 3:
+        if status_code == OPEN:
             return self.get_contracts_to_execute()
-        elif status_code == 1 or status_code == 0:
+        elif status_code == PENDING_PLACEMENT or status_code == OPTIONS_ESTIMATE:
             return [
                 f
                 for f in self.gather_pending_orders()
@@ -155,14 +157,35 @@ class Strategy(Model):
             raise ValueError(f"Invalid status code {status_code}")
 
     @property
-    def deployment_status(self) -> dict:
+    def contract_status(self) -> dict:
         """Return the deployment status."""
-        return self._deployment_status
+        return self._contract_status
+
+    @property
+    def is_deploying(self) -> bool:
+        """Get is deploying."""
+        return self.deployment_status == "deploying"
 
     @property
     def ledger_id(self) -> str:
         """Get the ledger id."""
         return self._ledger_id
+
+    def get_contract_address(self, contract_name: str) -> str:
+        """Get the contract address."""
+        status, contract_address = self.contract_status.get(contract_name, (None, None))
+        if contract_address is None:
+            raise ValueError("Could not retrieve contract address.")
+        return contract_address
+
+    def set_status(self, contract_name: str, callable_: str, reference: str) -> None:
+        """Set deployment status."""
+        key = f"{contract_name}_{callable_}"
+        self.contract_status[key] = (
+            "pending",
+            reference,
+        )
+        self.deployment_status = "deploying"
 
     def get_deploy_terms(self) -> Terms:
         """
