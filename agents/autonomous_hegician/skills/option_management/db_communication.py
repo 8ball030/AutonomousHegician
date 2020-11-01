@@ -55,14 +55,6 @@ class DBCommunication:
         """
 
     @staticmethod
-    def get_orders():
-        with flask_app.app_context():
-            db.create_all()
-            results = db.session.query(Option).all()
-            db.session.close()
-        return results
-
-    @staticmethod
     def create_new_snapshot(params):
         with flask_app.app_context():
             snap = Snapshot(**params)
@@ -121,8 +113,32 @@ class DBCommunication:
         return True
 
     @staticmethod
+    def get_options():
+        with flask_app.app_context():
+            db.create_all()
+            results = db.session.query(Option).all()
+            db.session.close()
+        return results
+
+    @staticmethod
     def get_option(option_id) -> Option:
         with flask_app.app_context():
             option = db.session.query(Option).filter(Option.id == option_id).one()
             db.session.close()
         return option
+
+    @staticmethod
+    def add_data():
+        """Create the initial state for the agent"""
+        with flask_app.app_context():
+            db.create_all()
+            db.session.merge(ExecutionStrategy(id=0, description="auto_itm_execution"))
+            db.session.merge(StatusCode(id=0, description="options_estimate"))
+            db.session.merge(StatusCode(id=1, description="pending_placement"))
+            db.session.merge(StatusCode(id=2, description="placing"))
+            db.session.merge(StatusCode(id=3, description="open"))
+            db.session.merge(StatusCode(id=4, description="closed"))
+            db.session.merge(StatusCode(id=5, description="failed"))
+            db.session.query(Option).delete()
+            db.session.commit()
+            db.session.close()

@@ -19,7 +19,7 @@
 
 """This module contains the scaffold contract definition."""
 
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from aea.contracts.base import Contract
 from aea.crypto.base import LedgerApi
@@ -27,6 +27,27 @@ from aea.crypto.base import LedgerApi
 
 class BTCPriceProvider(Contract):
     """The scaffold contract class for a smart contract."""
+
+    @classmethod
+    def get_latest_answer(
+        cls,
+        ledger_api: LedgerApi,
+        contract_address: str,
+        deployer_address: str,
+        data: Optional[bytes] = b"",
+        gas: int = 300000,
+    ) -> Dict[str, Any]:
+        """
+        Get the transaction to create a single token.
+        :param ledger_api: the ledger API
+        :param contract_address: the address of the contract
+        :param deployer_address: the address of the deployer
+        :return: the transaction object
+        """
+        # create the transaction dict
+        instance = cls.get_instance(ledger_api, contract_address)
+        answer = instance.functions.latestAnswer().call()
+        return {"price": answer}
 
     @classmethod
     def get_deploy_transaction(

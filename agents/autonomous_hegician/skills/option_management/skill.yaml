@@ -42,11 +42,11 @@ behaviours:
     class_name: OptionMonitor
   price_ticker:
     args:
-      services_interval: 10
+      services_interval: 1
     class_name: PriceTicker
   snapshot:
     args:
-      services_interval: 30
+      services_interval: 300
     class_name: SnapShot
 handlers:
   contract_api:

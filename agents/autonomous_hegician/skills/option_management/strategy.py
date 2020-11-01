@@ -76,6 +76,7 @@ class Strategy(Model):
 
         if not_deployed >= 0:
             self._deployment_status["status"] = "pending"
+        self._current_order = None
         self.eth_balance = None
         super().__init__(**kwargs)
         self.context.logger.info(f"Deployment paramets {self.deployment_status}")
@@ -92,7 +93,7 @@ class Strategy(Model):
 
     def gather_pending_orders(self) -> List[Option]:
         """Here we retrieve all non-executed contracts."""
-        return self._database.get_orders()
+        return self._database.get_options()
 
     def get_contracts_to_execute(self) -> list:
         orders = [f for f in self.gather_pending_orders() if f.status_code_id == 3]

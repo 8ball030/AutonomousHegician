@@ -19,7 +19,6 @@
 
 """This package contains the behaviour of a erc1155 deploy skill AEA."""
 
-import time
 from datetime import datetime
 from typing import Dict, cast
 
@@ -27,7 +26,6 @@ import web3
 
 from aea.skills.behaviours import TickerBehaviour
 
-from packages.eightballer.skills.option_management.dex_wrapper import DexWrapper
 from packages.eightballer.skills.option_management.dialogues import (
     ContractApiDialogue,
     ContractApiDialogues,
@@ -115,17 +113,20 @@ class PriceTicker(TickerBehaviour):
         Implement the setup.
         :return: None
         """
-        self.dex = DexWrapper()
-        self._set_current_price()
+        self._request_current_prices()
 
-    def _set_current_price(self) -> None:
-        """Retrieve the current Eth dai price from the Dex."""
-        try:
-            prices = {k: 100 for k in ["ETH", "WBTC"]}  # self.dex.get_ticker("DAI", k)
-            self._current_price = prices
-        except Exception as e:
-            self.context.logger.info(f"Error getting price!\n{e}")
-            time.sleep(15)
+    def _request_current_prices(self) -> None:
+        """request the current prices from the contract the Dex."""
+
+        # prices = {k: 100 for k in ["ETH", "WBTC"]}  # self.dex.get_ticker("DAI", k)
+        self._request_contract_state(
+            contract_name=f"priceprovider", callable="get_latest_answer", parameters={}
+        )
+        self._request_contract_state(
+            contract_name=f"btcpriceprovider",
+            callable="get_latest_answer",
+            parameters={},
+        )
 
     def act(self) -> None:
         """
@@ -133,7 +134,66 @@ class PriceTicker(TickerBehaviour):
 
         :return: None
         """
-        self._set_current_price()
+        strategy = cast(Strategy, self.context.strategy)
+        if strategy.deployment_status["status"][0] == "deploying":
+            return
+
+        self._set_current_prices()
+        self._request_current_prices()
+
+    def _set_current_prices(self) -> None:
+        """If the results are present then set the current price."""
+        strategy = cast(Strategy, self.context.strategy)
+        eth_price = strategy.deployment_status.get(
+            "priceprovider_get_latest_answer", None
+        )
+        btc_price = strategy.deployment_status.get(
+            "btcpriceprovider_get_latest_answer", None
+        )
+
+        if eth_price is None and btc_price is None:
+            self.context.logger.info("No price to store.....")
+            return
+        self._current_price = {
+            "ETH": eth_price[1]["price"],
+            "BTC": btc_price[1]["price"],
+        }
+
+    def _request_contract_state(
+        self, contract_name: str, callable: str, parameters: dict
+    ) -> None:
+        """
+        Request contract deploy transaction
+
+        :return: None
+        """
+        params = {"deployer_address": self.context.agent_address}
+        params.update(parameters)
+        strategy = cast(Strategy, self.context.strategy)
+        strategy.is_behaviour_active = False
+        contract_api_dialogues = cast(
+            ContractApiDialogues, self.context.contract_api_dialogues
+        )
+        contract_api_msg, contract_api_dialogue = contract_api_dialogues.create(
+            counterparty=LEDGER_API_ADDRESS,
+            performative=ContractApiMessage.Performative.GET_STATE,
+            ledger_id=strategy.ledger_id,
+            contract_id=f"eightballer/{contract_name}:0.1.0",
+            contract_address=strategy.deployment_status[contract_name][1],
+            callable=callable,
+            kwargs=ContractApiMessage.Kwargs(params),
+        )
+        contract_api_dialogue = cast(ContractApiDialogue, contract_api_dialogue,)
+        contract_api_dialogue.terms = strategy.get_deploy_terms()
+        self.context.outbox.put_message(message=contract_api_msg)
+        strategy.deployment_status[f"{contract_name}_{callable}"] = (
+            "pending",
+            contract_api_dialogue.dialogue_label.dialogue_reference[0],
+        )
+        strategy.deployment_status["status"] = ["deploying", contract_name]
+        self.context.logger.info(
+            f"requesting contract {contract_name} state transaction..."
+        )
 
 
 class OptionMonitor(TickerBehaviour):
