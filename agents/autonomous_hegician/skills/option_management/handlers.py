@@ -169,7 +169,7 @@ class LedgerApiHandler(Handler):
                 continue
             elif status[1] == contract_reference:
                 self.context.logger.info(f"retrieved deployment {contract}")
-                strategy.deployment_status[contract] = (
+                strategy.contract_status[contract] = (
                     "deployed",
                     ledger_api_msg.transaction_receipt.receipt["contractAddress"],
                 )
@@ -289,12 +289,12 @@ class ContractApiHandler(Handler):
         """Handle state reading of the contract apis."""
         strategy = cast(Strategy, self.context.strategy)
         contract_reference = contract_api_dialogue.dialogue_label.dialogue_reference[0]
-        for contract, status in strategy.deployment_status.items():
+        for contract, status in strategy.contract_status.items():
             if status[0] is None:
                 continue
             elif status[1] == contract_reference:
                 self.context.logger.info(f"retrieved deployment {contract} state query")
-                strategy.deployment_status[contract] = (
+                strategy.contract_status[contract] = (
                     "results",
                     contract_api_msg.state.body,
                 )

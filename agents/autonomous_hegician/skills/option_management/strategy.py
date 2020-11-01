@@ -81,7 +81,7 @@ class Strategy(Model):
         self._current_order = None
         self.eth_balance = None
         super().__init__(**kwargs)
-        self.context.logger.info(f"Deployment paramets {self.deployment_status}")
+        self.context.logger.info(f"Contract status parameters {self.contract_status}")
 
     @property
     def current_order(self) -> None:

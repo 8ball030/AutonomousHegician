@@ -159,10 +159,10 @@ class PriceTicker(TickerBehaviour):
     def _set_current_prices(self) -> None:
         """If the results are present then set the current price."""
         strategy = cast(Strategy, self.context.strategy)
-        eth_price = strategy.deployment_status.get(
+        eth_price = strategy.contract_status.get(
             "priceprovider_get_latest_answer", None
         )
-        btc_price = strategy.deployment_status.get(
+        btc_price = strategy.contract_status.get(
             "btcpriceprovider_get_latest_answer", None
         )
 
