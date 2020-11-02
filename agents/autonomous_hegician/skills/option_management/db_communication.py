@@ -16,11 +16,9 @@
 #   limitations under the License.
 #
 # ------------------------------------------------------------------------------
-
 """This module defines the db communication models."""
 
 from typing import Dict
-
 
 try:
     from packages.eightballer.skills.option_management.web_server import (
@@ -32,21 +30,30 @@ try:
         flask_app,
     )
 except Exception:
-    from .web_server import (
-        Option,
-        Snapshot,
-        StatusCode,
-        ExecutionStrategy,
-        db,
-        flask_app,
-    )
+    try:
+        from .web_server import (
+            Option,
+            Snapshot,
+            StatusCode,
+            ExecutionStrategy,
+            db,
+            flask_app,
+        )
+    except Exception:
+        from web_server import (
+            Option,
+            Snapshot,
+            StatusCode,
+            ExecutionStrategy,
+            db,
+            flask_app,
+        )
 
 from datetime import datetime, timedelta
 
 
 class DBCommunication:
     """A class to communicate with a database."""
-
     def __init__(self):
         """
         Initialize the database communication.
@@ -64,7 +71,8 @@ class DBCommunication:
         return snap
 
     @staticmethod
-    def create_new_option(amount, strike_price, period, option_type, market) -> Dict:
+    def create_new_option(amount, strike_price, period, option_type,
+                          market) -> Dict:
         with flask_app.app_context():
             execution_strategy = db.session.query(ExecutionStrategy).one()
             option = Option(
@@ -72,10 +80,10 @@ class DBCommunication:
                 strike_price=strike_price,
                 period=period,
                 market=market,
-                date_modified=datetime.now(),
-                date_created=datetime.now(),
+                date_modified=datetime.utcnow(),
+                date_created=datetime.utcnow(),
                 option_type=option_type,
-                expiration_date=datetime.now() + timedelta(seconds=period),
+                expiration_date=datetime.utcnow() + timedelta(seconds=period),
                 execution_strategy_id=execution_strategy.id,
                 status_code_id=0,
             )
@@ -96,7 +104,8 @@ class DBCommunication:
     @staticmethod
     def update_option(option_db_id, params) -> Option:
         with flask_app.app_context():
-            option = db.session.query(Option).filter(Option.id == option_db_id).one()
+            option = db.session.query(Option).filter(
+                Option.id == option_db_id).one()
             for key, value in params.items():
                 setattr(option, key, value)
             db.session.merge(option)
@@ -123,7 +132,8 @@ class DBCommunication:
     @staticmethod
     def get_option(option_id) -> Option:
         with flask_app.app_context():
-            option = db.session.query(Option).filter(Option.id == option_id).one()
+            option = db.session.query(Option).filter(
+                Option.id == option_id).one()
             db.session.close()
         return option
 
@@ -132,7 +142,8 @@ class DBCommunication:
         """Create the initial state for the agent"""
         with flask_app.app_context():
             db.create_all()
-            db.session.merge(ExecutionStrategy(id=0, description="auto_itm_execution"))
+            db.session.merge(
+                ExecutionStrategy(id=0, description="auto_itm_execution"))
             db.session.merge(StatusCode(id=0, description="options_estimate"))
             db.session.merge(StatusCode(id=1, description="pending_placement"))
             db.session.merge(StatusCode(id=2, description="placing"))
@@ -142,3 +153,7 @@ class DBCommunication:
             db.session.query(Option).delete()
             db.session.commit()
             db.session.close()
+
+
+if __name__ == "__main__":
+    DBCommunication.add_data()

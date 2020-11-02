@@ -73,12 +73,14 @@ class Option(db.Model):  # type: ignore
 
     id = db.Column(db.BigInteger(), primary_key=True)
     ledger_id = db.Column(db.BigInteger())
+    tx_hash = db.Column(db.String)
     market = db.Column(db.String(255))
     period = db.Column(db.BigInteger())
     amount = db.Column(db.BigInteger())
     strike_price = db.Column(db.BigInteger())
     fees = db.Column(db.String(255))
     option_type = db.Column(db.Integer)
+    breakeven = db.Column(db.Integer)
     status_code_id = db.Column(db.ForeignKey("StatusCodes.id"))
     execution_strategy_id = db.Column(db.ForeignKey("ExecutionStrategies.id"))
     date_created = db.Column(db.DateTime(timezone=True))
@@ -171,7 +173,7 @@ class HegicAgents(Resource):
             ]
         ]
         for res in results:
-            if res["date_updated"] + timedelta(seconds=30) > datetime.now():
+            if res["date_updated"] + timedelta(seconds=30) > datetime.utcnow():
                 res["status"] = "running"
             else:
                 res["status"] = "paused"

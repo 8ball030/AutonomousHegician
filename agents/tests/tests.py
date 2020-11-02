@@ -13,9 +13,7 @@ import json
 import datetime
 import logging
 
-
 # we need access to the database, so we will piggy back off the option monitoring skill
-
 
 try:
     sys.path += [os.path.sep.join(os.getcwd().split(os.path.sep)[:-1])]
@@ -23,14 +21,15 @@ try:
 except ImportError as e:
     raise
 
+
 def setup_db():
     ds = DBCommunication()
     ds.add_data()
     return ds
 
+
 # the ah must be run in demo mode after the hegicContractDeployer has deployed the contracts to a local ganache cli
 
-    
 w3 = web3.Web3(web3.HTTPProvider('http://127.0.0.1:7545'))
 w3.isConnected()
 deployer_address = w3.eth.coinbase
@@ -39,39 +38,47 @@ deployer_address = w3.eth.coinbase
 def launch_autonomous_hegician():
     """Emulate the AH launch."""
     command = "cd autonomous_hegician/; aea -s run"
-    Process(target=subprocess.run, args=[command], kwargs={'shell': True}).start()
+    p = Process(target=subprocess.run, args=[command], kwargs={'shell': True})
+    p.start()
     time.sleep(10)  # give it time to start up
+    return p
 
 
-    
-    
 def get_current_addresses():
-    with open("./autonomous_hegician/skills/option_management/skill.yaml", "r") as f:
-        return {k: v for k, v in yaml.safe_load(f)["models"]["strategy"]['args'].items() if k != "ledger_id"}
+    with open("./autonomous_hegician/skills/option_management/skill.yaml",
+              "r") as f:
+        return {
+            k: v
+            for k, v in yaml.safe_load(f)["models"]["strategy"]
+            ['args'].items() if k != "ledger_id"
+        }
+
 
 def load_contracts(addresses):
     """Read in the contracts from the agent."""
-    mapping = {"priceprovider": "FakePriceProvider.json", 
-               "ethoptions": "HegicETHOptions.json",
-               "ethpool": "HegicETHPool.json",
-               "ethpriceprovider": "FakeETHPriceProvider.json",
-               "btcoptions": "HegicWBTCOptions.json",
-               "btcpool": "HegicERCPool.json",
-               "btcpriceprovider": "FakeBTCPriceProvider.json",
-               "exchange": "FakeExchange.json",
-               "hegic": "FakeHEGIC.json",
-               "wbtc": "FakeWBTC.json",
-               "stakingeth": "HegicStakingETH.json",
-               "stakingwbtc": "HegicStakingWBTC.json",
-               }
+    mapping = {
+        "priceprovider": "FakePriceProvider.json",
+        "ethoptions": "HegicETHOptions.json",
+        "ethpool": "HegicETHPool.json",
+        "ethpriceprovider": "FakeETHPriceProvider.json",
+        "btcoptions": "HegicWBTCOptions.json",
+        "btcpool": "HegicERCPool.json",
+        "btcpriceprovider": "FakeBTCPriceProvider.json",
+        "exchange": "FakeExchange.json",
+        "hegic": "FakeHEGIC.json",
+        "wbtc": "FakeWBTC.json",
+        "stakingeth": "HegicStakingETH.json",
+        "stakingwbtc": "HegicStakingWBTC.json",
+    }
     contracts = {}
     for contract, address in addresses.items():
-        with open(f"./hegic_deployer/contracts/{contract}/build/contracts/{mapping[contract]}", "r") as f:
+        with open(
+                f"./hegic_deployer/contracts/{contract}/build/contracts/{mapping[contract]}",
+                "r") as f:
             c = json.loads(f.read())
             contracts[contract] = w3.eth.contract(address=address,
-                                    abi=c['abi'])
+                                                  abi=c['abi'])
     return contracts
-    
 
 
 class TestOptionExecutionTester(unittest.TestCase):
@@ -80,35 +87,33 @@ class TestOptionExecutionTester(unittest.TestCase):
 
     def set_price(self, new_price, provider):
         price_provider = self.contracts[provider]
-        price_provider.functions.setPrice(new_price).transact({"from": deployer_address})
-    
+        price_provider.functions.setPrice(new_price).transact(
+            {"from": deployer_address})
+
     def tearDown(self):
         DBCommunication.delete_options()
-    
-    
-    
-    
-    order_params = {"amount": 10000000,
-                    "strike_price": 200,
-                    "period": 60 * 60 * 24 * 2,
-                    "option_type": 1,
-                    "market": "ETH"
-                    }
+
+    order_params = {
+        "amount": 10000000,
+        "strike_price": 200,
+        "period": 60 * 60 * 24 * 2,
+        "option_type": 1,
+        "market": "ETH"
+    }
 
     @classmethod
     def setUpClass(cls):
         setup_db()
         cls.addresses = get_current_addresses()
         cls.contracts = load_contracts(cls.addresses)
-        launch_autonomous_hegician()
-
 
     def test_does_ah_create_eth_put_option(self):
         # now the ah will retrieve this order from the db an execute it.
         self.set_price(self.order_params['strike_price'], "priceprovider")
         new_order = DBCommunication.create_new_option(**self.order_params)
         orders = DBCommunication.get_options()
-        self.assertEqual(len(orders), 1, "Only 1 order expected as in testing!")
+        self.assertEqual(len(orders), 1,
+                         "Only 1 order expected as in testing!")
         self.assertTrue(self.await_order_status_code(3, new_order))
 
     def test_does_ah_create_btc_put_option(self):
@@ -116,7 +121,8 @@ class TestOptionExecutionTester(unittest.TestCase):
         order_params["market"] = "BTC"
         new_order = DBCommunication.create_new_option(**order_params)
         orders = DBCommunication.get_options()
-        self.assertEqual(len(orders), 1, "Only 1 order expected as in testing!")
+        self.assertEqual(len(orders), 1,
+                         "Only 1 order expected as in testing!")
         self.assertTrue(self.await_order_status_code(3, new_order))
 
     def test_does_ah_create_eth_call_option(self):
@@ -125,7 +131,8 @@ class TestOptionExecutionTester(unittest.TestCase):
         option_params["option_type"] = 2
         new_order = DBCommunication.create_new_option(**self.order_params)
         orders = DBCommunication.get_options()
-        self.assertEqual(len(orders), 1, "Only 1 order expected as in testing!")
+        self.assertEqual(len(orders), 1,
+                         "Only 1 order expected as in testing!")
         self.assertTrue(self.await_order_status_code(3, new_order))
 
     def test_does_ah_create_btc_call_option(self):
@@ -134,7 +141,8 @@ class TestOptionExecutionTester(unittest.TestCase):
         order_params["option_type"] = 2
         new_order = DBCommunication.create_new_option(**order_params)
         orders = DBCommunication.get_options()
-        self.assertEqual(len(orders), 1, "Only 1 order expected as in testing!")
+        self.assertEqual(len(orders), 1,
+                         "Only 1 order expected as in testing!")
         self.assertTrue(self.await_order_status_code(3, new_order))
 
 #   def test_does_ah_exercise_eth_call_option(self):
@@ -143,24 +151,24 @@ class TestOptionExecutionTester(unittest.TestCase):
 #       order_params = deepcopy(self.order_params)
 #       order_params["option_type"] = 2
 #       new_order = DBCommunication.create_new_option(**self.order_params)
-   #      self.set_price(order_params['strike_price'], "btcpriceprovider")
-        # we are expecting the status code to be in 3 (open)
-    
+#      self.set_price(order_params['strike_price'], "btcpriceprovider")
+# we are expecting the status code to be in 3 (open)
+
     def await_order_status_code(self, status_code, order_params):
         done = False
         timeout = 20
-        start = datetime.datetime.now()
+        start = datetime.datetime.utcnow()
         last_order = None
         while not done:
-            if datetime.datetime.now() - datetime.timedelta(seconds=timeout) > start:
+            if datetime.datetime.now() - datetime.timedelta(
+                    seconds=timeout) > start:
                 return False
             time.sleep(1)
             order = DBCommunication.get_option(order_params['option_id'])
             if order.status_code.id == status_code:
                 done = True
         return done
-            
-        
+
 
 #   def test_does_ah_excercise_btc_call_option(self):
 #       pass
@@ -190,5 +198,8 @@ def setup_deployer_from_config():
 
 
 if __name__ == '__main__':
+    agent = launch_autonomous_hegician()
     unittest.main()
+    agent.terminate()
     sys.exit()
+    quit()

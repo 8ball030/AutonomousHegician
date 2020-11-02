@@ -26,6 +26,24 @@ class OptionList extends React.Component {
         },
       },
       {
+        name: "tx_hash",
+        label: "TX Hash",
+        options: {},
+      },
+
+      {
+        name: "breakeven",
+        label: "Breakeven Price",
+        options: {},
+      },
+
+      {
+        name: "pnl",
+        label: "P&L",
+        options: {},
+      },
+
+      {
         name: "date_created",
         label: "Date Created",
         options: {},
@@ -62,6 +80,15 @@ class OptionList extends React.Component {
   constructor (props) {
     super(props);
     setInterval(() => this.UpdateGraph(), 1000);
+  }
+
+  componentDidMount() {
+    this._isMounted = true;
+    this.UpdateGraph();
+  }
+
+  componentWillUnmount() {
+    this._isMounted = false;
   }
 
   UpdateGraph() {

@@ -19,16 +19,12 @@ import {
 } from 'react-jsx-highcharts';
 
 
-function createData(name, calories, fat, carbs, protein, status) {
-  return { name, calories, fat, carbs, protein, status };
+function createData(name, calories, fat, carbs, protein, status, amount) {
+  return { name, calories, fat, carbs, protein, status, amount };
 }
 
 const rows = [
-  createData('Frozen yoghurt', 159, 6.0, 24, 4.0, 'paused'),
-  createData('Ice cream sandwich', 237, 9.0, 37, 4.3, 'error'),
-  createData('Eclair', 262, 16.0, 24, 6.0, 'running'),
-  createData('Cupcake', 305, 3.7, 67, 4.3, 'running'),
-  createData('Gingerbread', 356, 16.0, 49, 3.9, 'running'),
+  createData('Frozen yoghurt', 159, 6.0, 24, 4.0, 'paused' ,100),
 ];
 const states = {
   running: {
@@ -52,11 +48,21 @@ class AgentList extends React.Component {
     setInterval(() => this.UpdateGraph(), 10000);
   }
 
+  componentDidMount() {
+    this._isMounted = true;
+    this.UpdateGraph();
+  }
+
+  componentWillUnmount() {
+    this._isMounted = false;
+  }
+
 
   UpdateGraph() {
     API.get('get_all_agents')
       .then(agents => agents.data)
       .then(agentsList => {
+          console.log(agentsList );
           this.setState({ agentsData: agentsList });
       });
   }
@@ -67,6 +73,7 @@ class AgentList extends React.Component {
 
   render() {
 
+    const{agentsData} = this.state;
 
     return (
         <TableContainer component={Paper}>
@@ -82,7 +89,7 @@ class AgentList extends React.Component {
               </TableRow>
             </TableHead>
             <TableBody>
-              {rows.map((row) => (
+              {this.agentsData.map((row) => (
                 <TableRow key={row.address}>
                   <TableCell component="th" scope="row">
                     {row.name}
@@ -94,7 +101,6 @@ class AgentList extends React.Component {
                     <Button
                       style={states[row.status]}
                     >
-                      {row.status}
                     </Button>
                   </TableCell>
                 </TableRow>

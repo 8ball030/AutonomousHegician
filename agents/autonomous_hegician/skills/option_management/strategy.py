@@ -19,7 +19,7 @@
 
 """This module contains the strategy class."""
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Dict, List, Optional, Tuple, Union
 
 from aea.configurations.constants import DEFAULT_LEDGER
@@ -32,7 +32,7 @@ from packages.eightballer.skills.option_management.db_communication import (
 from packages.eightballer.skills.option_management.web_server import Option
 
 
-DEFAULT_LEDGER_ID = DEFAULT_LEDGER
+DEFAULT_LEDGER_ID = "ethereum" 
 DEFAULT_TIME_BEFORE_EXECUTION = 600
 
 
@@ -111,7 +111,7 @@ class Strategy(Model):
             seconds=DEFAULT_TIME_BEFORE_EXECUTION
         )
 
-        if contract.status_code_id == 3 and datetime.now() > deadline:
+        if contract.status_code_id == 3 and datetime.now(deadline.tzinfo) > deadline:
             price = self.context.behaviours.price_ticker.current_price[contract.market]
             if any(
                 [

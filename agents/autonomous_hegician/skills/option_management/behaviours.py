@@ -57,8 +57,8 @@ class SnapShot(TickerBehaviour):
             eth_val=eth_val,
             usd_val=float(eth_val)
             * float(self.context.behaviours.price_ticker.current_price["ETH"]),
-            date_created=datetime.now(),
-            date_updated=datetime.now(),
+            date_created=datetime.utcnow(),
+            date_updated=datetime.utcnow(),
             address=self.context.agent_address,
         )
         strategy.create_new_snapshot(snapshot_params)
