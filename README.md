@@ -109,7 +109,7 @@ Now we can launch the test suite available;
 ```bash
 cd agents
 pipenv shell
-python tests/
+python tests/tests.py
 ```
 
 

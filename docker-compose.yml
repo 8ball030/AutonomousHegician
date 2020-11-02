@@ -22,6 +22,7 @@ services:
         POSTGRES_USER: admin
         POSTGRES_PASSWORD: WKLpwoDJd03DJ423DJwlDJlaDJsdDJsdDJlDJsa
   ganachecli:
+    hostname: ganachecli
     build: 
       context: ./ganachecli/
       dockerfile: Dockerfile
