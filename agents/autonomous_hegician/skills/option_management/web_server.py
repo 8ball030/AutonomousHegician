@@ -37,7 +37,7 @@ logger = logging.getLogger(__name__)
 flask_app = Flask(__name__)  # Flask Application
 flask_app.config[
     "SQLALCHEMY_DATABASE_URI"
-] = f"postgresql://admin:WKLpwoDJd03DJ423DJwlDJlaDJsdDJsdDJlDJsa@postgresdb:5432/cortex"
+] = "postgresql://admin:WKLpwoDJd03DJ423DJwlDJlaDJsdDJsdDJlDJsa@postgresdb:5432/cortex"
 flask_app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = True
 # Create RestPlus API
 api = Api(

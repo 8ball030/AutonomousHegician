@@ -25,6 +25,14 @@ from aea.crypto.ledger_apis import LedgerApis
 from aea.protocols.base import Message
 from aea.skills.base import Handler
 
+from packages.eightballer.skills.option_management.db_communication import (
+    CLOSED,
+    FAILED,
+    OPEN,
+    OPTIONS_ESTIMATE,
+    PENDING_PLACEMENT,
+    PLACING,
+)
 from packages.eightballer.skills.option_management.dialogues import (
     ContractApiDialogue,
     ContractApiDialogues,
@@ -156,14 +164,12 @@ class LedgerApiHandler(Handler):
         contract_reference = ledger_api_dialogue._associated_signing_dialogue._associated_contract_api_dialogue.dialogue_label.dialogue_reference[
             0
         ]
-        for contract, status in strategy._deployment_status.items():
+        for contract, status in strategy.contract_status.items():
             if status[0] is None:
                 continue
             elif status[1] == contract_reference:
-                self.context.logger.info(
-                    "retrieved deployment {contract}".format(contract=contract)
-                )
-                strategy.deployment_status[contract] = (
+                self.context.logger.info(f"retrieved deployment {contract}")
+                strategy.contract_status[contract] = (
                     "deployed",
                     ledger_api_msg.transaction_receipt.receipt["contractAddress"],
                 )
@@ -175,13 +181,13 @@ class LedgerApiHandler(Handler):
         #                     strategy.current_order_id, {"status_code_id": 3})
         order = strategy.get_order(strategy.current_order.id)
         if is_transaction_successful:
-            if order.status_code_id == 2:  # we have created our order
+            if order.status_code_id == PLACING:  # we have created our order
                 strategy.update_current_order(
-                    order, {"status_code_id": 3}
+                    order, {"status_code_id": OPEN}
                 )  # now we mark for placement
-            elif order.status_code_id == 3:  # we have  excercised
+            elif order.status_code_id == OPEN:  # we have  excercised
                 strategy.update_current_order(
-                    order, {"status_code_id": 4}
+                    order, {"status_code_id": CLOSED}
                 )  # now we mark for placement
 
             self.context.logger.info(
@@ -191,14 +197,14 @@ class LedgerApiHandler(Handler):
             )
         else:
             strategy.update_current_order(
-                order, {"status_code_id": 5}
+                order, {"status_code_id": FAILED}
             )  # now we mark for placement
             self.context.logger.error(
                 "transaction failed. Transaction receipt={}".format(
                     ledger_api_msg.transaction_receipt
                 )
             )
-        strategy.deployment_status["status"] = "pending"
+        strategy.deployment_status = "pending"
 
     def _handle_error(
         self, ledger_api_msg: LedgerApiMessage, ledger_api_dialogue: LedgerApiDialogue
@@ -283,28 +289,26 @@ class ContractApiHandler(Handler):
         """Handle state reading of the contract apis."""
         strategy = cast(Strategy, self.context.strategy)
         contract_reference = contract_api_dialogue.dialogue_label.dialogue_reference[0]
-        for contract, status in strategy._deployment_status.items():
+        for contract, status in strategy.contract_status.items():
             if status[0] is None:
                 continue
             elif status[1] == contract_reference:
-                self.context.logger.info(
-                    "retrieved deployment {contract} state query".format(
-                        contract=contract
-                    )
-                )
-                strategy.deployment_status[contract] = (
+                self.context.logger.info(f"retrieved deployment {contract} state query")
+                strategy.contract_status[contract] = (
                     "results",
                     contract_api_msg.state.body,
                 )
-                strategy.deployment_status["status"] = "pending"
+                strategy.deployment_status = "pending"
                 break
         if contract in ["btcoptions_estimate", "ethoptions_estimate"]:
             order = strategy.get_order(strategy.current_order.id)
-            if order.status_code_id == 0:  # we have receievd our estimates
+            if (
+                order.status_code_id == OPTIONS_ESTIMATE
+            ):  # we have received our estimates
                 strategy.update_current_order(
                     order,
                     {
-                        "status_code_id": 1,
+                        "status_code_id": PENDING_PLACEMENT,
                         "ledger_id": contract_api_msg.state.body["option_id"],
                         "fees": contract_api_msg.state.body["fee_estimate"],
                     },
@@ -378,7 +382,7 @@ class ContractApiHandler(Handler):
             )
         )
         order = strategy.current_order
-        strategy.update_current_order(order.id, {"status_code_id": 5})
+        strategy.update_current_order(order.id, {"status_code_id": FAILED})
 
     def _handle_invalid(
         self,
