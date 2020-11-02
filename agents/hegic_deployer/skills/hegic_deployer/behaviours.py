@@ -281,7 +281,7 @@ class ServiceRegistrationBehaviour(TickerBehaviour):
             elif self.run_contract_tests is True and self.monitoring is False:
                 if strategy.deployment_status.get("ethoptions_estimate")[0] is None:
                     self.context.logger.info(
-                        f"**** Running Test of eth contract estimate."
+                        "**** Running Test of eth contract estimate."
                     )
                     self._request_contract_state(
                         "ethoptions",
@@ -300,7 +300,7 @@ class ServiceRegistrationBehaviour(TickerBehaviour):
                     strategy.deployment_status.get("ethoptions_create_option")[0]
                     is None
                 ):
-                    self.context.logger.info(f"**** Running Test of contract create.")
+                    self.context.logger.info("**** Running Test of contract create.")
                     self._request_contract_interaction(
                         "ethoptions",
                         "create_option",
@@ -320,9 +320,7 @@ class ServiceRegistrationBehaviour(TickerBehaviour):
                     == "results"
                     and strategy.deployment_status.get("ethoptions_exercise")[0] is None
                 ):
-                    self.context.logger.info(
-                        f"**** Running Test of contract excercise."
-                    )
+                    self.context.logger.info("**** Running Test of contract excercise.")
                     option_id = strategy.deployment_status.get("ethoptions_estimate")[
                         1
                     ]["option_id"]
@@ -335,7 +333,7 @@ class ServiceRegistrationBehaviour(TickerBehaviour):
                     and not self.tested_eth
                 ):
                     self.context.logger.info(
-                        f"****Functionality Test of eth contracts complete!"
+                        "****Functionality Test of eth contracts complete!"
                     )
                     self.tested_eth = True
 
@@ -343,7 +341,7 @@ class ServiceRegistrationBehaviour(TickerBehaviour):
 
                 elif strategy.deployment_status.get("btcoptions_estimate")[0] is None:
                     self.context.logger.info(
-                        f"**** Running Test of btc contract estimate."
+                        "**** Running Test of btc contract estimate."
                     )
                     self._request_contract_state(
                         "btcoptions", "estimate", self.test_option_btc_params
@@ -353,7 +351,7 @@ class ServiceRegistrationBehaviour(TickerBehaviour):
                     strategy.deployment_status.get("btcoptions_create_option")[0]
                     is None
                 ):
-                    self.context.logger.info(f"**** Running Test of contract create.")
+                    self.context.logger.info("**** Running Test of contract create.")
                     self._request_contract_interaction(
                         "btcoptions",
                         "create_option",
@@ -374,9 +372,7 @@ class ServiceRegistrationBehaviour(TickerBehaviour):
                     == "results"
                     and strategy.deployment_status.get("btcoptions_exercise")[0] is None
                 ):
-                    self.context.logger.info(
-                        f"**** Running Test of contract excercise."
-                    )
+                    self.context.logger.info("**** Running Test of contract excercise.")
                     option_id = strategy.deployment_status.get("btcoptions_estimate")[
                         1
                     ]["option_id"]
@@ -386,7 +382,7 @@ class ServiceRegistrationBehaviour(TickerBehaviour):
 
                 elif strategy.deployment_status.get("btcoptions_exercise") is not None:
                     self.context.logger.info(
-                        f"****Functionality Test of btc contracts complete!"
+                        "****Functionality Test of btc contracts complete!"
                     )
                     strategy.deployment_status["status"] = "complete"
                     import sys
