@@ -42,6 +42,7 @@ const states = {
 };
 
 class AgentList extends React.Component {
+  state = {agentsData: {"date_created": "Data is Loading..."}}
 
   constructor (props) {
     super(props);
@@ -66,14 +67,11 @@ class AgentList extends React.Component {
           this.setState({ agentsData: agentsList });
       });
   }
-  //componentDidMount() {
-  //  this.UpdateGraph();
-  //}
-
 
   render() {
 
-    const{agentsData} = this.state;
+    const { agentsData } = this.state;
+    let keys = Object.keys(agentsData);
 
     return (
         <TableContainer component={Paper}>
@@ -83,24 +81,25 @@ class AgentList extends React.Component {
                 <TableCell>Agent Public Address</TableCell>
                 <TableCell align="right">Date Created</TableCell>
                 <TableCell align="right">Last Updated</TableCell>
-                <TableCell align="right">Status</TableCell>
-                <TableCell align="right">USD Value</TableCell>
                 <TableCell align="right">ETH Value</TableCell>
+                <TableCell align="right">USD Value</TableCell>
+                <TableCell align="right">Status</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {this.agentsData.map((row) => (
+              {keys.map((row) => (
                 <TableRow key={row.address}>
                   <TableCell component="th" scope="row">
-                    {row.name}
+                    {agentsData[row].address}
                   </TableCell>
-                  <TableCell align="right">{row.date_created}</TableCell>
-                  <TableCell align="right">{row.date_updated}</TableCell>
-                  <TableCell align="right">{row.usd_val}</TableCell>
+                  <TableCell align="right">{agentsData[row].date_created}</TableCell>
+                  <TableCell align="right">{agentsData[row].date_updated}</TableCell>
+                  <TableCell align="right">{agentsData[row].eth_val}</TableCell>
+                  <TableCell align="right">{agentsData[row].usd_val}</TableCell>
                   <TableCell align="right">
                     <Button
-                      style={states[row.status]}
-                    >
+                      style={states[agentsData[row].status]} 
+                    >{agentsData[row].status}
                     </Button>
                   </TableCell>
                 </TableRow>
