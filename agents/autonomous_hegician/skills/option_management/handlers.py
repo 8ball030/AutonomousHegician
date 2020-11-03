@@ -176,20 +176,16 @@ class LedgerApiHandler(Handler):
                 self.context.logger.info(
                     f"** {ledger_api_msg.transaction_receipt.receipt['contractAddress']}  Retireved and stored)"
                 )
-        #              if contract in ["ethoptions_create_option", "btcoptions_create_option"]:
-        #                  strategy.update_option(
-        #                     strategy.current_order_id, {"status_code_id": 3})
         order = strategy.get_order(strategy.current_order.id)
         if is_transaction_successful:
             if order.status_code_id == PLACING:  # we have created our order
                 strategy.update_current_order(
-                    order, {"status_code_id": OPEN}
+                    order, {"status_code_id": OPEN, "tx_hash": ledger_api_msg.transaction_receipt.transaction['hash'].hex()}
                 )  # now we mark for placement
             elif order.status_code_id == OPEN:  # we have  excercised
                 strategy.update_current_order(
-                    order, {"status_code_id": CLOSED}
+                    order, {"status_code_id": CLOSED, "tx_hash": ledger_api_msg.transaction_receipt.transaction['hash'].hex()}
                 )  # now we mark for placement
-
             self.context.logger.info(
                 "transaction was successfully settled. Transaction receipt={}".format(
                     "ledger_api_msg.transaction_receipt"
@@ -197,7 +193,7 @@ class LedgerApiHandler(Handler):
             )
         else:
             strategy.update_current_order(
-                order, {"status_code_id": FAILED}
+                order, {"status_code_id": FAILED, "tx_hash": ledger_api_msg.transaction_receipt.transaction['hash'].hex()}
             )  # now we mark for placement
             self.context.logger.error(
                 "transaction failed. Transaction receipt={}".format(
@@ -217,12 +213,15 @@ class LedgerApiHandler(Handler):
         :param ledger_api_message: the ledger api message
         :param ledger_api_dialogue: the ledger api dialogue
         """
+        strategy = cast(Strategy, self.context.strategy)
+        order = strategy.get_order(strategy.current_order.id)
         self.context.logger.info(
             "received ledger_api error message={} in dialogue={}.".format(
                 ledger_api_msg, ledger_api_dialogue
             )
         )
-        raise ValueError("Error in ledger_api not correctly Handled.")
+        strategy.update_current_order(
+                order, {"status_code_id": FAILED, "tx_hash": ledger_api_msg.transaction_receipt.body})
 
     def _handle_invalid(
         self, ledger_api_msg: LedgerApiMessage, ledger_api_dialogue: LedgerApiDialogue

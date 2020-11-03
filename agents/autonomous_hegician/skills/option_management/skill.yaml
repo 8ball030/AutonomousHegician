@@ -11,7 +11,7 @@ behaviours:
     class_name: PriceTicker
   snapshot:
     args:
-      services_interval: 300
+      services_interval: 10
     class_name: SnapShot
 contracts:
 - eightballer/btcoptions:0.1.0
