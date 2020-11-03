@@ -22,7 +22,6 @@
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Tuple
 
-from aea.configurations.constants import DEFAULT_LEDGER
 from aea.helpers.transaction.base import Terms
 from aea.skills.base import Model
 
@@ -31,11 +30,12 @@ from packages.eightballer.skills.option_management.db_communication import (
     OPEN,
     OPTIONS_ESTIMATE,
     PENDING_PLACEMENT,
+    EXPIRED,
 )
 from packages.eightballer.skills.option_management.web_server import Option
 
 
-DEFAULT_LEDGER_ID = "ethereum" 
+DEFAULT_LEDGER_ID = "ethereum"
 DEFAULT_TIME_BEFORE_EXECUTION = 600
 
 
@@ -81,7 +81,10 @@ class Strategy(Model):
         self._current_order = None
         self.eth_balance = None
         super().__init__(**kwargs)
-        self.context.logger.info(f"Contract status parameters {self.contract_status}")
+        self.is_price_behaviour_active = True
+        self.is_order_behaviour_active = False
+
+    #       self.context.logger.info(f"Contract status parameters {self.contract_status}")
 
     @property
     def current_order(self) -> None:
@@ -105,7 +108,12 @@ class Strategy(Model):
         for order in orders:
             if self.check_contract_should_execute(order):
                 results.append(order)
+            self.check_contract_should_expire(order)
         return results
+
+    def check_contract_should_expire(self, order):
+        if order.expiration_date < datetime.now(order.expiration_date.tzinfo):
+            self.update_current_order(order, {"status_code_id": EXPIRED})
 
     def check_contract_should_execute(self, contract: Option) -> bool:
         """Check if the contract is in the money, and that the expiration date is near"""
@@ -119,11 +127,11 @@ class Strategy(Model):
                 [
                     (
                         contract.option_type == 1  # put option
-                        and contract.strike_price > price
+                        and contract.strike_price >= price
                     ),
                     (
                         contract.option_type == 2  # call option
-                        and contract.strike_price < price
+                        and contract.strike_price <= price
                     ),
                 ]
             ):

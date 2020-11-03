@@ -40,7 +40,7 @@ from packages.eightballer.skills.option_management.dialogues import (
 from packages.eightballer.skills.option_management.strategy import Strategy
 from packages.fetchai.protocols.contract_api.message import ContractApiMessage
 from packages.fetchai.protocols.ledger_api.message import LedgerApiMessage
-
+from collections import OrderedDict
 
 DEFAULT_SERVICES_INTERVAL = 30.0
 LEDGER_API_ADDRESS = "fetchai/ledger:0.8.0"
@@ -113,9 +113,13 @@ class PriceTicker(TickerBehaviour):
             "services_interval", DEFAULT_SERVICES_INTERVAL
         )  # type: int
         super().__init__(tick_interval=services_interval, **kwargs)
-        self._current_price = {
-            ETH: DEFAULT_CURRENT_ETH_PRICE,
-            BTC: DEFAULT_CURRENT_BTC_PRICE,
+        self._current_price = OrderedDict(
+            {ETH: DEFAULT_CURRENT_ETH_PRICE, BTC: DEFAULT_CURRENT_BTC_PRICE}
+        )
+        self.last = "ETH"
+        self.token_contract_mapping = {
+            "ETH": "priceprovider",
+            "BTC": "btcpriceprovider",
         }
 
     @property
@@ -131,17 +135,17 @@ class PriceTicker(TickerBehaviour):
         self._request_current_prices()
 
     def _request_current_prices(self) -> None:
-        """Request the current prices from the contract the Dex."""
+        """Request the latest current prices from smart contract."""
 
-        # prices = {k: 100 for k in ["ETH", "WBTC"]}  # self.dex.get_ticker("DAI", k)
         self._request_contract_state(
-            contract_name="priceprovider", callable_="get_latest_answer", parameters={}
-        )
-        self._request_contract_state(
-            contract_name="btcpriceprovider",
+            contract_name=self.token_contract_mapping[self.last],
             callable_="get_latest_answer",
             parameters={},
         )
+        if self.last == "BTC":
+            self.last = "ETH"
+        else:
+            self.last = "BTC"
 
     def act(self) -> None:
         """
@@ -150,7 +154,7 @@ class PriceTicker(TickerBehaviour):
         :return: None
         """
         strategy = cast(Strategy, self.context.strategy)
-        if strategy.is_deploying:
+        if strategy.is_order_behaviour_active or not strategy.is_price_behaviour_active:
             return
 
         self._set_current_prices()
@@ -191,7 +195,7 @@ class PriceTicker(TickerBehaviour):
         params = {"deployer_address": self.context.agent_address}
         params.update(parameters)
         strategy = cast(Strategy, self.context.strategy)
-        strategy.is_behaviour_active = False
+        strategy.is_price_behaviour_active = False
         contract_api_dialogues = cast(
             ContractApiDialogues, self.context.contract_api_dialogues
         )
@@ -212,7 +216,9 @@ class PriceTicker(TickerBehaviour):
             contract_api_dialogue.dialogue_label.dialogue_reference[0],
         )
         self.context.outbox.put_message(message=contract_api_msg)
-        self.context.logger.info(f"requesting contract {contract_name} state...")
+
+
+#         self.context.logger.info(f"requesting contract price {contract_name} state...")
 
 
 class OptionMonitor(TickerBehaviour):
@@ -237,7 +243,7 @@ class OptionMonitor(TickerBehaviour):
         :return: None
         """
         strategy = cast(Strategy, self.context.strategy)
-        if strategy.is_deploying:
+        if strategy.is_order_behaviour_active:
             return
 
         orders_to_estimate = strategy.retrieve_orders(status_code=OPTIONS_ESTIMATE)
@@ -245,9 +251,14 @@ class OptionMonitor(TickerBehaviour):
         orders_to_exercise = strategy.retrieve_orders(status_code=OPEN)
 
         for order_batch in [orders_to_create, orders_to_estimate, orders_to_exercise]:
-            if len(order_batch) == 0:
-                continue
-            self.context.logger.info(f"Orders to action! : {len(order_batch)}")
+            #           self.context.logger.info(f"Orders to action! : {len(order_batch)}")
+            if len(order_batch) > 0:
+                strategy.is_order_behaviour_active = True
+                strategy.is_price_behaviour_active = False
+        #               self.context.logger.info(
+        #                   f"""Retrieved {order_batch}, order_behaviour {strategy.is_order_behaviour_active}
+        #                                price behaviour active {strategy.is_price_behaviour_active}"""
+        #               )
 
         for order in orders_to_exercise:
             self._request_contract_interaction(
@@ -299,7 +310,7 @@ class OptionMonitor(TickerBehaviour):
         params = {"deployer_address": self.context.agent_address}
         params.update(parameters)
         strategy = cast(Strategy, self.context.strategy)
-        strategy.is_behaviour_active = False
+        strategy.is_price_behaviour_active = False
         contract_api_dialogues = cast(
             ContractApiDialogues, self.context.contract_api_dialogues
         )
@@ -320,9 +331,10 @@ class OptionMonitor(TickerBehaviour):
             contract_api_dialogue.dialogue_label.dialogue_reference[0],
         )
         self.context.outbox.put_message(message=contract_api_msg)
-        self.context.logger.info(
-            f"**** requesting contract {contract_name} {callable_} raw transaction..."
-        )
+
+    #       self.context.logger.info(
+    #           f"**** requesting contract {contract_name} {callable_} raw transaction..."
+    #       )
 
     def _request_contract_state(
         self, contract_name: str, callable_: str, parameters: dict
@@ -335,7 +347,7 @@ class OptionMonitor(TickerBehaviour):
         params = {"deployer_address": self.context.agent_address}
         params.update(parameters)
         strategy = cast(Strategy, self.context.strategy)
-        strategy.is_behaviour_active = False
+        strategy.is_price_behaviour_active = False
         contract_api_dialogues = cast(
             ContractApiDialogues, self.context.contract_api_dialogues
         )
@@ -356,4 +368,6 @@ class OptionMonitor(TickerBehaviour):
             contract_api_dialogue.dialogue_label.dialogue_reference[0],
         )
         self.context.outbox.put_message(message=contract_api_msg)
-        self.context.logger.info(f"requesting contract {contract_name} state...")
+
+
+#        self.context.logger.info(f"requesting contract {contract_name} state...")

@@ -3,11 +3,11 @@ author: eightballer
 behaviours:
   option_management:
     args:
-      services_interval: 0.0001
+      services_interval: 1
     class_name: OptionMonitor
   price_ticker:
     args:
-      services_interval: 1
+      services_interval: 0.01
     class_name: PriceTicker
   snapshot:
     args:

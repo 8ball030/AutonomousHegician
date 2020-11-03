@@ -204,7 +204,9 @@ class LedgerApiHandler(Handler):
                     ledger_api_msg.transaction_receipt
                 )
             )
-        strategy.deployment_status = "pending"
+
+        strategy.is_order_behaviour_active = False
+        strategy.is_price_behaviour_active = True
 
     def _handle_error(
         self, ledger_api_msg: LedgerApiMessage, ledger_api_dialogue: LedgerApiDialogue
@@ -220,6 +222,7 @@ class LedgerApiHandler(Handler):
                 ledger_api_msg, ledger_api_dialogue
             )
         )
+        raise ValueError("Error in ledger_api not correctly Handled.")
 
     def _handle_invalid(
         self, ledger_api_msg: LedgerApiMessage, ledger_api_dialogue: LedgerApiDialogue
@@ -235,6 +238,7 @@ class LedgerApiHandler(Handler):
                 ledger_api_msg.performative, ledger_api_dialogue,
             )
         )
+        raise ValueError("Error in ledger_api not correctly Handled.")
 
 
 class ContractApiHandler(Handler):
@@ -293,7 +297,7 @@ class ContractApiHandler(Handler):
             if status[0] is None:
                 continue
             elif status[1] == contract_reference:
-                self.context.logger.info(f"retrieved deployment {contract} state query")
+                #                self.context.logger.info(f"retrieved deployment {contract} state query")
                 strategy.contract_status[contract] = (
                     "results",
                     contract_api_msg.state.body,
@@ -313,6 +317,18 @@ class ContractApiHandler(Handler):
                         "fees": contract_api_msg.state.body["fee_estimate"],
                     },
                 )  # now we mark for placement
+                strategy.is_order_behaviour_active = False
+        elif contract in [
+            "btcpriceprovider_get_latest_answer",
+            "priceprovider_get_latest_answer",
+        ]:
+            if not strategy.is_order_behaviour_active:
+                strategy.is_price_behaviour_active = True
+        else:
+            raise ValueError(f"State transaction not handled!: {contract}")
+
+    #    self.context.logger.info(f"""Retrieved {contract}, order_behaviour {strategy.is_order_behaviour_active}
+    #                             price behaviour active {strategy.is_price_behaviour_active}""")
 
     def teardown(self) -> None:
         """

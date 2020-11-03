@@ -10,14 +10,25 @@ import time
 import yaml
 import json
 
-import datetime
+from datetime import datetime, timedelta
 import logging
 
 # we need access to the database, so we will piggy back off the option monitoring skill
 
 try:
     sys.path += [os.path.sep.join(os.getcwd().split(os.path.sep)[:-1])]
-    from agents.autonomous_hegician.skills.option_management.db_communication import DBCommunication
+    from agents.autonomous_hegician.skills.option_management.db_communication import (
+
+        OPTIONS_ESTIMATE,
+        PENDING_PLACEMENT,
+        PLACING,
+        OPEN,
+        CLOSED,
+        FAILED,
+        EXPIRED,
+        DBCommunication
+    )
+
 except ImportError as e:
     raise
 
@@ -114,7 +125,7 @@ class TestOptionExecutionTester(unittest.TestCase):
         orders = DBCommunication.get_options()
         self.assertEqual(len(orders), 1,
                          "Only 1 order expected as in testing!")
-        self.assertTrue(self.await_order_status_code(3, new_order))
+        self.assertTrue(self.await_order_status_code(OPEN, new_order))
 
     def test_does_ah_create_btc_put_option(self):
         order_params = deepcopy(self.order_params)
@@ -123,7 +134,7 @@ class TestOptionExecutionTester(unittest.TestCase):
         orders = DBCommunication.get_options()
         self.assertEqual(len(orders), 1,
                          "Only 1 order expected as in testing!")
-        self.assertTrue(self.await_order_status_code(3, new_order))
+        self.assertTrue(self.await_order_status_code(OPEN, new_order))
 
     def test_does_ah_create_eth_call_option(self):
         self.set_price(self.order_params['strike_price'], "priceprovider")
@@ -133,7 +144,7 @@ class TestOptionExecutionTester(unittest.TestCase):
         orders = DBCommunication.get_options()
         self.assertEqual(len(orders), 1,
                          "Only 1 order expected as in testing!")
-        self.assertTrue(self.await_order_status_code(3, new_order))
+        self.assertTrue(self.await_order_status_code(OPEN, new_order))
 
     def test_does_ah_create_btc_call_option(self):
         order_params = deepcopy(self.order_params)
@@ -143,8 +154,117 @@ class TestOptionExecutionTester(unittest.TestCase):
         orders = DBCommunication.get_options()
         self.assertEqual(len(orders), 1,
                          "Only 1 order expected as in testing!")
-        self.assertTrue(self.await_order_status_code(3, new_order))
+        self.assertTrue(self.await_order_status_code(OPEN, new_order))
 
+    def test_does_ah_excercise_eth_atm_put_option(self):
+        # now the ah will retrieve this order from the db an execute it.
+        order_params = deepcopy(self.order_params)
+        self.set_price(order_params['strike_price'], "priceprovider")
+        new_order = DBCommunication.create_new_option(**order_params)
+        orders = DBCommunication.get_options()
+        self.assertEqual(len(orders), 1,
+                         "Only 1 order expected as in testing!")
+        self.assertTrue(self.await_order_status_code(OPEN, new_order))
+
+        expiration_date = datetime.utcnow() + timedelta(seconds=10)
+        DBCommunication.update_option(new_order['option_id'], {
+                                      "expiration_date": expiration_date})
+        self.assertTrue(self.await_order_status_code(4, new_order))
+
+    def test_does_ah_excercise_itm_eth_put_option(self):
+        # now the ah will retrieve this order from the db an execute it.
+        order_params = deepcopy(self.order_params)
+        self.set_price(int(order_params['strike_price'] * 0.95), "priceprovider")
+        new_order = DBCommunication.create_new_option(**order_params)
+        orders = DBCommunication.get_options()
+        self.assertEqual(len(orders), 1,
+                         "Only 1 order expected as in testing!")
+        self.assertTrue(self.await_order_status_code(OPEN, new_order))
+
+        expiration_date = datetime.utcnow() + timedelta(seconds=10)
+        DBCommunication.update_option(new_order['option_id'], {
+                                      "expiration_date": expiration_date})
+        self.assertTrue(self.await_order_status_code(CLOSED, new_order))
+
+    def test_does_ah_expire_otm_eth_put_option(self):
+        # now the ah will retrieve this order from the db an execute it.
+        order_params = deepcopy(self.order_params)
+        new_order = DBCommunication.create_new_option(**order_params)
+        self.set_price(int(order_params['strike_price'] * 1.05), "priceprovider")
+        orders = DBCommunication.get_options()
+        self.assertEqual(len(orders), 1,
+                         "Only 1 order expected as in testing!")
+        self.assertTrue(self.await_order_status_code(OPEN, new_order))
+
+        expiration_date = datetime.utcnow() + timedelta(seconds=10)
+        DBCommunication.update_option(new_order['option_id'], {
+                                      "expiration_date": expiration_date})
+        self.assertTrue(self.await_order_status_code(EXPIRED, new_order))
+
+    def test_does_ah_expire_otm_eth_call_option(self):
+        # now the ah will retrieve this order from the db an execute it.
+        order_params = deepcopy(self.order_params)
+        order_params["option_type"] = 2
+        new_order = DBCommunication.create_new_option(**order_params)
+        self.set_price(int(order_params['strike_price'] * 0.95), "priceprovider")
+        orders = DBCommunication.get_options()
+        self.assertEqual(len(orders), 1,
+                         "Only 1 order expected as in testing!")
+        self.assertTrue(self.await_order_status_code(OPEN, new_order))
+
+        expiration_date = datetime.utcnow() + timedelta(seconds=10)
+        DBCommunication.update_option(new_order['option_id'], {
+                                      "expiration_date": expiration_date})
+        self.assertTrue(self.await_order_status_code(EXPIRED, new_order))
+
+    def test_does_ah_expire_otm_btc_put_option(self):
+        # now the ah will retrieve this order from the db an execute it.
+        order_params = deepcopy(self.order_params)
+        order_params["market"] = "BTC"
+        self.set_price(int(order_params['strike_price']), "btcpriceprovider")
+        new_order = DBCommunication.create_new_option(**order_params)
+        self.set_price(int(order_params['strike_price'] * 1.05), "btcpriceprovider")
+        orders = DBCommunication.get_options()
+        self.assertEqual(len(orders), 1,
+                         "Only 1 order expected as in testing!")
+        self.assertTrue(self.await_order_status_code(OPEN, new_order))
+
+        expiration_date = datetime.utcnow() + timedelta(seconds=10)
+        DBCommunication.update_option(new_order['option_id'], {
+                                      "expiration_date": expiration_date})
+        self.assertTrue(self.await_order_status_code(EXPIRED, new_order))
+
+    def test_does_ah_expire_otm_btc_call_option(self):
+        # now the ah will retrieve this order from the db an execute it.
+        order_params = deepcopy(self.order_params)
+        order_params["option_type"] = 2
+        order_params["market"] = "BTC"
+        self.set_price(int(order_params['strike_price']), "btcpriceprovider")
+        new_order = DBCommunication.create_new_option(**order_params)
+        self.set_price(int(order_params['strike_price'] * 0.95), "btcpriceprovider")
+        orders = DBCommunication.get_options()
+        self.assertEqual(len(orders), 1,
+                         "Only 1 order expected as in testing!")
+        self.assertTrue(self.await_order_status_code(OPEN, new_order))
+
+        expiration_date = datetime.utcnow() + timedelta(seconds=10)
+        DBCommunication.update_option(new_order['option_id'], {
+                                      "expiration_date": expiration_date})
+        self.assertTrue(self.await_order_status_code(EXPIRED, new_order))
+#   def test_does_ah_excercise_eth_call_option(self):
+#       # now the ah will retrieve this order from the db an execute it.
+#       order_params = deepcopy(self.order_params)
+#       order_params["option_type"] = 2
+#       self.set_price(order_params['strike_price'], "priceprovider")
+#       new_order = DBCommunication.create_new_option(**order_params)
+#       orders = DBCommunication.get_options()
+#       self.assertEqual(len(orders), 1,
+#                        "Only 1 order expected as in testing!")
+#       self.assertTrue(self.await_order_status_code(3, new_order))
+#
+#       expiration_date =datetime.utcnow() + timedelta(seconds = 10)
+#       DBCommunication.update_option(new_order['option_id'], {"expiration_date": expiration_date})
+#       self.assertTrue(self.await_order_status_code(4, new_order))
 #   def test_does_ah_exercise_eth_call_option(self):
 #       # now we need to create the option, wait until it is status code three,
 #       # we the price provider to a price 25% higher than it currently is;
@@ -157,10 +277,10 @@ class TestOptionExecutionTester(unittest.TestCase):
     def await_order_status_code(self, status_code, order_params):
         done = False
         timeout = 20
-        start = datetime.datetime.utcnow()
+        start = datetime.utcnow()
         last_order = None
         while not done:
-            if datetime.datetime.now() - datetime.timedelta(
+            if datetime.now() - timedelta(
                     seconds=timeout) > start:
                 return False
             time.sleep(1)
@@ -199,7 +319,15 @@ def setup_deployer_from_config():
 
 if __name__ == '__main__':
     agent = launch_autonomous_hegician()
-    unittest.main()
+    if True:
+        unittest.main()
+    else:
+        partial = unittest.TestSuite()
+        partial.addTests([TestOptionExecutionTester(
+            'test_does_ah_excercise_eth_atm_put_option',
+            )])
+        unittest.TextTestRunner().run(partial)
     agent.terminate()
     sys.exit()
+    sys.run("pkill -f aea")
     quit()
