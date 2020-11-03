@@ -56,9 +56,8 @@ OPTIONS_ESTIMATE = 0
 PENDING_PLACEMENT = 1
 PLACING = 2
 OPEN = 3
-EXERCISED = 4
-EXPIRED = 5
-FAILED = 6
+CLOSED = 4
+FAILED = 5
 
 
 class DBCommunication:
@@ -160,8 +159,7 @@ class DBCommunication:
             )
             db.session.merge(StatusCode(id=PLACING, description="placing"))
             db.session.merge(StatusCode(id=OPEN, description="open"))
-            db.session.merge(StatusCode(id=EXERCISED, description="exercised"))
-            db.session.merge(StatusCode(id=EXPIRED, description="expired"))
+            db.session.merge(StatusCode(id=CLOSED, description="closed"))
             db.session.merge(StatusCode(id=FAILED, description="failed"))
             db.session.query(Option).delete()
             db.session.commit()

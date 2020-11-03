@@ -26,7 +26,7 @@ from aea.protocols.base import Message
 from aea.skills.base import Handler
 
 from packages.eightballer.skills.option_management.db_communication import (
-    EXERCISED,
+    CLOSED,
     FAILED,
     OPEN,
     OPTIONS_ESTIMATE,
@@ -156,7 +156,6 @@ class LedgerApiHandler(Handler):
 
         :param ledger_api_message: the ledger api message
         """
-        self.context.logger.info("RECIPET!!!!!")
         strategy = cast(Strategy, self.context.strategy)
         is_transaction_successful = LedgerApis.is_transaction_settled(
             ledger_api_msg.transaction_receipt.ledger_id,
@@ -165,12 +164,11 @@ class LedgerApiHandler(Handler):
         contract_reference = ledger_api_dialogue._associated_signing_dialogue._associated_contract_api_dialogue.dialogue_label.dialogue_reference[
             0
         ]
-        raise ValueError
         for contract, status in strategy.contract_status.items():
             if status[0] is None:
                 continue
             elif status[1] == contract_reference:
-#                self.context.logger.info(f"retrieved deployment {contract}")
+                self.context.logger.info(f"retrieved deployment {contract}")
                 strategy.contract_status[contract] = (
                     "deployed",
                     ledger_api_msg.transaction_receipt.receipt["contractAddress"],
@@ -178,7 +176,6 @@ class LedgerApiHandler(Handler):
                 self.context.logger.info(
                     f"** {ledger_api_msg.transaction_receipt.receipt['contractAddress']}  Retireved and stored)"
                 )
-                break
         #              if contract in ["ethoptions_create_option", "btcoptions_create_option"]:
         #                  strategy.update_option(
         #                     strategy.current_order_id, {"status_code_id": 3})
@@ -186,12 +183,12 @@ class LedgerApiHandler(Handler):
         if is_transaction_successful:
             if order.status_code_id == PLACING:  # we have created our order
                 strategy.update_current_order(
-                    order, {"status_code_id": OPEN, "tx_hash": ledger_api_msg.transaction_receipt.tx_hash}
+                    order, {"status_code_id": OPEN}
                 )  # now we mark for placement
             elif order.status_code_id == OPEN:  # we have  excercised
                 strategy.update_current_order(
-                    order, {"status_code_id": EXERCISED, "tx_hash": ledger_api_msg.transaction_receipt.tx_hash}
-                )  # 
+                    order, {"status_code_id": CLOSED}
+                )  # now we mark for placement
 
             self.context.logger.info(
                 "transaction was successfully settled. Transaction receipt={}".format(
@@ -200,8 +197,8 @@ class LedgerApiHandler(Handler):
             )
         else:
             strategy.update_current_order(
-                order, {"status_code_id": FAILED, "tx_hash": ledger_api_msg.transaction_receipt.tx_hash}
-            )  
+                order, {"status_code_id": FAILED}
+            )  # now we mark for placement
             self.context.logger.error(
                 "transaction failed. Transaction receipt={}".format(
                     ledger_api_msg.transaction_receipt
@@ -218,14 +215,11 @@ class LedgerApiHandler(Handler):
         :param ledger_api_message: the ledger api message
         :param ledger_api_dialogue: the ledger api dialogue
         """
-        strategy = cast(Strategy, self.context.strategy)
-        order = strategy.get_order(strategy.current_order.id)
         self.context.logger.info(
             "received ledger_api error message={} in dialogue={}.".format(
-                ledger_api_msg, ledger_api_dialogue))
-        strategy.update_current_order(
-                order, {"status_code_id": FAILED}
-            )  # now we mark for placement
+                ledger_api_msg, ledger_api_dialogue
+            )
+        )
 
     def _handle_invalid(
         self, ledger_api_msg: LedgerApiMessage, ledger_api_dialogue: LedgerApiDialogue
@@ -388,8 +382,7 @@ class ContractApiHandler(Handler):
             )
         )
         order = strategy.current_order
-        strategy.update_current_order(order, {"status_code_id": FAILED})
-        strategy.deployment_status = "pending"
+        strategy.update_current_order(order.id, {"status_code_id": FAILED})
 
     def _handle_invalid(
         self,

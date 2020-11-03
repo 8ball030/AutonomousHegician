@@ -10,22 +10,14 @@ import time
 import yaml
 import json
 
-from datetime import datetime, timedelta
+import datetime
 import logging
 
 # we need access to the database, so we will piggy back off the option monitoring skill
 
 try:
     sys.path += [os.path.sep.join(os.getcwd().split(os.path.sep)[:-1])]
-    from agents.autonomous_hegician.skills.option_management.db_communication import (
-        DBCommunication,
-        OPTIONS_ESTIMATE,
-        PENDING_PLACEMENT,
-        PLACING,
-        OPEN,
-        EXERCISED,
-        EXPIRED,
-        FAILED)
+    from agents.autonomous_hegician.skills.option_management.db_communication import DBCommunication
 except ImportError as e:
     raise
 
@@ -40,20 +32,8 @@ def setup_db():
 
 w3 = web3.Web3(web3.HTTPProvider('http://127.0.0.1:7545'))
 w3.isConnected()
-deployer_address = "0x0df08E74FFd70cd5D4C28D5bA6261755040E69d1" # w3.eth.coinbase
+deployer_address = w3.eth.coinbase
 
-import logging
- 
-#Set the log filename
-filename = 'tests/test_log.log'
- 
-#Set the log filename and level
-logging.basicConfig(filename=filename,level=logging.DEBUG)
- 
-#Print messages to the file
-logging.debug('Debug message')
-logging.info('Info message')
-logging.error('Error Message')
 
 def launch_autonomous_hegician():
     """Emulate the AH launch."""
@@ -102,28 +82,13 @@ def load_contracts(addresses):
 
 
 class TestOptionExecutionTester(unittest.TestCase):
-    def _await_order_status_code(self, status_code, order_params):
-        done = False
-        timeout = 20
-        start = datetime.utcnow()
-        last_order = None
-        while not done:
-            if datetime.now() - timedelta(
-                    seconds=timeout) > start:
-                return False
-            time.sleep(1)
-            order = DBCommunication.get_option(order_params['option_id'])
-            if order.status_code.id == status_code:
-                done = True
-        return done
     def set_btc_price(price):
         pass
 
     def set_price(self, new_price, provider):
         price_provider = self.contracts[provider]
-        price_provider.functions.setPrice(int(new_price)).transact(
+        price_provider.functions.setPrice(new_price).transact(
             {"from": deployer_address})
-        logging.info(f"Set price for {provider} @ {new_price}")
 
     def tearDown(self):
         DBCommunication.delete_options()
@@ -136,10 +101,6 @@ class TestOptionExecutionTester(unittest.TestCase):
         "market": "ETH"
     }
 
-    def setUp(self):
-        for provider in ["btcpriceprovider", "priceprovider"]:
-            self.set_price(self.order_params["strike_price"], provider)
-        
     @classmethod
     def setUpClass(cls):
         setup_db()
@@ -153,7 +114,7 @@ class TestOptionExecutionTester(unittest.TestCase):
         orders = DBCommunication.get_options()
         self.assertEqual(len(orders), 1,
                          "Only 1 order expected as in testing!")
-        self.assertTrue(self._await_order_status_code(OPEN, new_order))
+        self.assertTrue(self.await_order_status_code(3, new_order))
 
     def test_does_ah_create_btc_put_option(self):
         order_params = deepcopy(self.order_params)
@@ -162,7 +123,7 @@ class TestOptionExecutionTester(unittest.TestCase):
         orders = DBCommunication.get_options()
         self.assertEqual(len(orders), 1,
                          "Only 1 order expected as in testing!")
-        self.assertTrue(self._await_order_status_code(OPEN, new_order))
+        self.assertTrue(self.await_order_status_code(3, new_order))
 
     def test_does_ah_create_eth_call_option(self):
         self.set_price(self.order_params['strike_price'], "priceprovider")
@@ -172,7 +133,7 @@ class TestOptionExecutionTester(unittest.TestCase):
         orders = DBCommunication.get_options()
         self.assertEqual(len(orders), 1,
                          "Only 1 order expected as in testing!")
-        self.assertTrue(self._await_order_status_code(OPEN, new_order))
+        self.assertTrue(self.await_order_status_code(3, new_order))
 
     def test_does_ah_create_btc_call_option(self):
         order_params = deepcopy(self.order_params)
@@ -182,39 +143,7 @@ class TestOptionExecutionTester(unittest.TestCase):
         orders = DBCommunication.get_options()
         self.assertEqual(len(orders), 1,
                          "Only 1 order expected as in testing!")
-        self.assertTrue(self._await_order_status_code(OPEN, new_order))
-
-
-    def test_does_ah_exercise_eth_call_option(self):
-        order_params = deepcopy(self.order_params)
-        order_params["market"] = "ETH"
-        order_params["option_type"] = 2
-        new_order = DBCommunication.create_new_option(**order_params)
-        orders = DBCommunication.get_options()
-        self.assertEqual(len(orders), 1, "Only 1 order expected as in testing!")
-        self.assertTrue(self._await_order_status_code(OPEN, new_order))
-        # now we set the expiration date to be now + 10 seconds
-        # now we set the price
-        self.set_price(order_params["strike_price"] * 1.1, "btcpriceprovider")
-        expiration_date = datetime.utcnow() + timedelta(seconds=10)
-        DBCommunication.update_option(new_order['option_id'], {"expiration_date" : expiration_date})
-        time.sleep(10000)
-        self.assertTrue(self._await_order_status_code(EXERCISED, new_order))
-
-    def test_does_ah_exercise_btc_put_option(self):
-        order_params = deepcopy(self.order_params)
-        order_params["market"] = "BTC"
-        order_params["option_type"] = 1
-        new_order = DBCommunication.create_new_option(**order_params)
-        orders = DBCommunication.get_options()
-        self.assertEqual(len(orders), 1, "Only 1 order expected as in testing!")
-        self.assertTrue(self._await_order_status_code(OPEN, new_order))
-        # now we set the expiration date to be now + 10 seconds
-        # now we set the price
-        self.set_price(order_params["strike_price"] * 0.9, "btcpriceprovider")
-        expiration_date = datetime.utcnow() + timedelta(seconds=10)
-        DBCommunication.update_option(new_order['option_id'], {"expiration_date" : expiration_date})
-        self.assertTrue(self._await_order_status_code(EXERCISED, new_order))
+        self.assertTrue(self.await_order_status_code(3, new_order))
 
 #   def test_does_ah_exercise_eth_call_option(self):
 #       # now we need to create the option, wait until it is status code three,
@@ -225,6 +154,20 @@ class TestOptionExecutionTester(unittest.TestCase):
 #      self.set_price(order_params['strike_price'], "btcpriceprovider")
 # we are expecting the status code to be in 3 (open)
 
+    def await_order_status_code(self, status_code, order_params):
+        done = False
+        timeout = 20
+        start = datetime.datetime.utcnow()
+        last_order = None
+        while not done:
+            if datetime.datetime.now() - datetime.timedelta(
+                    seconds=timeout) > start:
+                return False
+            time.sleep(1)
+            order = DBCommunication.get_option(order_params['option_id'])
+            if order.status_code.id == status_code:
+                done = True
+        return done
 
 
 #   def test_does_ah_excercise_btc_call_option(self):
@@ -255,15 +198,8 @@ def setup_deployer_from_config():
 
 
 if __name__ == '__main__':
-    RUN_ALL = False
     agent = launch_autonomous_hegician()
-    if RUN_ALL:
-        unittest.main()
-    else:
-            suite = unittest.TestSuite()
-            suite.addTest(TestOptionExecutionTester("test_does_ah_exercise_eth_call_option"))
-            runner = unittest.TextTestRunner()
-            runner.run(suite)
-    agent.kill()
+    unittest.main()
+    agent.terminate()
     sys.exit()
     quit()

@@ -31,7 +31,6 @@ from packages.eightballer.skills.option_management.db_communication import (
     OPEN,
     OPTIONS_ESTIMATE,
     PENDING_PLACEMENT,
-    EXPIRED
 )
 from packages.eightballer.skills.option_management.web_server import Option
 
@@ -99,7 +98,7 @@ class Strategy(Model):
         return self._database.get_options()
 
     def get_contracts_to_execute(self) -> list:
-        orders = [f for f in self.gather_pending_orders() if f.status_code_id == OPEN]
+        orders = [f for f in self.gather_pending_orders() if f.status_code_id == 3]
         results = []
         #  self.context.logger.info(
         #      f"Monitoring {len(orders)} orders for execution.")
@@ -114,7 +113,7 @@ class Strategy(Model):
             seconds=DEFAULT_TIME_BEFORE_EXECUTION
         )
 
-        if contract.status_code_id == OPEN and datetime.now(deadline.tzinfo) > deadline:
+        if contract.status_code_id == 3 and datetime.now(deadline.tzinfo) > deadline:
             price = self.context.behaviours.price_ticker.current_price[contract.market]
             if any(
                 [

@@ -166,10 +166,7 @@ class PriceTicker(TickerBehaviour):
             "btcpriceprovider_get_latest_answer", None
         )
 
-        if any([eth_price is None,
-                btc_price is None,
-                btc_price[0] == "pending",
-                eth_price[0] == "pending"]):
+        if eth_price is None or btc_price is None:
             self.context.logger.info("No price to store.....")
             return
         self._current_price = {
@@ -215,7 +212,7 @@ class PriceTicker(TickerBehaviour):
             contract_api_dialogue.dialogue_label.dialogue_reference[0],
         )
         self.context.outbox.put_message(message=contract_api_msg)
-#        self.context.logger.info(f"requesting contract {contract_name} state...")
+        self.context.logger.info(f"requesting contract {contract_name} state...")
 
 
 class OptionMonitor(TickerBehaviour):
@@ -248,6 +245,8 @@ class OptionMonitor(TickerBehaviour):
         orders_to_exercise = strategy.retrieve_orders(status_code=OPEN)
 
         for order_batch in [orders_to_create, orders_to_estimate, orders_to_exercise]:
+            if len(order_batch) == 0:
+                continue
             self.context.logger.info(f"Orders to action! : {len(order_batch)}")
 
         for order in orders_to_exercise:
