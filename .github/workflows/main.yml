@@ -48,18 +48,24 @@ jobs:
           sudo apt-get autoremove
           sudo apt-get autoclean
           pip install tox
-          cd agents
       - name: Security Check
-        run: tox -e bandit
+        run: |
+          cd agents
+          tox -e bandit
       - name: Safety Check
-        run: tox -e safety
+        run: |
+          cd agents
+          tox -e safety
       - name: Code style check
         run: |
+          cd agents
           tox -e black-check
           tox -e isort-check
           tox -e flake8
       - name: Unused code check
-        run: tox -e vulture
+        run: |
+          cd agents
+          tox -e vulture
       - name: Static type check
         run: tox -e mypy
       
@@ -80,4 +86,5 @@ jobs:
           pip install tox
       - name: Pylint check
         run: |
+          cd agents
           tox -e pylint
