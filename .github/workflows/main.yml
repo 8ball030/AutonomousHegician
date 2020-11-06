@@ -23,8 +23,6 @@ jobs:
           python-version: 3.6
       - name: Install dependencies (ubuntu-latest)
         run: |
-          pwd
-          ls
           cd agents
           sudo apt-get update --fix-missing
           sudo apt-get autoremove
@@ -89,6 +87,5 @@ jobs:
           pip install tox
       - name: Pylint check
         run: |
-          pwd
           cd agents
           tox -e pylint
