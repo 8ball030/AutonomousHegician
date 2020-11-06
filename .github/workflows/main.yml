@@ -56,10 +56,6 @@ jobs:
       - name: Safety Check
         run: |
           cd agents
-          tox -e safety
-      - name: Code style check
-        run: |
-          cd agents
           make security
       - name: Unused code check
         run: |
