@@ -1,0 +1,82 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the master branch
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  common_checks_1:
+    continue-on-error: False
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions/setup-python@master
+        with:
+          python-version: 3.6
+      - name: Install dependencies (ubuntu-latest)
+        run: |
+          sudo apt-get update --fix-missing
+          sudo apt-get autoremove
+          sudo apt-get autoclean
+          pip install pipenv
+      - name: Pipenv lock
+        run: pipenv lock
+
+  common_checks_2:
+    continue-on-error: False
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions/setup-python@master
+        with:
+          python-version: 3.6
+      - uses: actions/setup-go@master
+        with:
+          go-version: '^1.14.0'
+      - name: Install dependencies (ubuntu-latest)
+        run: |
+          sudo apt-get update --fix-missing
+          sudo apt-get autoremove
+          sudo apt-get autoclean
+          pip install tox
+      - name: Security Check
+        run: tox -e bandit
+      - name: Safety Check
+        run: tox -e safety
+      - name: Code style check
+        run: |
+          tox -e black-check
+          tox -e isort-check
+          tox -e flake8
+      - name: Unused code check
+        run: tox -e vulture
+      - name: Static type check
+        run: tox -e mypy
+      
+  common_checks_3:
+    continue-on-error: False
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions/setup-python@master
+        with:
+          python-version: 3.6
+      - name: Install dependencies (ubuntu-latest)
+        run: |
+          sudo apt-get update --fix-missing
+          sudo apt-get autoremove
+          sudo apt-get autoclean
+          pip install tox
+      - name: Pylint check
+        run: |
+          tox -e pylint
