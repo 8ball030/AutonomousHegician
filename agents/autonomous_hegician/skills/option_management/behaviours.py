@@ -72,6 +72,11 @@ class SnapShot(TickerBehaviour):
             date_updated=datetime.now(),
             address=self.context.agent_address,
         )
+        orders = strategy.retrieve_orders(OPEN)
+        for order in orders:
+            order.update_with_fees(
+                self.context.behaviours.price_ticker.current_price[order.market]
+            )
         strategy.create_new_snapshot(snapshot_params)
 
     def __init__(self, **kwargs):
@@ -275,7 +280,7 @@ class OptionMonitor(TickerBehaviour):
                 callable_="create_option",
                 parameters={
                     "period": order.period,
-                    "amount": order.amount,
+                    "amount": int(order.amount),
                     "strike": order.strike_price,
                     "type": order.option_type,
                 },
@@ -290,7 +295,7 @@ class OptionMonitor(TickerBehaviour):
                 contract_name=f"{order.market.lower()}options",
                 callable_="estimate",
                 parameters={
-                    "amount": order.amount,
+                    "amount": int(order.amount),
                     "period": order.period,
                     "strike": order.strike_price,
                     "type": order.option_type,

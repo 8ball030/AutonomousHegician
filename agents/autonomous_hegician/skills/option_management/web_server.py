@@ -16,7 +16,6 @@
 #   limitations under the License.
 #
 # ------------------------------------------------------------------------------
-
 """This module defines the webserver."""
 
 import json
@@ -30,7 +29,7 @@ from flask_restplus_sqlalchemy import ApiModelFactory
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func
 from sqlalchemy.orm import subqueryload
-
+from web3 import Web3
 
 logger = logging.getLogger(__name__)
 
@@ -76,7 +75,7 @@ class Option(db.Model):  # type: ignore
     tx_hash = db.Column(db.String)
     market = db.Column(db.String(255))
     period = db.Column(db.BigInteger())
-    amount = db.Column(db.BigInteger())
+    amount = db.Column(db.Numeric())
     strike_price = db.Column(db.BigInteger())
     fees = db.Column(db.String(255))
     option_type = db.Column(db.Integer)
@@ -86,6 +85,8 @@ class Option(db.Model):  # type: ignore
     date_created = db.Column(db.DateTime(timezone=True))
     date_modified = db.Column(db.DateTime(timezone=True))
     expiration_date = db.Column(db.DateTime(timezone=True))
+    breakeven = db.Column(db.BigInteger())
+    current_pnl = db.Column(db.BigInteger())
 
     execution_strategy = db.relationship(
         "ExecutionStrategy",
@@ -102,6 +103,21 @@ class Option(db.Model):  # type: ignore
 
     def as_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+    def update_with_fees(self, current_price):
+        pnl = 0
+        cost = self.fees.strip("}{").split(",")[0]
+        cost_per_unit = int(int(cost) / self.amount)
+        if self.option_type == 1:
+            self.breakeven = self.strike_price - cost_per_unit
+        else:
+            self.breakeven = self.strike_price + cost_per_unit
+        dif = current_price - self.breakeven
+        if self.option_type == 1 and dif < 0:
+            pnl = -dif * amount
+        elif self.option_type == 2 and dif > 1:
+            pnl = dif * amount
+        self.current_pnl = pnl / cost * 100
 
 
 class Snapshot(db.Model):  # type: ignore
@@ -143,6 +159,9 @@ class HegicOptions(Resource):
             ret = row.as_dict()
             ret["status_code_id"] = row.status_code.description
             ret["option_type"] = "Put" if row.option_type == 1 else "Call"
+            ret["amount"] = Web3.fromWei(row.amount, "ether")
+            ret["breakeven"] = int(row.get("breakeven", 0))
+            ret["current_pnl"] = int(row.get("current_pnl", 0))
             return ret
 
         results = [
@@ -207,7 +226,7 @@ class HegicOption(Resource):
             market=res["market"],
             execution_strategy_id=res["execution_strategy_id"],
             option_type=res["option_type"],
-            amount=res["amount"],
+            amount=Web3.toWei(res["amount"], "ether"),  # TODO BTC is wrong!
             strike_price=res["strike_price"],
             date_created=datetime.utcnow(),
             date_modified=datetime.utcnow(),

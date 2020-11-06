@@ -38,7 +38,7 @@ class OptionList extends React.Component {
       },
 
       {
-        name: "pnl",
+        name: "current_pnl",
         label: "P&L",
         options: {},
       },

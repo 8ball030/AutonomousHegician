@@ -180,11 +180,23 @@ class LedgerApiHandler(Handler):
         if is_transaction_successful:
             if order.status_code_id == PLACING:  # we have created our order
                 strategy.update_current_order(
-                    order, {"status_code_id": OPEN, "tx_hash": ledger_api_msg.transaction_receipt.transaction['hash'].hex()}
+                    order,
+                    {
+                        "status_code_id": OPEN,
+                        "tx_hash": ledger_api_msg.transaction_receipt.transaction[
+                            "hash"
+                        ].hex(),
+                    },
                 )  # now we mark for placement
             elif order.status_code_id == OPEN:  # we have  excercised
                 strategy.update_current_order(
-                    order, {"status_code_id": CLOSED, "tx_hash": ledger_api_msg.transaction_receipt.transaction['hash'].hex()}
+                    order,
+                    {
+                        "status_code_id": CLOSED,
+                        "tx_hash": ledger_api_msg.transaction_receipt.transaction[
+                            "hash"
+                        ].hex(),
+                    },
                 )  # now we mark for placement
             self.context.logger.info(
                 "transaction was successfully settled. Transaction receipt={}".format(
@@ -193,7 +205,13 @@ class LedgerApiHandler(Handler):
             )
         else:
             strategy.update_current_order(
-                order, {"status_code_id": FAILED, "tx_hash": ledger_api_msg.transaction_receipt.transaction['hash'].hex()}
+                order,
+                {
+                    "status_code_id": FAILED,
+                    "tx_hash": ledger_api_msg.transaction_receipt.transaction[
+                        "hash"
+                    ].hex(),
+                },
             )  # now we mark for placement
             self.context.logger.error(
                 "transaction failed. Transaction receipt={}".format(
@@ -221,7 +239,12 @@ class LedgerApiHandler(Handler):
             )
         )
         strategy.update_current_order(
-                order, {"status_code_id": FAILED, "tx_hash": ledger_api_msg.transaction_receipt.body})
+            order,
+            {
+                "status_code_id": FAILED,
+                "tx_hash": ledger_api_msg.transaction_receipt.body,
+            },
+        )
 
     def _handle_invalid(
         self, ledger_api_msg: LedgerApiMessage, ledger_api_dialogue: LedgerApiDialogue
@@ -397,7 +420,7 @@ class ContractApiHandler(Handler):
             )
         )
         order = strategy.current_order
-        strategy.update_current_order(order.id, {"status_code_id": FAILED})
+        strategy.update_current_order(order, {"status_code_id": FAILED})
 
     def _handle_invalid(
         self,
