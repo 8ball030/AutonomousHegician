@@ -88,4 +88,5 @@ jobs:
       - name: Pylint check
         run: |
           cd agents
+          ls
           tox -e pylint
