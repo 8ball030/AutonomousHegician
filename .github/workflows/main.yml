@@ -60,9 +60,7 @@ jobs:
       - name: Code style check
         run: |
           cd agents
-          tox -e black-check
-          tox -e isort-check
-          tox -e flake8
+          make security
       - name: Unused code check
         run: |
           cd agents
