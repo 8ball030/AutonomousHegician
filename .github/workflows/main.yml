@@ -52,7 +52,7 @@ jobs:
       - name: Security Check
         run: |
           cd agents
-          tox -e bandit
+          make lint
       - name: Safety Check
         run: |
           cd agents
