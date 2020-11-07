@@ -26,17 +26,22 @@ def parse_args():
 def _stop():
     os.system("docker-compose down")
 
-    
+
 def run_tests():
     # remove all containers
     _stop()
     # start required containers
     os.system("docker-compose up -d postgresdb ganachecli")
     # create db schema
-    os.system("cd agents; pipenv run ./autonomous_hegician/skills/option_management/db_communication.py")
+    os.system(
+        "cd agents; pipenv run python autonomous_hegician/skills/option_management/db_communication.py"
+    )
     # run tests
+    os.system("cd agents; pipenv install --skip-lock")
     os.system("cd agents; pipenv run deploy_contracts")
-    os.system("cd agents; python scripts/update_ah_with_deployed_testnet_contracts.py")
+    os.system(
+        "cd agents; python scripts/update_ah_with_deployed_testnet_contracts.py"
+    )
     os.system("cd agents; pipenv run tests")
 
 
