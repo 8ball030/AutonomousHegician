@@ -60,9 +60,12 @@ jobs:
       - name: Unused code check
         run: |
           cd agents
-          tox -e vulture
+          vulture ./autonomous_hegician/skills/option_management/ whitelist.py
+          vulture ./hegic_deployer/skills/hegic_deployer/ whitelist.py
       - name: Static type check
-        run: tox -e mypy
+        run: |
+          cd agents
+          make static
       
   common_checks_3:
     continue-on-error: False
