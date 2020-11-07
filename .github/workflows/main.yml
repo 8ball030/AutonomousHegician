@@ -20,7 +20,7 @@ jobs:
       - uses: actions/checkout@master
       - uses: actions/setup-python@master
         with:
-          python-version: 3.6
+          python-version: 3.8
       - name: Install dependencies (ubuntu-latest)
         run: |
           sudo apt-get update --fix-missing
@@ -39,7 +39,7 @@ jobs:
       - uses: actions/checkout@master
       - uses: actions/setup-python@master
         with:
-          python-version: 3.6
+          python-version: 3.8
       - uses: actions/setup-go@master
         with:
           go-version: '^1.14.0'
@@ -48,39 +48,21 @@ jobs:
           sudo apt-get update --fix-missing
           sudo apt-get autoremove
           sudo apt-get autoclean
-          pip install tox black isort flake8 mypy bandit
-      - name: Code style check
+          pip install black isort flake8 mypy
+      - name: Black check
         run: |
           cd agents
-          make lint
-      - name: Safety Check
+          black --check autonomous_hegician/contracts autonomous_hegician/skills hegic_deployer/contracts hegic_deployer/skills
+      - name: Isort check
         run: |
           cd agents
-          make security
-      - name: Unused code check
+          isort --check autonomous_hegician/contracts autonomous_hegician/skills hegic_deployer/contracts hegic_deployer/skills
+      - name: Flake8 check
         run: |
           cd agents
-          tox -e vulture
+          flake8 autonomous_hegician/contracts autonomous_hegician/skills hegic_deployer/contracts hegic_deployer/skills
       - name: Static type check
-        run: tox -e mypy
-      
-  common_checks_3:
-    continue-on-error: False
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@master
-      - uses: actions/setup-python@master
-        with:
-          python-version: 3.6
-      - name: Install dependencies (ubuntu-latest)
-        run: |
-          sudo apt-get update --fix-missing
-          sudo apt-get autoremove
-          sudo apt-get autoclean
-          pip install tox
-      - name: Pylint check
         run: |
           cd agents
-          ls
-          tox -e pylint
+          mypy autonomous_hegician/contracts autonomous_hegician/skills
+          mypy hegic_deployer/contracts hegic_deployer/skills

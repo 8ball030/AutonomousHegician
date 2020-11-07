@@ -31,6 +31,7 @@ from sqlalchemy import func
 from sqlalchemy.orm import subqueryload
 from web3 import Web3
 
+
 logger = logging.getLogger(__name__)
 
 flask_app = Flask(__name__)  # Flask Application
@@ -114,9 +115,9 @@ class Option(db.Model):  # type: ignore
             self.breakeven = self.strike_price + cost_per_unit
         dif = current_price - self.breakeven
         if self.option_type == 1 and dif < 0:
-            pnl = -dif * amount
+            pnl = -dif * self.amount
         elif self.option_type == 2 and dif > 1:
-            pnl = dif * amount
+            pnl = dif * self.amount
         self.current_pnl = pnl / cost * 100
 
 

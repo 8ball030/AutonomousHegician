@@ -27,10 +27,10 @@ from aea.skills.base import Model
 
 from packages.eightballer.skills.option_management.db_communication import (
     DBCommunication,
+    EXPIRED,
     OPEN,
     OPTIONS_ESTIMATE,
     PENDING_PLACEMENT,
-    EXPIRED,
 )
 from packages.eightballer.skills.option_management.web_server import Option
 

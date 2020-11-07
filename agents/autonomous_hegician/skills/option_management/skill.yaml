@@ -13,6 +13,8 @@ behaviours:
     args:
       services_interval: 1
     class_name: SnapShot
+connections:
+- fetchai/ledger:0.9.0
 contracts:
 - eightballer/btcoptions:0.1.0
 - eightballer/btcpool:0.1.0
@@ -31,13 +33,13 @@ description: The hegic deploy skill has the ability to deploy and interact with 
 fingerprint:
   README.md: QmSPKqYqzJdf3NmviqGwZfdsuhTQ2NrNSzktPX9Un78FDx
   __init__.py: QmanmQfdWSEPtEKJCt6sz6S13ju3o7D7oSzriBkVABAARj
-  behaviours.py: QmVD4Uv5JwGnhaRzMLg8pEZCpGpKpqUKNRJZz1LdgjTrYj
-  db_communication.py: QmYaHWyacScis6NvvCtBFej1rZeyda26KnaFB9oPDgJc76
+  behaviours.py: QmYeabyybGHixD4BgEefffb2eP66V8gkQUJ9rNN631qJcC
+  db_communication.py: Qmc2hs59JW48ezBrxVSkrvj64Qw9vk5mWieY1KFZn39Bo2
   dex_wrapper.py: QmZM19jvfPL9uTCdENY56uhUPxwj1VDM1TzuRMSPemepnP
   dialogues.py: QmTYVyD9o8qNFwiKQGHxGjmXTzeSVShdXNq4pXpVxvdjoo
-  handlers.py: QmXdCUw8rWTm2kXxR2n2xjNQxa36Wdz5Yydk6AUJFiQNjd
-  strategy.py: Qmbm2BbRGKobWxBQDzVSAZUot6Dar8Pz8qBBaFj9FCsCUT
-  web_server.py: QmTVYdTepqdKPKunVDeP9YVw5jU8cjbyY3orRLC5qVFGe2
+  handlers.py: QmY9i89pKjtbjnJ3auwHXm43Sx5NUcsMui9UtkXdERakC3
+  strategy.py: QmTABQTNPKm6Jr39UZ9M4AVm4VaEEPGbDbPSqzv5xbbF2V
+  web_server.py: QmU51fPJb1uJUuTTV256Y5XyZT6Rn5CzozkjxWbC1Xt8hy
 fingerprint_ignore_patterns: []
 handlers:
   contract_api:
@@ -83,4 +85,3 @@ protocols:
 skills: []
 type: skill
 version: 0.1.0
-connections: []

@@ -42,12 +42,15 @@ from packages.eightballer.skills.option_management.dialogues import (
     SigningDialogues,
 )
 from packages.eightballer.skills.option_management.strategy import Strategy
+from packages.fetchai.connections.ledger.base import (
+    CONNECTION_ID as LEDGER_CONNECTION_PUBLIC_ID,
+)
 from packages.fetchai.protocols.contract_api.message import ContractApiMessage
 from packages.fetchai.protocols.ledger_api.message import LedgerApiMessage
 from packages.fetchai.protocols.signing.message import SigningMessage
 
 
-LEDGER_API_ADDRESS = "fetchai/ledger:0.8.0"
+LEDGER_API_ADDRESS = str(LEDGER_CONNECTION_PUBLIC_ID)
 
 
 class LedgerApiHandler(Handler):

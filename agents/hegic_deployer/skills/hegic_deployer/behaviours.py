@@ -31,12 +31,15 @@ from packages.eightballer.skills.hegic_deployer.dialogues import (
     LedgerApiDialogues,
 )
 from packages.eightballer.skills.hegic_deployer.strategy import Strategy
+from packages.fetchai.connections.ledger.base import (
+    CONNECTION_ID as LEDGER_CONNECTION_PUBLIC_ID,
+)
 from packages.fetchai.protocols.contract_api.message import ContractApiMessage
 from packages.fetchai.protocols.ledger_api.message import LedgerApiMessage
 
 
 DEFAULT_SERVICES_INTERVAL = 0.1
-LEDGER_API_ADDRESS = "fetchai/ledger:0.8.0"
+LEDGER_API_ADDRESS = str(LEDGER_CONNECTION_PUBLIC_ID)
 
 
 def toBTC(x):
@@ -504,8 +507,7 @@ class ServiceRegistrationBehaviour(TickerBehaviour):
 
         :return: None
         """
-        self._unregister_service()
-        self._unregister_agent()
+        pass
 
     def _request_balance(self) -> None:
         """

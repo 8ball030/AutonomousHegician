@@ -9,11 +9,13 @@ description: The hegic deploy skill has the ability to deploy and interact with 
 fingerprint:
   README.md: QmZ7swVkRpmJbJZ2NoLb9CWwH8p3QjnjRJg71UbAXdrKyx
   __init__.py: QmanmQfdWSEPtEKJCt6sz6S13ju3o7D7oSzriBkVABAARj
-  behaviours.py: QmVMwchBHtdF43KwvR6qdX3QoP53gs5Z6oTirtE8GSGX3L
+  behaviours.py: Qmcn6PsY8FcnqHeidVDi7QXFiTePUWx7FpUoPpbEEb3Gk3
   dialogues.py: QmTYVyD9o8qNFwiKQGHxGjmXTzeSVShdXNq4pXpVxvdjoo
-  handlers.py: QmVKHPM3xPLoeSHUvLcqvzYgQG9pyaoV23oqTMQQPhkJrL
+  handlers.py: QmSaRQMMCGTJ5yxHum9QM3CXpE18E9iyCXksDXyn2wYt91
   strategy.py: QmWmbY3twr5g8Kae9RXLzrCfpukFcSbcrDjKzgHzeftuAL
 fingerprint_ignore_patterns: []
+connections:
+- fetchai/ledger:0.9.0
 contracts:
 - eightballer/btcoptions:0.1.0
 - eightballer/btcpool:0.1.0
@@ -73,4 +75,3 @@ models:
       wbtc: ''
     class_name: Strategy
 dependencies: {}
-connections: []

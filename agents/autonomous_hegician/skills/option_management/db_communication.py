@@ -20,6 +20,7 @@
 
 from typing import Dict
 
+
 try:
     from packages.eightballer.skills.option_management.web_server import (
         ExecutionStrategy,
@@ -32,6 +33,15 @@ try:
 except Exception:
     try:
         from .web_server import (
+            ExecutionStrategy,
+            Option,
+            Snapshot,
+            StatusCode,
+            db,
+            flask_app,
+        )
+    except Exception:
+        from web_server import (  # type: ignore
             Option,
             Snapshot,
             StatusCode,
@@ -39,12 +49,9 @@ except Exception:
             db,
             flask_app,
         )
-    except Exception:
-        from web_server import (  # type: ignore
-            Option, Snapshot, StatusCode, ExecutionStrategy, db, flask_app,
-        )
 
 from datetime import datetime, timedelta
+
 
 OPTIONS_ESTIMATE = 0
 PENDING_PLACEMENT = 1
@@ -57,6 +64,7 @@ EXPIRED = 6
 
 class DBCommunication:
     """A class to communicate with a database."""
+
     def __init__(self):
         """
         Initialize the database communication.
@@ -74,8 +82,7 @@ class DBCommunication:
         return snap
 
     @staticmethod
-    def create_new_option(amount, strike_price, period, option_type,
-                          market) -> Dict:
+    def create_new_option(amount, strike_price, period, option_type, market) -> Dict:
         with flask_app.app_context():
             execution_strategy = db.session.query(ExecutionStrategy).one()
             option = Option(
@@ -107,8 +114,7 @@ class DBCommunication:
     @staticmethod
     def update_option(option_db_id, params) -> Option:
         with flask_app.app_context():
-            option = db.session.query(Option).filter(
-                Option.id == option_db_id).one()
+            option = db.session.query(Option).filter(Option.id == option_db_id).one()
             for key, value in params.items():
                 setattr(option, key, value)
             db.session.merge(option)
@@ -135,8 +141,7 @@ class DBCommunication:
     @staticmethod
     def get_option(option_id) -> Option:
         with flask_app.app_context():
-            option = db.session.query(Option).filter(
-                Option.id == option_id).one()
+            option = db.session.query(Option).filter(Option.id == option_id).one()
             db.session.close()
         return option
 
@@ -145,14 +150,13 @@ class DBCommunication:
         """Create the initial state for the agent"""
         with flask_app.app_context():
             db.create_all()
+            db.session.merge(ExecutionStrategy(id=0, description="auto_itm_execution"))
             db.session.merge(
-                ExecutionStrategy(id=0, description="auto_itm_execution"))
+                StatusCode(id=OPTIONS_ESTIMATE, description="options_estimate")
+            )
             db.session.merge(
-                StatusCode(id=OPTIONS_ESTIMATE,
-                           description="options_estimate"))
-            db.session.merge(
-                StatusCode(id=PENDING_PLACEMENT,
-                           description="pending_placement"))
+                StatusCode(id=PENDING_PLACEMENT, description="pending_placement")
+            )
             db.session.merge(StatusCode(id=PLACING, description="placing"))
             db.session.merge(StatusCode(id=OPEN, description="open"))
             db.session.merge(StatusCode(id=CLOSED, description="closed"))
