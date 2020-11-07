@@ -34,10 +34,26 @@ from web3 import Web3
 
 logger = logging.getLogger(__name__)
 
+
+def _create_url():
+
+    for required in ["DB_URL", "DB_PORT", "DB_USER", "DB_PASS"]:
+        if os.environ.get("DB_URL', None) is None:
+            raise ValueError("DB_URL is required check environ vars")
+    un = os.environ.get("DB_USER")
+    pw = os.environ.get("DB_PASS")
+    url = os.environ.get(("DB_URL")
+    port = os.environ.get("DB_PORT")
+    return f"{url}://{un}:{pw}@{url}:{port}/cortex"
+             
+            
+    
+    
+
 flask_app = Flask(__name__)  # Flask Application
 flask_app.config[
     "SQLALCHEMY_DATABASE_URI"
-] = "postgresql://admin:WKLpwoDJd03DJ423DJwlDJlaDJsdDJsdDJlDJsa@postgresdb:5432/cortex"
+] = _create_url()# "postgresql://admin:WKLpwoDJd03DJ423DJwlDJlaDJsdDJsdDJlDJsa@postgresdb:5432/cortex"
 flask_app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = True
 # Create RestPlus API
 api = Api(
