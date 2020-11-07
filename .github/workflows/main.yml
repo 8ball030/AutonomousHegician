@@ -65,4 +65,5 @@ jobs:
       - name: Static type check
         run: |
           cd agents
-          make static
+          pipenv install --skip-lock
+          pipenv run make static
