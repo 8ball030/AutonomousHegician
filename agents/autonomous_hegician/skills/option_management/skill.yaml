@@ -39,7 +39,7 @@ fingerprint:
   dialogues.py: QmTYVyD9o8qNFwiKQGHxGjmXTzeSVShdXNq4pXpVxvdjoo
   handlers.py: QmX8STY9Biyx3i8YDt91uGEbMiTTbyVQr6Jj6VinJywk9G
   strategy.py: QmTABQTNPKm6Jr39UZ9M4AVm4VaEEPGbDbPSqzv5xbbF2V
-  web_server.py: QmU51fPJb1uJUuTTV256Y5XyZT6Rn5CzozkjxWbC1Xt8hy
+  web_server.py: QmbDUeqq6fvMBut3iMWYnSTxE3osmWdhggSwgXpeVU7KEe
 fingerprint_ignore_patterns: []
 handlers:
   contract_api:
@@ -81,7 +81,7 @@ name: option_management
 protocols:
 - fetchai/contract_api:0.8.0
 - fetchai/ledger_api:0.7.0
-- fetchai/signing:0.6.0
+- fetchai/signing:0.7.0
 skills: []
 type: skill
 version: 0.1.0
