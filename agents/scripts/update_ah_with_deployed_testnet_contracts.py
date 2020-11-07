@@ -25,7 +25,7 @@ def update_ah_config_with_new_config(
     skill_config = full_config[1]
     assert skill_config["public_id"] == "eightballer/option_management:0.1.0"
     skill_config["models"]["strategy"]["args"] = OrderedDict(addresses)
-    full_config_updated = [full_config[0], skill_config]
+    full_config_updated = [full_config[0], skill_config] + full_config[2:]
     with open(file_path, "w") as fp:
         yaml_dump_all(full_config_updated, fp)
 

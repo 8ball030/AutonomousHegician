@@ -27,7 +27,25 @@ contracts:
 - eightballer/stakingeth:0.1.0
 - eightballer/stakingwbtc:0.1.0
 - eightballer/wbtc:0.1.0
-dependencies: {}
+dependencies:
+  Flask:
+    version: ==0.12.2
+  Flask-Cors:
+    version: ==3.0.7
+  flask-restplus:
+    version: ==0.13.0
+  flask-restplus-sqlalchemy:
+    version: ==0.0.3
+  Flask-SQLAlchemy:
+    version: ==2.4.4
+  psycopg2-binary:
+    version: ==2.8.6
+  SQLAlchemy:
+    version: ==1.3.11
+  web3:
+    version: ==5.11.1
+  werkzeug:
+    version: ==0.16.0
 description: The hegic deploy skill has the ability to deploy and interact with the
   smart contracts.
 fingerprint:

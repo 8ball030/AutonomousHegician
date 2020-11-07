@@ -18,11 +18,11 @@ services:
       - "5432:5432"
     image: postgres:latest
     volumes:
-        - ./persistant_data/postgres:/var/lib/postgresql/data
+      - ./persistant_data/postgres:/var/lib/postgresql/data
     environment:
-        POSTGRES_DB: cortex
-        POSTGRES_USER: admin
-        POSTGRES_PASSWORD: WKLpwoDJd03DJ423DJwlDJlaDJsdDJsdDJlDJsa
+      POSTGRES_DB: cortex
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: WKLpwoDJd03DJ423DJwlDJlaDJsdDJsdDJlDJsa
 
   ganachecli:
     build: 
