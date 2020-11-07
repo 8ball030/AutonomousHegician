@@ -80,7 +80,7 @@ Make sure ganache is installed:
 npm install -g ganache-cli
 ```
 
-The directories `hegic_contracts` and `scripts` are kept for reference.
+The directory `hegic_contracts` is kept for reference.
 
 ## Tests
 To run tests, the Hegic contracts must first be deployed.
