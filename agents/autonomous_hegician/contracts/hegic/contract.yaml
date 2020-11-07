@@ -4,11 +4,11 @@ version: 0.1.0
 type: contract
 description: The scaffold contract scaffolds a contract to be implemented by the developer.
 license: Apache-2.0
-aea_version: '==0.7.0'
+aea_version: '>=0.7.0, <0.8.0'
 fingerprint:
   __init__.py: QmPBwWhEg3wcH1q9612srZYAYdANVdWLDFWKs7TviZmVj6
   build/contracts/FakeHEGIC.json: Qma9EWhoSkm74CfpiL53Ehrj3QNEP3XLxhTZnddYtvqAVY
-  contract.py: QmT3o8E77VD6SgaSBy7FCdPMNh8tpmhqYRLz6aWuQGc8YJ
+  contract.py: QmbG2sHW3Q1kuxHNiRjKkPqFF6ypEAJzcPxrpyMZywGbYB
 fingerprint_ignore_patterns: []
 class_name: FakeHegic
 contract_interface_paths:

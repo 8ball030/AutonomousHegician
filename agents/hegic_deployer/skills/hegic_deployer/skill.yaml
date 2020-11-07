@@ -9,10 +9,10 @@ description: The hegic deploy skill has the ability to deploy and interact with 
 fingerprint:
   README.md: QmZ7swVkRpmJbJZ2NoLb9CWwH8p3QjnjRJg71UbAXdrKyx
   __init__.py: QmanmQfdWSEPtEKJCt6sz6S13ju3o7D7oSzriBkVABAARj
-  behaviours.py: QmaC3uUxHSFFn8ZnLXaUXJDnxWaE9gFa3V39uas2gKNG8d
-  dialogues.py: QmfCY3h2CXTryfRrLFt4oeDBTS2AMBbbNyVMJKoWtt93Mt
-  handlers.py: QmbF5R3XSPCQP8UH5KJryUhbnhRL73NMGKd9C77BN76Zk2
-  strategy.py: QmYcHfitHbYEMsiffAFTxVaWNrS8ToNLyUw8H3zsoiG33m
+  behaviours.py: QmVMwchBHtdF43KwvR6qdX3QoP53gs5Z6oTirtE8GSGX3L
+  dialogues.py: QmTYVyD9o8qNFwiKQGHxGjmXTzeSVShdXNq4pXpVxvdjoo
+  handlers.py: QmVKHPM3xPLoeSHUvLcqvzYgQG9pyaoV23oqTMQQPhkJrL
+  strategy.py: QmWmbY3twr5g8Kae9RXLzrCfpukFcSbcrDjKzgHzeftuAL
 fingerprint_ignore_patterns: []
 contracts:
 - eightballer/btcoptions:0.1.0
@@ -27,8 +27,8 @@ contracts:
 - eightballer/stakingwbtc:0.1.0
 - eightballer/wbtc:0.1.0
 protocols:
-- fetchai/contract_api:0.7.0
-- fetchai/ledger_api:0.6.0
+- fetchai/contract_api:0.8.0
+- fetchai/ledger_api:0.7.0
 - fetchai/signing:0.6.0
 skills: []
 is_abstract: false
@@ -59,7 +59,6 @@ models:
     class_name: SigningDialogues
   strategy:
     args:
-      ledger_id: ethereum
       btcoptions: ''
       btcpool: ''
       btcpriceprovider: ''
@@ -67,9 +66,11 @@ models:
       ethpool: ''
       exchange: ''
       hegic: ''
+      ledger_id: ethereum
       priceprovider: ''
       stakingeth: ''
       stakingwbtc: ''
       wbtc: ''
     class_name: Strategy
 dependencies: {}
+connections: []
