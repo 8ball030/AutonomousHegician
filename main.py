@@ -8,12 +8,12 @@ import os
 import sys
 from argparse import ArgumentParser
 
-import pyfiglet
+AH_LOGO = "    _         _                                              \n   / \\  _   _| |_ ___  _ __   ___  _ __ ___   ___  _   _ ___ \n  / _ \\| | | | __/ _ \\| '_ \\ / _ \\| '_ ` _ \\ / _ \\| | | / __|\n / ___ \\ |_| | || (_) | | | | (_) | | | | | | (_) | |_| \\__ \\\n/_/   \\_\\__,_|\\__\\___/|_| |_|\\___/|_| |_| |_|\\___/ \\__,_|___/\n                                                             \n _   _            _      _             \n| | | | ___  __ _(_) ___(_) __ _ _ __  \n| |_| |/ _ \\/ _` | |/ __| |/ _` | '_ \\ \n|  _  |  __/ (_| | | (__| | (_| | | | |\n|_| |_|\\___|\\__, |_|\\___|_|\\__,_|_| |_|\n            |___/                      \n"
 
 
 def parse_args():
-    parser = ArgumentParser(
-        description="Cli tool for the Autonomouse Hegician.")
+    """Parse arguments."""
+    parser = ArgumentParser(description="Cli tool for the Autonomouse Hegician.")
     parser.add_argument(
         "-o",
         "--options",
@@ -23,13 +23,10 @@ def parse_args():
     return parser.parse_args()
 
 
-def _stop():
-    os.system("docker-compose down")
-
-
 def run_tests():
+    """Run all tests."""
     # remove all containers
-    _stop()
+    os.system("docker-compose down")
     # start required containers
     os.system("docker-compose up -d postgresdb ganachecli")
     # create db schema
@@ -39,33 +36,31 @@ def run_tests():
     # run tests
     os.system("cd agents; pipenv install --skip-lock")
     os.system("cd agents; pipenv run deploy_contracts")
-    os.system(
-        "cd agents; python scripts/update_ah_with_deployed_testnet_contracts.py"
-    )
+    os.system("cd agents; pipenv run update_configs")
     os.system("cd agents; pipenv run tests")
 
 
 def deploy_contracts_to_testnet():
+    """Deploy contracts to testnet."""
     os.system("cd agents; pipenv run deploy_contracts")
 
 
 def launch_containers():
+    """Launch docker containers."""
     os.system("docker-compose up -d --build")
 
 
 def update_ah_config(config="testnet"):
+    """Update the AH config."""
     if config != "testnet":
-        os.system(
-            "cd agents; python3 scripts/update_ah_with_deployed_testnet_contracts.py"
-        )
+        os.system("cd agents; pipenv install --skip-lock")
+        os.system("cd agents; pipenv run update_configs")
 
 
 choices = {
-    1: ["1. Deploy Testnet Contracts.", deploy_contracts_to_testnet],
-    2:
-    ["2. Update Autonomous Hegicician with Test Contracts", update_ah_config],
-    3:
-    ["3. Update Autonomous Hegicician with Live Contracts", update_ah_config],
+    1: ["1. Deploy contracts to Ganache Testnet.", deploy_contracts_to_testnet],
+    2: ["2. Update Autonomous Hegicician with Test Contracts", update_ah_config],
+    3: ["3. Update Autonomous Hegicician with Live Contracts", update_ah_config],
     4: ["4. Run local tests.", run_tests],
     5: ["5. Launch Live Autonomous Hegician.", launch_containers],
 }
@@ -80,7 +75,7 @@ def main():
             i = int(input())
             print(i)
             func = choices[i][1]
-        except:
+        except KeyError:
             print("Invalid option!")
         func()
     else:
@@ -95,6 +90,14 @@ def main():
     pass
 
 
+def check_python_version():
+    """Check python version satisfies requirements."""
+    if not (sys.version_info[0] >= 3 and sys.version_info[1] >= 6):
+        print("Python 3.6 or higher required!")
+        sys.exit(1)
+
+
 if __name__ == "__main__":
-    print(pyfiglet.figlet_format("Autonomous Hegician"))
+    print(AH_LOGO)
+    check_python_version()
     main()
