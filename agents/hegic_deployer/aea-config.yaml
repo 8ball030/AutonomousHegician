@@ -59,3 +59,10 @@ models:
       stakingeth: ''
       stakingwbtc: ''
       wbtc: ''
+---
+public_id: fetchai/ledger:0.9.0
+type: connection
+config:
+  ledger_apis:
+    ethereum:
+      address: http://localhost:7545
