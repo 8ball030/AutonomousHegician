@@ -53,15 +53,13 @@ jobs:
         working-directory: ./agents
         run: black --check autonomous_hegician/contracts autonomous_hegician/skills hegic_deployer/contracts hegic_deployer/skills
       - name: Isort check
-        run: |
-          cd agents
-          isort --check autonomous_hegician/contracts autonomous_hegician/skills hegic_deployer/contracts hegic_deployer/skills
+        working-directory: ./agents
+        run: isort --check autonomous_hegician/contracts autonomous_hegician/skills hegic_deployer/contracts hegic_deployer/skills
       - name: Flake8 check
-        run: |
-          cd agents
-          flake8 autonomous_hegician/contracts autonomous_hegician/skills hegic_deployer/contracts hegic_deployer/skills
+        working-directory: ./agents
+        run: flake8 autonomous_hegician/contracts autonomous_hegician/skills hegic_deployer/contracts hegic_deployer/skills
       - name: Static type check
+        working-directory: ./agents
         run: |
-          cd agents
           mypy autonomous_hegician/contracts autonomous_hegician/skills
           mypy hegic_deployer/contracts hegic_deployer/skills
