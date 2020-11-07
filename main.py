@@ -101,3 +101,4 @@ if __name__ == "__main__":
     print(AH_LOGO)
     check_python_version()
     main()
+    sys.exit(0)

@@ -72,3 +72,23 @@ jobs:
         working-directory: ./agents
         run: |
           bandit -s B104 -r autonomous_hegician/contracts autonomous_hegician/skills hegic_deployer/contracts hegic_deployer/skills
+
+  integration_tests:
+    continue-on-error: False
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions/setup-python@master
+        with:
+          python-version: 3.6
+      - uses: actions/setup-go@master
+        with:
+          go-version: '^1.14.0'
+      - name: Install dependencies (ubuntu-latest)
+        run: |
+          sudo apt-get update --fix-missing
+          sudo apt-get autoremove
+          sudo apt-get autoclean
+      - name: All tests
+        run: python main.py -o 4
