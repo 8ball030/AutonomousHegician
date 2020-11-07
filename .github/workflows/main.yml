@@ -89,6 +89,9 @@ jobs:
         run: |
           sudo apt-get update --fix-missing
           sudo apt-get autoremove
-          sudo apt-get autoclean
+          sudo apt-get autoclean\
+          cd agents
+          pip install pipenv
+          cd ..
       - name: All tests
         run: python main.py -o 4
