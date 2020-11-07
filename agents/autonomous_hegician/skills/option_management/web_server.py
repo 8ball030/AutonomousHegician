@@ -46,7 +46,6 @@ def _create_url():
     url = os.environ.get("DB_URL")
     port = os.environ.get("DB_PORT")
     uri_string = f"postgresql://{un}:{pw}@{url}:{port}/cortex"
-    print(f"Connecting to {uri_string}")
     return uri_string
 
 
