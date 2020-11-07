@@ -40,9 +40,9 @@ clean-test:
 
 .PHONY: lint
 lint:
-	black autonomous_hegician/contracts autonomous_hegician/skills hegic_deployer/contracts hegic_deployer/skills
-	isort autonomous_hegician/contracts autonomous_hegician/skills hegic_deployer/contracts hegic_deployer/skills
-	flake8 autonomous_hegician/contracts autonomous_hegician/skills hegic_deployer/contracts hegic_deployer/skills
+	black autonomous_hegician/contracts autonomous_hegician/skills hegic_deployer/contracts hegic_deployer/skills scripts tests
+	isort autonomous_hegician/contracts autonomous_hegician/skills hegic_deployer/contracts hegic_deployer/skills scripts tests
+	flake8 autonomous_hegician/contracts autonomous_hegician/skills hegic_deployer/contracts hegic_deployer/skills scripts tests
 
 .PHONY: security
 security:
