@@ -48,14 +48,10 @@ def _create_url():
     uri_string = f"postgresql://{un}:{pw}@{url}:{port}/cortex"
     print(f"Connecting to {uri_string}")
     return uri_string
- 
+
 
 flask_app = Flask(__name__)  # Flask Application
-flask_app.config[
-    "SQLALCHEMY_DATABASE_URI"
-] = (
-    _create_url()
-)  # "postgresql://admin:WKLpwoDJd03DJ423DJwlDJlaDJsdDJsdDJlDJsa@postgresdb:5432/cortex"
+flask_app.config["SQLALCHEMY_DATABASE_URI"] = _create_url()
 flask_app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = True
 # Create RestPlus API
 api = Api(
