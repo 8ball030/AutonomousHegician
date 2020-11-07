@@ -31,12 +31,15 @@ from packages.eightballer.skills.hegic_deployer.dialogues import (
     LedgerApiDialogues,
 )
 from packages.eightballer.skills.hegic_deployer.strategy import Strategy
+from packages.fetchai.connections.ledger.base import (
+    CONNECTION_ID as LEDGER_CONNECTION_PUBLIC_ID,
+)
 from packages.fetchai.protocols.contract_api.message import ContractApiMessage
 from packages.fetchai.protocols.ledger_api.message import LedgerApiMessage
 
 
 DEFAULT_SERVICES_INTERVAL = 0.1
-LEDGER_API_ADDRESS = "fetchai/ledger:0.8.0"
+LEDGER_API_ADDRESS = str(LEDGER_CONNECTION_PUBLIC_ID)
 
 
 def toBTC(x):
@@ -206,7 +209,10 @@ class ServiceRegistrationBehaviour(TickerBehaviour):
 
             elif (
                 strategy.deployment_status.get("btcoptions_get_pool", None) is None
-                and strategy.deployment_status.get("ethpool",)[0] is not None
+                and strategy.deployment_status.get(
+                    "ethpool",
+                )[0]
+                is not None
             ):
                 self._request_contract_state("btcoptions", "get_pool", {})
             elif (
@@ -419,7 +425,10 @@ class ServiceRegistrationBehaviour(TickerBehaviour):
             "pending",
             contract_api_dialogue.dialogue_label.dialogue_reference[0],
         )
-        contract_api_dialogue = cast(ContractApiDialogue, contract_api_dialogue,)
+        contract_api_dialogue = cast(
+            ContractApiDialogue,
+            contract_api_dialogue,
+        )
         contract_api_dialogue.terms = strategy.get_deploy_terms()
         self.context.outbox.put_message(message=contract_api_msg)
         self.context.logger.info(
@@ -450,7 +459,10 @@ class ServiceRegistrationBehaviour(TickerBehaviour):
             callable=callable,
             kwargs=ContractApiMessage.Kwargs(params),
         )
-        contract_api_dialogue = cast(ContractApiDialogue, contract_api_dialogue,)
+        contract_api_dialogue = cast(
+            ContractApiDialogue,
+            contract_api_dialogue,
+        )
         contract_api_dialogue.terms = strategy.get_deploy_terms()
         self.context.outbox.put_message(message=contract_api_msg)
         strategy.deployment_status[f"{contract_name}_{callable}"] = (
@@ -486,7 +498,10 @@ class ServiceRegistrationBehaviour(TickerBehaviour):
             callable=callable,
             kwargs=ContractApiMessage.Kwargs(params),
         )
-        contract_api_dialogue = cast(ContractApiDialogue, contract_api_dialogue,)
+        contract_api_dialogue = cast(
+            ContractApiDialogue,
+            contract_api_dialogue,
+        )
         contract_api_dialogue.terms = strategy.get_deploy_terms()
         self.context.outbox.put_message(message=contract_api_msg)
         strategy.deployment_status[f"{contract_name}_{callable}"] = (
@@ -504,8 +519,7 @@ class ServiceRegistrationBehaviour(TickerBehaviour):
 
         :return: None
         """
-        self._unregister_service()
-        self._unregister_agent()
+        pass
 
     def _request_balance(self) -> None:
         """
@@ -551,7 +565,10 @@ class ServiceRegistrationBehaviour(TickerBehaviour):
             callable="get_deploy_transaction",
             kwargs=ContractApiMessage.Kwargs(params),
         )
-        contract_api_dialogue = cast(ContractApiDialogue, contract_api_dialogue,)
+        contract_api_dialogue = cast(
+            ContractApiDialogue,
+            contract_api_dialogue,
+        )
         contract_api_dialogue.terms = strategy.get_deploy_terms()
         self.context.outbox.put_message(message=contract_api_msg)
         strategy.deployment_status[contract_name] = (

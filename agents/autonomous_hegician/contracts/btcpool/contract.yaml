@@ -4,12 +4,11 @@ version: 0.1.0
 type: contract
 description: The scaffold contract scaffolds a contract to be implemented by the developer.
 license: Apache-2.0
-aea_version: '==0.7.0'
+aea_version: '>=0.7.0, <0.8.0'
 fingerprint:
   __init__.py: QmPBwWhEg3wcH1q9612srZYAYdANVdWLDFWKs7TviZmVj6
   build/contracts/HegicERCPool.json: QmV1scqXXwzP9GfxKA6eyMyw6fVP853qEyuMHLDDWNJrDQ
-  build/contracts/HegicETHPool.json: Qmaop7w4mioWjqp6jjfNavq5A6YQCCsfJ3pjkBB2DygbDp
-  contract.py: QmaruxGQ51Zj7od48BsAV7Yi9NQkA819GTq4eRFMoAy4Ar
+  contract.py: QmQMwmyX5DCtro8WrFEN8DVB7Y7yfiruvwTkzqrASbLynY
 fingerprint_ignore_patterns: []
 class_name: HegicBTCPool
 contract_interface_paths:

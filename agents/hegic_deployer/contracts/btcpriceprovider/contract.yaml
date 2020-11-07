@@ -4,11 +4,11 @@ version: 0.1.0
 type: contract
 description: The scaffold contract scaffolds a contract to be implemented by the developer.
 license: Apache-2.0
-aea_version: '==0.7.0'
+aea_version: '>=0.7.0, <0.8.0'
 fingerprint:
   __init__.py: QmPBwWhEg3wcH1q9612srZYAYdANVdWLDFWKs7TviZmVj6
   build/contracts/FakeBTCPriceProvider.json: QmeDWU7KFky1pKcak8jFv7G37sJExssa7U45PD17gdT9bS
-  contract.py: QmZmvsXvbS7Bws94UYxEKFss1oHcjwQyKcnrwMjVjWHoNc
+  contract.py: QmSbKv4pNjnPcTmwFhWfH8ko2pNXuRGTX1B7uMrkaLvoxF
 fingerprint_ignore_patterns: []
 class_name: BTCPriceProvider
 contract_interface_paths:

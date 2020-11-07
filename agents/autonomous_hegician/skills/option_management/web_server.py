@@ -31,6 +31,7 @@ from sqlalchemy import func
 from sqlalchemy.orm import subqueryload
 from web3 import Web3
 
+
 logger = logging.getLogger(__name__)
 
 flask_app = Flask(__name__)  # Flask Application

@@ -20,6 +20,7 @@
 
 from typing import Dict
 
+
 try:
     from packages.eightballer.skills.option_management.web_server import (
         ExecutionStrategy,
@@ -32,10 +33,10 @@ try:
 except Exception:
     try:
         from .web_server import (
+            ExecutionStrategy,
             Option,
             Snapshot,
             StatusCode,
-            ExecutionStrategy,
             db,
             flask_app,
         )
@@ -50,6 +51,7 @@ except Exception:
         )
 
 from datetime import datetime, timedelta
+
 
 OPTIONS_ESTIMATE = 0
 PENDING_PLACEMENT = 1

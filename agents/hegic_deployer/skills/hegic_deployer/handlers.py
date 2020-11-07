@@ -34,12 +34,15 @@ from packages.eightballer.skills.hegic_deployer.dialogues import (
     SigningDialogues,
 )
 from packages.eightballer.skills.hegic_deployer.strategy import Strategy
+from packages.fetchai.connections.ledger.base import (
+    CONNECTION_ID as LEDGER_CONNECTION_PUBLIC_ID,
+)
 from packages.fetchai.protocols.contract_api.message import ContractApiMessage
 from packages.fetchai.protocols.ledger_api.message import LedgerApiMessage
 from packages.fetchai.protocols.signing.message import SigningMessage
 
 
-LEDGER_API_ADDRESS = "fetchai/ledger:0.8.0"
+LEDGER_API_ADDRESS = str(LEDGER_CONNECTION_PUBLIC_ID)
 
 
 class LedgerApiHandler(Handler):
@@ -117,7 +120,8 @@ class LedgerApiHandler(Handler):
         """
         self.context.logger.info(
             "starting balance on {} ledger={}.".format(
-                ledger_api_msg.ledger_id, ledger_api_msg.balance,
+                ledger_api_msg.ledger_id,
+                ledger_api_msg.balance,
             )
         )
 
@@ -216,7 +220,8 @@ class LedgerApiHandler(Handler):
         """
         self.context.logger.warning(
             "cannot handle ledger_api message of performative={} in dialogue={}.".format(
-                ledger_api_msg.performative, ledger_api_dialogue,
+                ledger_api_msg.performative,
+                ledger_api_dialogue,
             )
         )
 
@@ -368,7 +373,8 @@ class ContractApiHandler(Handler):
         """
         self.context.logger.warning(
             "cannot handle contract_api message of performative={} in dialogue={}.".format(
-                contract_api_msg.performative, contract_api_dialogue,
+                contract_api_msg.performative,
+                contract_api_dialogue,
             )
         )
 

@@ -19,6 +19,7 @@
 
 """This package contains the behaviour of a erc1155 deploy skill AEA."""
 
+from collections import OrderedDict
 from datetime import datetime
 from typing import Dict, List, cast
 
@@ -38,12 +39,15 @@ from packages.eightballer.skills.option_management.dialogues import (
     LedgerApiDialogues,
 )
 from packages.eightballer.skills.option_management.strategy import Strategy
+from packages.fetchai.connections.ledger.base import (
+    CONNECTION_ID as LEDGER_CONNECTION_PUBLIC_ID,
+)
 from packages.fetchai.protocols.contract_api.message import ContractApiMessage
 from packages.fetchai.protocols.ledger_api.message import LedgerApiMessage
-from collections import OrderedDict
+
 
 DEFAULT_SERVICES_INTERVAL = 30.0
-LEDGER_API_ADDRESS = "fetchai/ledger:0.8.0"
+LEDGER_API_ADDRESS = str(LEDGER_CONNECTION_PUBLIC_ID)
 ETHER = "ether"
 ETH = "ETH"
 BTC = "BTC"

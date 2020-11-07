@@ -13,6 +13,8 @@ behaviours:
     args:
       services_interval: 1
     class_name: SnapShot
+connections:
+- fetchai/ledger:0.9.0
 contracts:
 - eightballer/btcoptions:0.1.0
 - eightballer/btcpool:0.1.0
@@ -29,15 +31,15 @@ dependencies: {}
 description: The hegic deploy skill has the ability to deploy and interact with the
   smart contracts.
 fingerprint:
-  README.md: QmZ7swVkRpmJbJZ2NoLb9CWwH8p3QjnjRJg71UbAXdrKyx
+  README.md: QmSPKqYqzJdf3NmviqGwZfdsuhTQ2NrNSzktPX9Un78FDx
   __init__.py: QmanmQfdWSEPtEKJCt6sz6S13ju3o7D7oSzriBkVABAARj
-  behaviours.py: QmP5SfYSbUesVrKQ9E1wG1Y8nqo6yiERgCbaYPjWrZ2HuZ
-  db_communication.py: QmTB27cFomsabeEzqe8PCmVre7jgdf2A7DiYJZFmcBJKWJ
+  behaviours.py: QmYeabyybGHixD4BgEefffb2eP66V8gkQUJ9rNN631qJcC
+  db_communication.py: Qmc2hs59JW48ezBrxVSkrvj64Qw9vk5mWieY1KFZn39Bo2
   dex_wrapper.py: QmZM19jvfPL9uTCdENY56uhUPxwj1VDM1TzuRMSPemepnP
-  dialogues.py: QmfCY3h2CXTryfRrLFt4oeDBTS2AMBbbNyVMJKoWtt93Mt
-  handlers.py: QmeiSALAdiDXRCpFyRh3z7Pk1w7tDcAgo92RNcvJ4qSa1h
-  strategy.py: QmWkbvbysSX2ERKSjL7p1NMwJTT4or4SVkKZS37gsbBEBU
-  web_server.py: QmNVFe5mCy9WsWY8gYnq88aEdj6nQVBWWshxijXGYpk5Ty
+  dialogues.py: QmTYVyD9o8qNFwiKQGHxGjmXTzeSVShdXNq4pXpVxvdjoo
+  handlers.py: QmX8STY9Biyx3i8YDt91uGEbMiTTbyVQr6Jj6VinJywk9G
+  strategy.py: QmTABQTNPKm6Jr39UZ9M4AVm4VaEEPGbDbPSqzv5xbbF2V
+  web_server.py: QmU51fPJb1uJUuTTV256Y5XyZT6Rn5CzozkjxWbC1Xt8hy
 fingerprint_ignore_patterns: []
 handlers:
   contract_api:
@@ -77,8 +79,8 @@ models:
     class_name: Strategy
 name: option_management
 protocols:
-- fetchai/contract_api:0.7.0
-- fetchai/ledger_api:0.6.0
+- fetchai/contract_api:0.8.0
+- fetchai/ledger_api:0.7.0
 - fetchai/signing:0.6.0
 skills: []
 type: skill
