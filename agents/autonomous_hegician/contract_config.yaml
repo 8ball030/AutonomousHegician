@@ -5,6 +5,8 @@ behaviours:
     args:
       services_interval: 0.0001
     class_name: ServiceRegistrationBehaviour
+connections:
+- fetchai/ledger:0.9.0
 contracts:
 - eightballer/btcoptions:0.1.0
 - eightballer/btcpool:0.1.0
@@ -23,10 +25,10 @@ description: The hegic deploy skill has the ability to deploy and interact with 
 fingerprint:
   README.md: QmZ7swVkRpmJbJZ2NoLb9CWwH8p3QjnjRJg71UbAXdrKyx
   __init__.py: QmanmQfdWSEPtEKJCt6sz6S13ju3o7D7oSzriBkVABAARj
-  behaviours.py: QmaC3uUxHSFFn8ZnLXaUXJDnxWaE9gFa3V39uas2gKNG8d
-  dialogues.py: QmfCY3h2CXTryfRrLFt4oeDBTS2AMBbbNyVMJKoWtt93Mt
-  handlers.py: QmbF5R3XSPCQP8UH5KJryUhbnhRL73NMGKd9C77BN76Zk2
-  strategy.py: QmYcHfitHbYEMsiffAFTxVaWNrS8ToNLyUw8H3zsoiG33m
+  behaviours.py: QmZhgmKbBQkM5jvLfuf4JH5CSq21661xyccvZSiYQQsx7H
+  dialogues.py: QmTYVyD9o8qNFwiKQGHxGjmXTzeSVShdXNq4pXpVxvdjoo
+  handlers.py: QmRre8azW3ZM9zKYpWgwPEJMujtmfNzAEAzK8wkN94hPNS
+  strategy.py: QmRnwSbH6bb62NWPKi4HhR1dg9sUh8dLfkXkWSGibjipY3
 fingerprint_ignore_patterns: []
 handlers:
   contract_api:
@@ -67,9 +69,9 @@ models:
     class_name: Strategy
 name: hegic_deployer
 protocols:
-- fetchai/contract_api:0.7.0
-- fetchai/ledger_api:0.6.0
-- fetchai/signing:0.6.0
+- fetchai/contract_api:0.8.0
+- fetchai/ledger_api:0.7.0
+- fetchai/signing:0.7.0
 skills: []
 type: skill
 version: 0.1.0

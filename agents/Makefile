@@ -79,7 +79,6 @@ new_env: clean
 		echo "In a virtual environment! Exit first: 'exit'.";\
 	fi
 
-
 .PHONY: install_env
 install_env:
 	pipenv install --dev --skip-lock

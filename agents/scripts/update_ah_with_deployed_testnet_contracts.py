@@ -15,9 +15,10 @@ def get_new_addresses(config_path="./hegic_deployer/contract_config.yaml"):
     return addresses
 
 
-def update_ah_config_with_new_config(addresses):
+def update_ah_config_with_new_config(
+    addresses, file_path: str = "./autonomous_hegician/aea-config.yaml"
+):
     """Get the AH config and update it with contract addresses."""
-    file_path = "./autonomous_hegician/aea-config.yaml"
     with open(file_path, "r") as fp:
         full_config: List[Dict[str, Any]] = yaml_load_all(fp)
     assert len(full_config) >= 2, "Expecting at least one override defined!"

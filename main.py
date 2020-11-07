@@ -73,8 +73,8 @@ def main():
         [print(f"\n{i[0]}\n") for i in choices.values()]
         try:
             i = int(input())
-            print(i)
-            func = choices[i][1]
+            name, func = choices[i]
+            print(f"\nRunning:\n\n{name}\n")
         except KeyError:
             print("Invalid option!")
         func()
