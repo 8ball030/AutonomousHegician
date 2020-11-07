@@ -1,0 +1,6 @@
+[bandit]
+skips: [B104:hardcoded_bind_all_interfaces]
+recursive: true
+targets: ./src
+format: html
+output: bandit.html

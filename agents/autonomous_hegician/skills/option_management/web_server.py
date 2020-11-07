@@ -80,14 +80,13 @@ class Option(db.Model):  # type: ignore
     strike_price = db.Column(db.BigInteger())
     fees = db.Column(db.String(255))
     option_type = db.Column(db.Integer)
-    breakeven = db.Column(db.Integer)
     status_code_id = db.Column(db.ForeignKey("StatusCodes.id"))
     execution_strategy_id = db.Column(db.ForeignKey("ExecutionStrategies.id"))
     date_created = db.Column(db.DateTime(timezone=True))
     date_modified = db.Column(db.DateTime(timezone=True))
     expiration_date = db.Column(db.DateTime(timezone=True))
-    breakeven = db.Column(db.BigInteger())
-    current_pnl = db.Column(db.BigInteger())
+    breakeven = db.Column(db.BigInteger(), default=0)
+    current_pnl = db.Column(db.BigInteger(), default=0)
 
     execution_strategy = db.relationship(
         "ExecutionStrategy",
@@ -107,7 +106,7 @@ class Option(db.Model):  # type: ignore
 
     def update_with_fees(self, current_price):
         pnl = 0
-        cost = self.fees.strip("}{").split(",")[0]
+        cost = int(self.fees.strip("}{").split(",")[0])
         cost_per_unit = int(int(cost) / self.amount)
         if self.option_type == 1:
             self.breakeven = self.strike_price - cost_per_unit
@@ -160,9 +159,15 @@ class HegicOptions(Resource):
             ret = row.as_dict()
             ret["status_code_id"] = row.status_code.description
             ret["option_type"] = "Put" if row.option_type == 1 else "Call"
-            ret["amount"] = Web3.fromWei(row.amount, "ether")
-            ret["breakeven"] = int(row.get("breakeven", 0))
-            ret["current_pnl"] = int(row.get("current_pnl", 0))
+            ret["amount"] = int(Web3.fromWei(row.amount, "ether"))
+            ret["breakeven"] = (
+                int(Web3.fromWei(row.breakeven, "ether")) if row.breakeven != 0 else 0
+            )
+            ret["current_pnl"] = (
+                int(Web3.fromWei(row.current_pnl, "ether"))
+                if row.current_pnl != 0
+                else 0
+            )
             return ret
 
         results = [
@@ -236,10 +241,6 @@ class HegicOption(Resource):
         db.session.add(option)
         db.session.commit()
         return 200
-
-
-def run_server(**kwargs):
-    flask_app.run(debug=False, host="0.0.0.0", port=8080, **kwargs)
 
 
 if __name__ == "__main__":

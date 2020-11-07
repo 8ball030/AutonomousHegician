@@ -105,9 +105,10 @@ class Strategy(Model):
         with open("contract_config.yaml", "w") as f:
             yaml.dump(output, f)
 
-        # update the AH with the new contract files
-        with open("../autonomous_hegician/contract_config.yaml", "w") as f:
-            yaml.dump(yaml_file, f)
+        if dev_mode:
+            # update the AH with the new contract files
+            with open("../autonomous_hegician/contract_config.yaml", "w") as f:
+                yaml.dump(yaml_file, f)
 
     def get_deploy_terms(self) -> Terms:
         """
