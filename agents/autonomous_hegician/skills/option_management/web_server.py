@@ -237,9 +237,5 @@ class HegicOption(Resource):
         return 200
 
 
-def run_server(**kwargs):
-    flask_app.run(debug=False, host="0.0.0.0", port=8080, **kwargs)
-
-
 if __name__ == "__main__":
     flask_app.run(debug=False, host="0.0.0.0", port=8080)
