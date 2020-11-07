@@ -35,7 +35,5 @@ clean-test:
 	rm -fr .hypothesis
 	rm -fr .pytest_cache
 	rm -fr .mypy_cache/
-	rm -fr fetch/AutonomousHegician/input_file
-	rm -fr fetch/AutonomousHegician/output_file
 	find . -name 'log.txt' -exec rm -fr {} +
 	find . -name 'log.*.txt' -exec rm -fr {} +
