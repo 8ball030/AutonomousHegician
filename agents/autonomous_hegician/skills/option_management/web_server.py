@@ -21,6 +21,7 @@
 import json
 import logging
 from datetime import datetime, timedelta
+import os
 
 from flask import Flask, request
 from flask_cors import CORS
@@ -38,22 +39,23 @@ logger = logging.getLogger(__name__)
 def _create_url():
 
     for required in ["DB_URL", "DB_PORT", "DB_USER", "DB_PASS"]:
-        if os.environ.get("DB_URL', None) is None:
+        if os.environ.get(required, None) is None:
             raise ValueError("DB_URL is required check environ vars")
     un = os.environ.get("DB_USER")
     pw = os.environ.get("DB_PASS")
-    url = os.environ.get(("DB_URL")
+    url = os.environ.get("DB_URL")
     port = os.environ.get("DB_PORT")
-    return f"{url}://{un}:{pw}@{url}:{port}/cortex"
-             
-            
-    
-    
+    uri_string = f"postgresql://{un}:{pw}@{url}:{port}/cortex"
+    print(f"Connecting to {uri_string}")
+    return uri_string
+ 
 
 flask_app = Flask(__name__)  # Flask Application
 flask_app.config[
     "SQLALCHEMY_DATABASE_URI"
-] = _create_url()# "postgresql://admin:WKLpwoDJd03DJ423DJwlDJlaDJsdDJsdDJlDJsa@postgresdb:5432/cortex"
+] = (
+    _create_url()
+)  # "postgresql://admin:WKLpwoDJd03DJ423DJwlDJlaDJsdDJsdDJlDJsa@postgresdb:5432/cortex"
 flask_app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = True
 # Create RestPlus API
 api = Api(
