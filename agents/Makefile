@@ -46,8 +46,22 @@ lint:
 
 .PHONY: security
 security:
-	bandit -r autonomous_hegician/contracts autonomous_hegician/skills hegic_deployer/contracts hegic_deployer/skills
-	safety check -i 37524 -i 38038 -i 37776 -i 38039
+	bandit -s B104 -r autonomous_hegician/contracts autonomous_hegician/skills hegic_deployer/contracts hegic_deployer/skills 
+
+.PHONY: vulture
+vulture:
+	if [ "0" == "$(shell ((vulture  autonomous_hegician/skills/option_management  whitelist.py )  | wc -l))" ];\
+	then\
+      echo "ah code is all used."; \
+  else \
+      echo "Not used!"; \
+  fi
+	if [ "0" == "$(shell ((vulture hegic_deployer/skills/hegic_deployer whitelist.py )  | wc -l))" ];\
+	then\
+      echo "deployer code is all used."; \
+  else \
+      echo "Not used!"; \
+  fi
 
 .PHONY: static
 static:
@@ -64,6 +78,7 @@ new_env: clean
 	else\
 		echo "In a virtual environment! Exit first: 'exit'.";\
 	fi
+
 
 .PHONY: install_env
 install_env:

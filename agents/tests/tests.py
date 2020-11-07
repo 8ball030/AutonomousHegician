@@ -251,28 +251,6 @@ class TestOptionExecutionTester(unittest.TestCase):
         DBCommunication.update_option(new_order['option_id'], {
                                       "expiration_date": expiration_date})
         self.assertTrue(self.await_order_status_code(EXPIRED, new_order))
-#   def test_does_ah_excercise_eth_call_option(self):
-#       # now the ah will retrieve this order from the db an execute it.
-#       order_params = deepcopy(self.order_params)
-#       order_params["option_type"] = 2
-#       self.set_price(order_params['strike_price'], "priceprovider")
-#       new_order = DBCommunication.create_new_option(**order_params)
-#       orders = DBCommunication.get_options()
-#       self.assertEqual(len(orders), 1,
-#                        "Only 1 order expected as in testing!")
-#       self.assertTrue(self.await_order_status_code(3, new_order))
-#
-#       expiration_date =datetime.utcnow() + timedelta(seconds = 10)
-#       DBCommunication.update_option(new_order['option_id'], {"expiration_date": expiration_date})
-#       self.assertTrue(self.await_order_status_code(4, new_order))
-#   def test_does_ah_exercise_eth_call_option(self):
-#       # now we need to create the option, wait until it is status code three,
-#       # we the price provider to a price 25% higher than it currently is;
-#       order_params = deepcopy(self.order_params)
-#       order_params["option_type"] = 2
-#       new_order = DBCommunication.create_new_option(**self.order_params)
-#      self.set_price(order_params['strike_price'], "btcpriceprovider")
-# we are expecting the status code to be in 3 (open)
 
     def await_order_status_code(self, status_code, order_params):
         done = False
