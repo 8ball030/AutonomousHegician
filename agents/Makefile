@@ -47,7 +47,6 @@ lint:
 .PHONY: security
 security:
 	bandit -s B104 -r autonomous_hegician/contracts autonomous_hegician/skills hegic_deployer/contracts hegic_deployer/skills 
-	safety check -i 37524 -i 38038 -i 37776 -i 38039
 
 .PHONY: vulture
 vulture:
