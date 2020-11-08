@@ -121,4 +121,4 @@ if __name__ == "__main__":
     print(AH_LOGO)
     check_python_version()
     main()
-    print("Completed Successfully \0/!")
+    sys.exit(0)
