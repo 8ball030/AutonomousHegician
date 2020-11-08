@@ -18,7 +18,7 @@ import yaml
 
 try:
     sys.path += [os.path.sep.join(os.getcwd().split(os.path.sep)[:-1])]
-    from agents.autonomous_hegician.skills.option_management.db_communication import (
+    from agents.autonomous_hegician.skills.option_management.db_communication import (  # type: ignore
         CLOSED,
         DBCommunication,
         EXPIRED,
@@ -316,7 +316,7 @@ if __name__ == "__main__":
             ]
         )
         results = unittest.TextTestRunner().run(partial)
-    if len(results.failures) == 0 and len(results.errors) == 0:
+    if len(results.failures) == 0 and len(results.errors) == 0:  # type: ignore
         print("All tests passed!")
         sys.exit(0)
     else:
