@@ -18,7 +18,7 @@ import yaml
 
 try:
     sys.path += [os.path.sep.join(os.getcwd().split(os.path.sep)[:-1])]
-    from agents.autonomous_hegician.skills.option_management.db_communication import (
+    from agents.autonomous_hegician.skills.option_management.db_communication import (  # type: ignore
         CLOSED,
         DBCommunication,
         EXPIRED,
@@ -88,6 +88,8 @@ def load_contracts(addresses):
 
 
 class TestOptionExecutionTester(unittest.TestCase):
+    currentResult = None
+
     def set_btc_price(price):
         pass
 
@@ -99,6 +101,18 @@ class TestOptionExecutionTester(unittest.TestCase):
 
     def tearDown(self):
         DBCommunication.delete_options()
+        ok = self.currentResult.wasSuccessful()
+        errors = self.currentResult.errors
+        failures = self.currentResult.failures
+        print(
+            " All tests passed so far!"
+            if ok
+            else " %d errors and %d failures so far" % (len(errors), len(failures))
+        )
+
+    def run(self, result=None):
+        self.currentResult = result  # remember result for use in tearDown
+        unittest.TestCase.run(self, result)  # call superclass run method
 
     order_params = {
         "amount": 10000000,
@@ -107,6 +121,11 @@ class TestOptionExecutionTester(unittest.TestCase):
         "option_type": 1,
         "market": "ETH",
     }
+
+    @classmethod
+    def tearDownClass(cls):
+        agent.terminate()
+        os.system("pkill -f libp2p_node")
 
     @classmethod
     def setUpClass(cls):
@@ -246,7 +265,7 @@ class TestOptionExecutionTester(unittest.TestCase):
 
     def await_order_status_code(self, status_code, order_params):
         done = False
-        timeout = 20
+        timeout = 15
         start = datetime.utcnow()
         while not done:
             if datetime.now() - timedelta(seconds=timeout) > start:
@@ -268,25 +287,10 @@ class TestOptionExecutionTester(unittest.TestCase):
 #       pass
 
 
-def deploy_test_net_contract_via_ah():
-    pass
-
-
-def tear_down_deployer():
-    # after we have conducted our tests, we can revert the deployer to null state ready for the next tests
-
-    pass
-
-
-def setup_deployer_from_config():
-    pass
-    # shutil.copyfile("../hegic_deployer/contract_config.yaml", "../hegic_deployer/skills/hegic_deployer/skill.yaml")
-
-
 if __name__ == "__main__":
     agent = launch_autonomous_hegician()
     if True:
-        unittest.main()
+        results = unittest.main()
     else:
         partial = unittest.TestSuite()
         partial.addTests(
@@ -296,8 +300,9 @@ if __name__ == "__main__":
                 )
             ]
         )
-        unittest.TextTestRunner().run(partial)
-    agent.terminate()
-    sys.exit()
-    sys.run("pkill -f aea")
-    quit()
+        results = unittest.TextTestRunner().run(partial)
+    if len(results.failures) == 0 and len(results.errors) == 0:  # type: ignore
+        print("All tests passed!")
+        sys.exit(0)
+    else:
+        sys.exit(1)

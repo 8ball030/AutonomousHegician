@@ -193,6 +193,7 @@ class LedgerApiHandler(Handler):
                     ledger_api_msg.transaction_receipt
                 )
             )
+            raise ValueError("Ledger message failed!")
 
     def _handle_error(
         self, ledger_api_msg: LedgerApiMessage, ledger_api_dialogue: LedgerApiDialogue
@@ -208,6 +209,7 @@ class LedgerApiHandler(Handler):
                 ledger_api_msg, ledger_api_dialogue
             )
         )
+        raise ValueError("Ledger message failed!")
 
     def _handle_invalid(
         self, ledger_api_msg: LedgerApiMessage, ledger_api_dialogue: LedgerApiDialogue
@@ -224,6 +226,7 @@ class LedgerApiHandler(Handler):
                 ledger_api_dialogue,
             )
         )
+        raise ValueError("Invalid ledger api")
 
 
 class ContractApiHandler(Handler):
@@ -359,6 +362,7 @@ class ContractApiHandler(Handler):
                 contract_api_msg, contract_api_dialogue
             )
         )
+        raise ValueError("Error in contract api request")
 
     def _handle_invalid(
         self,
@@ -473,6 +477,7 @@ class SigningHandler(Handler):
                 signing_msg.error_code, signing_dialogue
             )
         )
+        raise ValueError("Error in siging message")
 
     def _handle_invalid(
         self, signing_msg: SigningMessage, signing_dialogue: SigningDialogue

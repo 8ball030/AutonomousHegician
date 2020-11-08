@@ -23,7 +23,9 @@ RUN apk add --no-cache go
 
 RUN mkdir app
 COPY Pipfile /app
-WORKDIR /app
+WORKDIR /app/agents
 RUN pipenv install --skip-lock
+WORKDIR /app
 COPY . /app
+
 CMD ["python3","-u","app.py"]

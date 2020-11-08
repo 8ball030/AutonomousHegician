@@ -40,9 +40,9 @@ clean-test:
 
 .PHONY: lint
 lint:
-	black autonomous_hegician/contracts autonomous_hegician/skills hegic_deployer/contracts hegic_deployer/skills scripts tests
-	isort autonomous_hegician/contracts autonomous_hegician/skills hegic_deployer/contracts hegic_deployer/skills scripts tests
-	flake8 autonomous_hegician/contracts autonomous_hegician/skills hegic_deployer/contracts hegic_deployer/skills scripts tests
+	black autonomous_hegician/contracts autonomous_hegician/skills hegic_deployer/contracts hegic_deployer/skills scripts tests app.py
+	isort autonomous_hegician/contracts autonomous_hegician/skills hegic_deployer/contracts hegic_deployer/skills scripts tests app.py
+	flake8 autonomous_hegician/contracts autonomous_hegician/skills hegic_deployer/contracts hegic_deployer/skills scripts tests app.py
 
 .PHONY: security
 security:
@@ -67,6 +67,7 @@ vulture:
 static:
 	mypy autonomous_hegician/contracts autonomous_hegician/skills
 	mypy hegic_deployer/contracts hegic_deployer/skills
+	mypy scripts tests app.py
 
 .PHONY: new_env
 new_env: clean

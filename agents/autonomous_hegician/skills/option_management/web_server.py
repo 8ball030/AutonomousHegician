@@ -28,7 +28,6 @@ from flask_cors import CORS
 from flask_restplus import Api, Resource
 from flask_restplus_sqlalchemy import ApiModelFactory
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import func
 from sqlalchemy.orm import subqueryload
 from web3 import Web3
 
@@ -100,6 +99,7 @@ class Option(db.Model):  # type: ignore
     expiration_date = db.Column(db.DateTime(timezone=True))
     breakeven = db.Column(db.BigInteger(), default=0)
     current_pnl = db.Column(db.BigInteger(), default=0)
+    agent_id = db.Column(db.ForeignKey("Agents.id"))
 
     execution_strategy = db.relationship(
         "ExecutionStrategy",
@@ -142,6 +142,20 @@ class Snapshot(db.Model):  # type: ignore
     usd_val = db.Column(db.Float)
     eth_val = db.Column(db.Float)
     address = db.Column(db.String(255))
+    agent_id = db.Column(db.ForeignKey("Agents.id"))
+
+    def as_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+
+class Agent(db.Model):  # type: ignore
+    __tablename__ = "Agents"
+
+    id = db.Column(db.Integer, primary_key=True)
+    date_created = db.Column(db.DateTime)
+    date_updated = db.Column(db.DateTime)
+    address = db.Column(db.String(255))
+    status = db.Column(db.String(255))
 
     def as_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
@@ -154,7 +168,6 @@ class StatusCode(db.Model):  # type: ignore
     description = db.Column(db.String(255))
 
 
-db.Index("ix_date_created", func.lower(Snapshot.date_created))
 # Bind the SQLAlchemy to the Flask Application
 db.init_app(flask_app)
 api_model_factory = ApiModelFactory(api=api, db=db)
@@ -204,20 +217,12 @@ class HegicAgents(Resource):
         results = [
             f.as_dict()
             for f in [
-                db.session.query(Snapshot)
+                db.session.query(Agent)
                 .order_by(Snapshot.date_created.desc())
                 .limit(1)
                 .one()
             ]
         ]
-        for res in results:
-            if res["date_updated"] + timedelta(seconds=30) > datetime.utcnow():
-                res["status"] = "running"
-            else:
-                res["status"] = "paused"
-            for k, v in res.items():
-                if k.find("date") >= 0:
-                    res[k] = str(v)
         return results
 
 
