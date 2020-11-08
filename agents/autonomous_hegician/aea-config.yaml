@@ -48,21 +48,21 @@ type: skill
 models:
   strategy:
     args:
-      btcoptions: '0xce208B7a6b93F03e459c3D40F6629e744e6A3b37'
-      btcpool: '0xb5a0A437b8ff0BbE5eBb3394b2D1037705e57576'
-      btcpriceprovider: '0x187284aF7aD0f74169828778410D3Df3B7938cE7'
-      ethoptions: '0x529d0a2Ed4929E0782Ff56719e5d330F0a846EE3'
-      ethpool: '0xcCA555Ef12C0c950623C38c7E36AbAa28b82b986'
-      exchange: '0x54a600f55d933f633CeB6B755CD3177eF66e2149'
-      hegic: '0xd289531C3a34cE4dAB914D1606bBc48080a166F4'
-      priceprovider: '0x17c81cA853B2Cb808AFD21f4E54ac233876B673F'
-      stakingeth: '0xf5A7BBB74dBd1FB6A23eb26a8ADc0D36FE539284'
-      stakingwbtc: '0x32D2c3d0332bA1F07BA9EDeafCc288F37072ce6D'
-      wbtc: '0x83A0963C0450Cd3E15F61Bbc7586a6bbe6f3Ab2c'
+      btcoptions: '0xf5A7BBB74dBd1FB6A23eb26a8ADc0D36FE539284'
+      btcpool: '0xd9c2EDC1b22481c4Dfe821280f7279AcC094172F'
+      btcpriceprovider: '0xd289531C3a34cE4dAB914D1606bBc48080a166F4'
+      ethoptions: '0x32D2c3d0332bA1F07BA9EDeafCc288F37072ce6D'
+      ethpool: '0xbCc94A15677C700f997c5956071B83C58E401bb9'
+      exchange: '0x17c81cA853B2Cb808AFD21f4E54ac233876B673F'
+      hegic: '0x952138eABf80658B25Def95cb5e93A7d1EE22922'
+      priceprovider: '0x83A0963C0450Cd3E15F61Bbc7586a6bbe6f3Ab2c'
+      stakingeth: '0x54a600f55d933f633CeB6B755CD3177eF66e2149'
+      stakingwbtc: '0x187284aF7aD0f74169828778410D3Df3B7938cE7'
+      wbtc: '0xF9dDAe6AD22737a73533DAA9B7709f68601B3a5f'
 ---
 public_id: fetchai/ledger:0.9.0
 type: connection
 config:
   ledger_apis:
     ethereum:
-      address: http://ganachecli:7545
+      address: http://localhost:7545

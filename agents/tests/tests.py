@@ -299,7 +299,7 @@ def setup_deployer_from_config():
 
 if __name__ == "__main__":
     agent = launch_autonomous_hegician()
-    if False:
+    if True:
         results = unittest.main()
     else:
         partial = unittest.TestSuite()
