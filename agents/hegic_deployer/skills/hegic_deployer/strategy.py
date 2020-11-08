@@ -90,7 +90,7 @@ class Strategy(Model):
         """Get the ledger id."""
         return self._ledger_id
 
-    def create_config_yaml(self, dev_mode: bool = True) -> None:
+    def create_config_yaml(self) -> None:
         """Output the contract config into a skill file."""
         if self.generate_configs is False:
             return
@@ -104,11 +104,6 @@ class Strategy(Model):
         }
         with open("contract_config.yaml", "w") as f:
             yaml.dump(output, f)
-
-        if dev_mode:
-            # update the AH with the new contract files
-            with open("../autonomous_hegician/contract_config.yaml", "w") as f:
-                yaml.dump(yaml_file, f)
 
     def get_deploy_terms(self) -> Terms:
         """
@@ -150,5 +145,5 @@ class Strategy(Model):
         }
 
         path = "contract_config.yaml"
-        with open(path, "w") as f:
+        with open(path, "w+") as f:
             yaml.dump(new_params, f)

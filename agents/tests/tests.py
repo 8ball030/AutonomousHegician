@@ -18,7 +18,7 @@ import yaml
 
 try:
     sys.path += [os.path.sep.join(os.getcwd().split(os.path.sep)[:-1])]
-    from agents.autonomous_hegician.skills.option_management.db_communication import (
+    from agents.autonomous_hegician.skills.option_management.db_communication import (  # type: ignore
         CLOSED,
         DBCommunication,
         EXPIRED,
@@ -287,21 +287,6 @@ class TestOptionExecutionTester(unittest.TestCase):
 #       pass
 
 
-def deploy_test_net_contract_via_ah():
-    pass
-
-
-def tear_down_deployer():
-    # after we have conducted our tests, we can revert the deployer to null state ready for the next tests
-
-    pass
-
-
-def setup_deployer_from_config():
-    pass
-    # shutil.copyfile("../hegic_deployer/contract_config.yaml", "../hegic_deployer/skills/hegic_deployer/skill.yaml")
-
-
 if __name__ == "__main__":
     agent = launch_autonomous_hegician()
     if True:
@@ -316,7 +301,7 @@ if __name__ == "__main__":
             ]
         )
         results = unittest.TextTestRunner().run(partial)
-    if len(results.failures) == 0 and len(results.errors) == 0:
+    if len(results.failures) == 0 and len(results.errors) == 0:  # type: ignore
         print("All tests passed!")
         sys.exit(0)
     else:
