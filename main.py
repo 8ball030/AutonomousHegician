@@ -44,7 +44,10 @@ def run_tests():
     if code != 0:
         raise RuntimeError(f"Failed to install dependencies!")
     deploy_contracts_to_testnet()
-    code = os.system("cd agents; pipenv run update_configs")
+    code = os.system("cd agents; pipenv run update_ah_with_deployed_testnet_contract.py")
+    if code != 0:
+        raise RuntimeError(f"Failed to update configs of Autonomous Hegician!")
+    code = os.system("cd agents; pipenv run update_ah_with_ledger_connection.py")
     if code != 0:
         raise RuntimeError(f"Failed to update configs of Autonomous Hegician!")
     code = os.system("cd agents; pipenv run tests")
@@ -68,11 +71,13 @@ def launch_containers():
         raise RuntimeError("Launching containers has failed!")
 
 
+
 def update_ah_config(config="testnet"):
     """Update the AH config."""
     if config != "testnet":
         i = os.system("cd agents; pipenv install --skip-lock")
         i2 = os.system("cd agents; pipenv run update_configs")
+        i3 = os.system("cd agents; pipenv run set_ledger_connection_testnet")
 
         if sum([i, i2]) != 0:
             raise RuntimeError("Updateing the AH config has failed!")
@@ -92,7 +97,7 @@ def main():
     """Run the main method."""
     if len(sys.argv) == 1:
         print("Please choose from the following actions;")
-        [print(f"\n{i[0]}\n") for i in choices.values()]
+        [print(f"\n{i[0]}") for i in choices.values()]
         try:
             i = int(input())
             name, func = choices[i]

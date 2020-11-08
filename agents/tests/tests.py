@@ -313,9 +313,6 @@ if __name__ == "__main__":
         results = unittest.TextTestRunner().run(partial)
     agent.terminate()
     os.system("pkill -f libp2p_node")
-    import pdb
-
-    pdb.set_trace()
     if len(results.failures) == 0 and len(results.errors) == 0:
         print("All tests passed!")
         sys.exit(0)

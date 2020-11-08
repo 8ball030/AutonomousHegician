@@ -36,6 +36,7 @@ services:
       TESTS: "False"
       DEBUG: "False"
       RUN_CMD: "pipenv run start_api" 
+      PIPENV_DOTENV_LOCATION: /app/.env_container
     build:
       context: ./agents
       dockerfile: Dockerfile
@@ -49,6 +50,7 @@ services:
     environment:
       TESTS: "False"
       DEBUG: "False"
+      PIPENV_DOTENV_LOCATION: /app/.env_container
       RUN_CMD: "pipenv run start_agent"
     build:
       context: ./agents

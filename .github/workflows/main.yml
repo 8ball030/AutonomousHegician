@@ -77,6 +77,8 @@ jobs:
     continue-on-error: False
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    env: 
+      - PIPENV_DOTENV_LOCATION: /app/.env_container
     steps:
       - uses: actions/checkout@master
       - uses: actions/setup-python@master
@@ -95,4 +97,5 @@ jobs:
       - name: All tests
         working-directory: ./
         run: |
+          export 
           python main.py -o 4

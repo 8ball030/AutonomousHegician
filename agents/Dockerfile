@@ -26,4 +26,6 @@ COPY Pipfile /app
 WORKDIR /app
 RUN pipenv install --skip-lock
 COPY . /app
+RUN pwd
+RUN ls -la
 CMD ["python3","-u","app.py"]
