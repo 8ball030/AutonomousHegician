@@ -97,5 +97,6 @@ jobs:
       - name: All tests
         working-directory: ./
         run: |
-          export 
+          cd agents
+          pipenv install
           python main.py -o 1
