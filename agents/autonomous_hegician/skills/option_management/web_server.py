@@ -28,7 +28,6 @@ from flask_cors import CORS
 from flask_restplus import Api, Resource
 from flask_restplus_sqlalchemy import ApiModelFactory
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import func
 from sqlalchemy.orm import subqueryload
 from web3 import Web3
 
@@ -148,6 +147,7 @@ class Snapshot(db.Model):  # type: ignore
     def as_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
+
 class Agent(db.Model):  # type: ignore
     __tablename__ = "Agents"
 
@@ -159,6 +159,7 @@ class Agent(db.Model):  # type: ignore
 
     def as_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
 
 class StatusCode(db.Model):  # type: ignore
     __tablename__ = "StatusCodes"
