@@ -93,5 +93,6 @@ jobs:
           pip install pipenv
           cd ..
       - name: All tests
+        working-directory: ./
         run: |
           python main.py -o 4
