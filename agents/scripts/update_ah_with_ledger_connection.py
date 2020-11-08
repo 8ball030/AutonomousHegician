@@ -1,7 +1,5 @@
 """Script to update AH with contract configs."""
 import os
-
-from argparse import ArgumentParser
 from typing import Any, Dict, List
 
 from aea.helpers.yaml_utils import yaml_dump_all, yaml_load_all
@@ -10,15 +8,17 @@ from aea.helpers.yaml_utils import yaml_dump_all, yaml_load_all
 connection_strings = {
     "ganache_local": "http://localhost:7545",
     "ganache_container": "http://ganachecli:7545",
-    "live": "",  # todo
+    "live": "http://ganachecli:7545",  # todo
 }
 
 
 def parse_args():
     def is_acceptable_input(input_):
+        if input_ is None:
+            raise
         acceptable = ["ganache_local", "ganache_container", "live"]
         if input_ in acceptable:
-            return input_
+            return connection_strings[input_]
         else:
             raise ValueError(f"{input_} is not a valid option {acceptable}")
 
@@ -51,8 +51,7 @@ def update_ah_config_with_new_config(
 
 def do_work():
     """Run the script."""
-    args = parse_args()
-    ledger_string = connection_strings[args.ledger]
+    ledger_string = parse_args()
     update_ah_config_with_new_config(
         ledger_string,
     )

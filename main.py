@@ -23,6 +23,7 @@ def parse_args():
     return parser.parse_args()
 
 
+
 def run_tests():
     """Run all tests."""
     # remove all containers
@@ -43,13 +44,13 @@ def run_tests():
     code = os.system("cd agents; pipenv install --skip-lock")
     if code != 0:
         raise RuntimeError(f"Failed to install dependencies!")
+    code = os.system("cd agents; pipenv run update_ledger")
+    if code != 0:
+        raise RuntimeError(f"Failed to update ledger of Autonomous Hegician!")
     deploy_contracts_to_testnet()
-    code = os.system("cd agents; pipenv run update_ah_with_deployed_testnet_contract.py")
+    code = os.system("cd agents; pipenv run update_contracts")
     if code != 0:
-        raise RuntimeError(f"Failed to update configs of Autonomous Hegician!")
-    code = os.system("cd agents; pipenv run update_ah_with_ledger_connection.py")
-    if code != 0:
-        raise RuntimeError(f"Failed to update configs of Autonomous Hegician!")
+        raise RuntimeError(f"Failed to update newly deployed contracts to Autonomous Hegician!")
     code = os.system("cd agents; pipenv run tests")
     if code != 0:
         raise RuntimeError(f"Failed to run integration tests successfully!")
@@ -76,20 +77,20 @@ def update_ah_config(config="testnet"):
     """Update the AH config."""
     if config != "testnet":
         i = os.system("cd agents; pipenv install --skip-lock")
-        i2 = os.system("cd agents; pipenv run update_configs")
-        i3 = os.system("cd agents; pipenv run set_ledger_connection_testnet")
+        i2 = os.system("cd agents; pipenv run update_contracts")
+        i3 = os.system(f"cd agents; pipenv run update_ledger")
 
-        if sum([i, i2]) != 0:
+        if sum([i, i2, i3]) != 0:
             raise RuntimeError("Updateing the AH config has failed!")
 
 
 
-choices = {
-    1: ["1. Deploy contracts to Ganache Testnet.", deploy_contracts_to_testnet],
-    2: ["2. Update Autonomous Hegicician with Test Contracts", update_ah_config],
-    3: ["3. Update Autonomous Hegicician with Live Contracts", update_ah_config],
-    4: ["4. Run local tests.", run_tests],
-    5: ["5. Launch Live Autonomous Hegician.", launch_containers],
+choices = {k + 1: v for k, v in enumerate([
+    ['Deploy contracts to Ganache Testnet.', deploy_contracts_to_testnet],
+    ['Update Autonomous Hegicician with contracts and ledger from .env', update_ah_config],
+    ['Run local tests.', run_tests],
+    ['Launch containerised Autonomous Hegician.', launch_containers],
+])
 }
 
 
@@ -97,7 +98,7 @@ def main():
     """Run the main method."""
     if len(sys.argv) == 1:
         print("Please choose from the following actions;")
-        [print(f"\n{i[0]}") for i in choices.values()]
+        [print(f"\n{i[0]}. {i[1][0]}") for i in choices.items()]
         try:
             i = int(input())
             name, func = choices[i]
@@ -109,7 +110,7 @@ def main():
         args = parse_args()
         for k in [k for k in args.options.split(",") if k != ""]:
             try:
-                print(choices[int(k)][0])
+                print(f"Executing {k}...   {choices[int(k)][0]}")
                 choices[int(k)][1]()
             except KeyError:
                 print("Invalid options selected!")

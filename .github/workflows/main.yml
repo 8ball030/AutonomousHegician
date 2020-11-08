@@ -98,4 +98,4 @@ jobs:
         working-directory: ./
         run: |
           export 
-          python main.py -o 4
+          python main.py -o 1
