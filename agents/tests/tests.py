@@ -287,21 +287,6 @@ class TestOptionExecutionTester(unittest.TestCase):
 #       pass
 
 
-def deploy_test_net_contract_via_ah():
-    pass
-
-
-def tear_down_deployer():
-    # after we have conducted our tests, we can revert the deployer to null state ready for the next tests
-
-    pass
-
-
-def setup_deployer_from_config():
-    pass
-    # shutil.copyfile("../hegic_deployer/contract_config.yaml", "../hegic_deployer/skills/hegic_deployer/skill.yaml")
-
-
 if __name__ == "__main__":
     agent = launch_autonomous_hegician()
     if True:
