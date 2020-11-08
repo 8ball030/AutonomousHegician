@@ -78,7 +78,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env: 
-      - PIPENV_DOTENV_LOCATION=/app/.env_container
+      PIPENV_DOTENV_LOCATION: =/app/.env_container
     steps:
       - uses: actions/checkout@master
       - uses: actions/setup-python@master
