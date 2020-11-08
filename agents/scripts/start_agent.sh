@@ -1,4 +1,3 @@
 #!/bin/bash
-cd autonomous_hegician/
-aea -s install
+cd autonomous_hegician
 aea -s run

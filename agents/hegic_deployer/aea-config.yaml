@@ -65,4 +65,4 @@ type: connection
 config:
   ledger_apis:
     ethereum:
-      address: http://localhost:7545
+      address: http://ganachecli:7545
