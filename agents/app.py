@@ -3,10 +3,11 @@ Main entry script to application. Will check globals for debug and tests.
 
 """
 import os
-import sys
 import subprocess
-from pprint import pprint
+import sys
 import time
+from pprint import pprint
+
 
 def wait():
     while True:
