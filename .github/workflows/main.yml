@@ -99,5 +99,6 @@ jobs:
         run: |
           cd agents
           pipenv install --skip-lock
+          pipenv run update_ledger
           cd ../
           python main.py -o 1
