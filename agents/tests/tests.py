@@ -123,6 +123,11 @@ class TestOptionExecutionTester(unittest.TestCase):
     }
 
     @classmethod
+    def tearDownClass(cls):
+        agent.terminate()
+        os.system("pkill -f libp2p_node")
+
+    @classmethod
     def setUpClass(cls):
         setup_db()
         cls.addresses = get_current_addresses()
@@ -260,7 +265,7 @@ class TestOptionExecutionTester(unittest.TestCase):
 
     def await_order_status_code(self, status_code, order_params):
         done = False
-        timeout = 20
+        timeout = 15
         start = datetime.utcnow()
         while not done:
             if datetime.now() - timedelta(seconds=timeout) > start:
@@ -311,12 +316,8 @@ if __name__ == "__main__":
             ]
         )
         results = unittest.TextTestRunner().run(partial)
-    agent.terminate()
-    os.system("pkill -f libp2p_node")
     if len(results.failures) == 0 and len(results.errors) == 0:
         print("All tests passed!")
         sys.exit(0)
-        quit()
     else:
         sys.exit(1)
-        quit()

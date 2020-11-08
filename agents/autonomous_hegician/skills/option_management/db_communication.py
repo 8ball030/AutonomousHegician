@@ -19,7 +19,7 @@
 """This module defines the db communication models."""
 
 from typing import Dict
-
+from sqlalchemy.orm.exc import NoResultFound
 
 try:
     from packages.eightballer.skills.option_management.web_server import (

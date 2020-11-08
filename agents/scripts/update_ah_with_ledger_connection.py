@@ -8,7 +8,7 @@ from aea.helpers.yaml_utils import yaml_dump_all, yaml_load_all
 connection_strings = {
     "ganache_local": "http://localhost:7545",
     "ganache_container": "http://ganachecli:7545",
-    "live": "http://ganachecli:7545",  # todo
+    "live": "https://mainnet.infura.io/v3/f00f7b3ba0e848ddbdc8941c527447fe",  # todo
 }
 
 
