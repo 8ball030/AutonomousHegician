@@ -93,4 +93,6 @@ jobs:
           pip install pipenv
           cd ..
       - name: All tests
-        run: python main.py -o 4
+        run: |
+          pipenv install --skip-lock
+          python main.py -o 4
