@@ -35,6 +35,7 @@ def run_tests():
     if code != 0:
         raise RuntimeError(f"Failed to start test environment containers!")
     # create db schema
+    time.sleep(1)
     code = os.system(
         "cd agents; pipenv run python autonomous_hegician/skills/option_management/db_communication.py"
     )
