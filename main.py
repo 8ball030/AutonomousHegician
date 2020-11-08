@@ -26,35 +26,57 @@ def parse_args():
 def run_tests():
     """Run all tests."""
     # remove all containers
-    os.system("docker-compose down")
+    code = os.system("docker-compose down")
+    if code != 0:
+        raise RuntimeError(f"Failed to destroy existing containers!")
     # start required containers
-    os.system("docker-compose up -d postgresdb ganachecli")
+    code = os.system("docker-compose up -d postgresdb ganachecli")
+    if code != 0:
+        raise RuntimeError(f"Failed to start test environment containers!")
     # create db schema
-    os.system(
+    code = os.system(
         "cd agents; pipenv run python autonomous_hegician/skills/option_management/db_communication.py"
     )
+    if code != 0:
+        raise RuntimeError(f"Failed to create database!")
     # run tests
-    os.system("cd agents; pipenv install --skip-lock")
-    os.system("cd agents; pipenv run deploy_contracts")
-    os.system("cd agents; pipenv run update_configs")
-    os.system("cd agents; pipenv run tests")
+    code = os.system("cd agents; pipenv install --skip-lock")
+    if code != 0:
+        raise RuntimeError(f"Failed to install dependencies!")
+    deploy_contracts_to_testnet()
+    code = os.system("cd agents; pipenv run update_configs")
+    if code != 0:
+        raise RuntimeError(f"Failed to update configs of Autonomous Hegician!")
+    code = os.system("cd agents; pipenv run tests")
+    if code != 0:
+        raise RuntimeError(f"Failed to run integration tests successfully!")
+
 
 
 def deploy_contracts_to_testnet():
     """Deploy contracts to testnet."""
-    os.system("cd agents; pipenv run deploy_contracts")
+    code = os.system("cd agents; pipenv run deploy_contracts")
+    if code != 0:
+        raise RuntimeError("Deploying contracts has failed!")
+        
 
 
 def launch_containers():
     """Launch docker containers."""
-    os.system("docker-compose up -d --build")
+    code = os.system("docker-compose up -d --build")
+    if code != 0:
+        raise RuntimeError("Launching containers has failed!")
 
 
 def update_ah_config(config="testnet"):
     """Update the AH config."""
     if config != "testnet":
-        os.system("cd agents; pipenv install --skip-lock")
-        os.system("cd agents; pipenv run update_configs")
+        i = os.system("cd agents; pipenv install --skip-lock")
+        i2 = os.system("cd agents; pipenv run update_configs")
+
+        if sum([i, i2]) != 0:
+            raise RuntimeError("Updateing the AH config has failed!")
+
 
 
 choices = {
@@ -87,8 +109,6 @@ def main():
             except KeyError:
                 print("Invalid options selected!")
 
-    pass
-
 
 def check_python_version():
     """Check python version satisfies requirements."""
@@ -101,3 +121,4 @@ if __name__ == "__main__":
     print(AH_LOGO)
     check_python_version()
     main()
+    print("Completed Successfully \0/!")

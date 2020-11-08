@@ -88,6 +88,8 @@ def load_contracts(addresses):
 
 
 class TestOptionExecutionTester(unittest.TestCase):
+    currentResult = None
+    
     def set_btc_price(price):
         pass
 
@@ -99,6 +101,17 @@ class TestOptionExecutionTester(unittest.TestCase):
 
     def tearDown(self):
         DBCommunication.delete_options()
+        ok = self.currentResult.wasSuccessful()
+        errors = self.currentResult.errors
+        failures = self.currentResult.failures
+        print (' All tests passed so far!' if ok else \
+                ' %d errors and %d failures so far' % \
+                (len(errors), len(failures)))
+
+    def run(self, result=None):
+        self.currentResult = result # remember result for use in tearDown
+        unittest.TestCase.run(self, result) # call superclass run method
+
 
     order_params = {
         "amount": 10000000,
@@ -285,8 +298,8 @@ def setup_deployer_from_config():
 
 if __name__ == "__main__":
     agent = launch_autonomous_hegician()
-    if True:
-        unittest.main()
+    if False:
+        results = unittest.main()
     else:
         partial = unittest.TestSuite()
         partial.addTests(
@@ -296,8 +309,14 @@ if __name__ == "__main__":
                 )
             ]
         )
-        unittest.TextTestRunner().run(partial)
+        results = unittest.TextTestRunner().run(partial)
     agent.terminate()
-    sys.exit()
-    sys.run("pkill -f aea")
-    quit()
+    os.system("pkill -f libp2p_node")
+    import pdb; pdb.set_trace()
+    if len(results.failures) == 0 and len(results.errors) == 0:
+        print("All tests passed!")
+        sys.exit(0)
+        quit()
+    else:
+        sys.exit(1)
+        quit()
