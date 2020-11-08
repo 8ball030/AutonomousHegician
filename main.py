@@ -80,7 +80,7 @@ def launch_containers():
     if code != 0:
         raise RuntimeError("Launching containers has failed!")
     print(
-        "Containers running in background. Visit: `http://0.0.0.0:3001`. To shuw down: `docker-compose down`."
+        "Containers running in background. Visit: `http://0.0.0.0:3001`. To shut down: `docker-compose down`."
     )
 
 
