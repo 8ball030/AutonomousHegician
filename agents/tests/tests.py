@@ -304,7 +304,11 @@ if __name__ == "__main__":
     else:
         partial = unittest.TestSuite()
         partial.addTests(
-            [TestOptionExecutionTester("test_does_ah_excercise_eth_atm_put_option",)]
+            [
+                TestOptionExecutionTester(
+                    "test_does_ah_excercise_eth_atm_put_option",
+                )
+            ]
         )
         results = unittest.TextTestRunner().run(partial)
     agent.terminate()
