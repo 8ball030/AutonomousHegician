@@ -37,9 +37,12 @@ def run_tests():
         raise RuntimeError(f"Failed to start test environment containers!")
     # create db schema
     time.sleep(1)
-    code = os.system(
-        "cd agents; pipenv run python autonomous_hegician/skills/option_management/db_communication.py"
-    )
+    cmd = "cd agents; pipenv run python autonomous_hegician/skills/option_management/db_communication.py"
+    code = 1
+    for x in range(2):
+        code = os.system(cmd)
+        if code == 0:
+            continue
     if code != 0:
         raise RuntimeError(f"Failed to create database!")
     # run tests
