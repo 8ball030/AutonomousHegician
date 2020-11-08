@@ -99,4 +99,5 @@ jobs:
         run: |
           cd agents
           pipenv install --skip-lock
+          cd ../
           python main.py -o 1
