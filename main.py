@@ -59,6 +59,9 @@ def run_tests():
 
 def deploy_contracts_to_testnet():
     """Deploy contracts to testnet."""
+    code = os.system("docker-compose up -d ganachecli")
+    if code != 0:
+        raise RuntimeError("Failed to started local chain")
     code = os.system("cd agents; pipenv run deploy_contracts")
     if code != 0:
         raise RuntimeError("Deploying contracts has failed!")
