@@ -89,7 +89,7 @@ def load_contracts(addresses):
 
 class TestOptionExecutionTester(unittest.TestCase):
     currentResult = None
-    
+
     def set_btc_price(price):
         pass
 
@@ -104,14 +104,15 @@ class TestOptionExecutionTester(unittest.TestCase):
         ok = self.currentResult.wasSuccessful()
         errors = self.currentResult.errors
         failures = self.currentResult.failures
-        print (' All tests passed so far!' if ok else \
-                ' %d errors and %d failures so far' % \
-                (len(errors), len(failures)))
+        print(
+            " All tests passed so far!"
+            if ok
+            else " %d errors and %d failures so far" % (len(errors), len(failures))
+        )
 
     def run(self, result=None):
-        self.currentResult = result # remember result for use in tearDown
-        unittest.TestCase.run(self, result) # call superclass run method
-
+        self.currentResult = result  # remember result for use in tearDown
+        unittest.TestCase.run(self, result)  # call superclass run method
 
     order_params = {
         "amount": 10000000,
@@ -303,16 +304,14 @@ if __name__ == "__main__":
     else:
         partial = unittest.TestSuite()
         partial.addTests(
-            [
-                TestOptionExecutionTester(
-                    "test_does_ah_excercise_eth_atm_put_option",
-                )
-            ]
+            [TestOptionExecutionTester("test_does_ah_excercise_eth_atm_put_option",)]
         )
         results = unittest.TextTestRunner().run(partial)
     agent.terminate()
     os.system("pkill -f libp2p_node")
-    import pdb; pdb.set_trace()
+    import pdb
+
+    pdb.set_trace()
     if len(results.failures) == 0 and len(results.errors) == 0:
         print("All tests passed!")
         sys.exit(0)
