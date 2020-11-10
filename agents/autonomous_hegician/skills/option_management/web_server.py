@@ -23,13 +23,14 @@ import logging
 import os
 from datetime import datetime, timedelta
 
+import yaml
 from flask import Flask, request
 from flask_cors import CORS
 from flask_restplus import Api, Resource
 from flask_restplus_sqlalchemy import ApiModelFactory
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import subqueryload
-from web3 import Web3
+from web3 import HTTPProvider, Web3
 
 
 logger = logging.getLogger(__name__)
@@ -213,17 +214,7 @@ class HegicOptions(Resource):
 @api.route("/get_all_agents")
 class HegicAgents(Resource):
     def get(self):
-        db.create_all()
-        results = [
-            f.as_dict()
-            for f in [
-                db.session.query(Agent)
-                .order_by(Snapshot.date_created.desc())
-                .limit(1)
-                .one()
-            ]
-        ]
-        return results
+        return db.session.query(Agent).all()
 
 
 @api.route("/get_snapshots")
@@ -245,12 +236,12 @@ class HegicOption(Resource):
         db.create_all()
         res = json.loads(request.data)["data"]
         option = Option(
-            period=res["period"] * 3600 * 24,
+            period=res["period"],
             status_code_id=0,
             market=res["market"],
             execution_strategy_id=res["execution_strategy_id"],
             option_type=res["option_type"],
-            amount=Web3.toWei(res["amount"], "ether"),  # TODO BTC is wrong!
+            amount=res["amount"],  # TODO BTC is wrong!
             strike_price=res["strike_price"],
             date_created=datetime.utcnow(),
             date_modified=datetime.utcnow(),
@@ -258,7 +249,60 @@ class HegicOption(Resource):
         )
         db.session.add(option)
         db.session.commit()
-        return 200
+        return option.id
+
+
+@api.route("/get_web3_config")
+class web3_config(Resource):
+    def _load_contracts(self):
+        """Read in the contracts from the agent."""
+        w3 = Web3(HTTPProvider(os.environ.get("LEDGER")))
+        if not w3.isConnected():
+            raise ValueError("Not successfully conencted to the chain!")
+
+        addresses = self._read_addresses()
+        mapping = {
+            "priceprovider": "FakePriceProvider.json",
+            "ethoptions": "HegicETHOptions.json",
+            "ethpool": "HegicETHPool.json",
+            "ethpriceprovider": "FakeETHPriceProvider.json",
+            "btcoptions": "HegicWBTCOptions.json",
+            "btcpool": "HegicERCPool.json",
+            "btcpriceprovider": "FakeBTCPriceProvider.json",
+            "exchange": "FakeExchange.json",
+            "hegic": "FakeHEGIC.json",
+            "wbtc": "FakeWBTC.json",
+            "stakingeth": "HegicStakingETH.json",
+            "stakingwbtc": "HegicStakingWBTC.json",
+        }
+        contracts = {}
+        for contract, _address in addresses.items():
+            with open(
+                f"./hegic_deployer/contracts/{contract}/build/contracts/{mapping[contract]}",
+                "r",
+            ) as f:
+                c = json.loads(f.read())
+                contracts[contract] = c
+        return contracts
+
+    def _read_addresses(self):
+        with open(
+            "./autonomous_hegician/skills/option_management/skill.yaml", "r"
+        ) as f:
+            return {
+                k: v
+                for k, v in yaml.safe_load(f)["models"]["strategy"]["args"].items()
+                if k != "ledger_id"
+            }
+
+    def get(self):
+        object = {
+            "ledger_string": os.environ["LEDGER"],
+            "contract_addresses": self._read_addresses(),
+            "contract_abis": self._load_contracts(),
+        }
+
+        return object
 
 
 if __name__ == "__main__":

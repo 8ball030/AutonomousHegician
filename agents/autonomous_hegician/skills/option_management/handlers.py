@@ -248,6 +248,8 @@ class LedgerApiHandler(Handler):
                 "tx_hash": ledger_api_msg.transaction_receipt.body,
             },
         )
+        strategy.is_order_behaviour_active = False
+        strategy.is_price_behaviour_active = True
 
     def _handle_invalid(
         self, ledger_api_msg: LedgerApiMessage, ledger_api_dialogue: LedgerApiDialogue
@@ -258,13 +260,15 @@ class LedgerApiHandler(Handler):
         :param ledger_api_message: the ledger api message
         :param ledger_api_dialogue: the ledger api dialogue
         """
+        strategy = cast(Strategy, self.context.strategy)
         self.context.logger.warning(
             "cannot handle ledger_api message of performative={} in dialogue={}.".format(
                 ledger_api_msg.performative,
                 ledger_api_dialogue,
             )
         )
-        raise ValueError("Error in ledger_api not correctly Handled.")
+        strategy.is_order_behaviour_active = False
+        strategy.is_price_behaviour_active = True
 
 
 class ContractApiHandler(Handler):
@@ -353,9 +357,6 @@ class ContractApiHandler(Handler):
         else:
             raise ValueError(f"State transaction not handled!: {contract}")
 
-    #    self.context.logger.info(f"""Retrieved {contract}, order_behaviour {strategy.is_order_behaviour_active}
-    #                             price behaviour active {strategy.is_price_behaviour_active}""")
-
     def teardown(self) -> None:
         """
         Implement the handler teardown.
@@ -425,6 +426,8 @@ class ContractApiHandler(Handler):
         )
         order = strategy.current_order
         strategy.update_current_order(order, {"status_code_id": FAILED})
+        strategy.is_order_behaviour_active = False
+        strategy.is_price_behaviour_active = True
 
     def _handle_invalid(
         self,

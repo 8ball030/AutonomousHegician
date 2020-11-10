@@ -90,8 +90,13 @@ def load_contracts(addresses):
 class TestOptionExecutionTester(unittest.TestCase):
     currentResult = None
 
-    def set_btc_price(price):
-        pass
+    order_params = {
+        "amount": 10000000,
+        "strike_price": 200,
+        "period": 60 * 60 * 24 * 2,
+        "option_type": 1,
+        "market": "ETH",
+    }
 
     def set_price(self, new_price, provider):
         price_provider = self.contracts[provider]
@@ -113,14 +118,6 @@ class TestOptionExecutionTester(unittest.TestCase):
     def run(self, result=None):
         self.currentResult = result  # remember result for use in tearDown
         unittest.TestCase.run(self, result)  # call superclass run method
-
-    order_params = {
-        "amount": 10000000,
-        "strike_price": 200,
-        "period": 60 * 60 * 24 * 2,
-        "option_type": 1,
-        "market": "ETH",
-    }
 
     @classmethod
     def tearDownClass(cls):
@@ -275,16 +272,6 @@ class TestOptionExecutionTester(unittest.TestCase):
             if order.status_code.id == status_code:
                 done = True
         return done
-
-
-#   def test_does_ah_excercise_btc_call_option(self):
-#       pass
-
-#   def test_does_ah_excercise_eth_put_option(self):
-#       pass
-
-#   def test_does_ah_excercise_btc_put_option(self):
-#       pass
 
 
 if __name__ == "__main__":
