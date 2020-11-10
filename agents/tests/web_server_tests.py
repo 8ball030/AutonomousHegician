@@ -38,7 +38,7 @@ HOST = "http://localhost:8080"
 LEDGER = "http://127.0.0.1:7545"
 w3 = web3.Web3(web3.HTTPProvider(LEDGER))
 w3.isConnected()
-deployer_address = "0x1cb8a2d2a75747f0be56180619ba1aaf0ab74c72e7c1892758d210cbf36742e2"
+deployer_address = "0xEF2B779BcD74b7730989dbD7C6CCC2D0BEDe9f9e"
 
 
 def setup_db():
