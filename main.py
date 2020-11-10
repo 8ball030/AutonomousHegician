@@ -34,7 +34,7 @@ def run_tests():
     if code != 0:
         raise RuntimeError("Failed to destroy existing containers!")
     # start required containers
-    code = os.system("docker-compose up -d postgresdb ganachecli")
+    code = os.system("docker-compose up -d postgresdb ganachecli api")
     if code != 0:
         raise RuntimeError("Failed to start test environment containers!")
     # create db schema
