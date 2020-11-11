@@ -34,7 +34,7 @@ sudo hostnamectl set-hostname autonomous_hegician
  docker version
  
  # create sshkey
- ssh-keygen -t rsa -b 4096 -C "tomrae030@hotmail.com"
+ ssh-keygen -t rsa -b 4096 -C "xxxxxxxxxx@hotmail.com"
  
  # install python
 
