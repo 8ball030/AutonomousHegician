@@ -6,7 +6,3 @@ The AH is designed to provide a number advanced features that would be impossibl
 
 The AH is capable of being on a raspberry pi 4 (insert referal link), with minimal resources;
 
-INSERT PICTURE OF GUI
-
-
-

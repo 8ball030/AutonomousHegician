@@ -1,13 +1,15 @@
 # Setup of Project
 
+This file contains a number of helpful resources for the setup of a raspberry pi to run the Autonomous Hegician
+
 - Flash a raspberry pi image using balenEthcher
-
 - update the allowed hosts
+- enable ssh
+- install docker
 
-- enable ssh access
+# Enable SSH
 
 
-# 
 
 create the following files in the boot drive
 [wpa_supplicant.conf](https://gist.github.com/anshulkhare7/fdd662c358a2ff7eba48fd11050b9243)
@@ -27,15 +29,16 @@ sudo hostnamectl set-hostname autonomous_hegician
  curl -fsSL https://get.docker.com -o get-docker.sh 
  sudo sh get-docker.sh
  rm get-docker.sh
- 
+
  # update permission to make easier to run
  sudo usermod -aG docker pi
- 
+
  docker version
- 
+
  # create sshkey
- ssh-keygen -t rsa -b 4096 -C "xxxxxxxxxx@hotmail.com"
- 
+
+ ssh-keygen -t rsa -b 4096 -C "YOUREMAIL"
+
  # install python
 
  sudo apt-get install python3 python3-pip -y
@@ -46,7 +49,7 @@ sudo hostnamectl set-hostname autonomous_hegician
 sudo curl -L "https://github.com/docker/compose/releases/download/1.26.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 sudo chmod +x /usr/local/bin/docker-compose
 sudo  pip3 install docker-compose
- 
+
  # To run
  ``` #bash#
  cd AutonmousHegician;
@@ -54,18 +57,6 @@ sudo  pip3 install docker-compose
  ```
  # To run tests
  Due to the transactional nature of the of the application and the behavioural nature of the agent, we perform a number of integration tests.
- 
+
  The initial test is to configure the local blockchain which will allow the user to perform local testing before the deployment to a live environment.
- # To setup on local test net
- ``` ## bash ##
- cd hegic_contracts
- python3 
- ```
- 
- 
- # To setup to run on live chain
- 
- # To setup to run on ropsten
- 
- 
 
