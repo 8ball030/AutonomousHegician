@@ -10,7 +10,19 @@ import {
   withHighcharts
 } from 'react-jsx-highcharts';
 
+
+class HegicOptions{
+  constructor() {
+    API.get('get_web3_config')
+      .then(config => results.data)
+      .then(config=> {
+        console.log(config);
+      });
+  }
+}
+
 class OptionList extends React.Component {
+  Pricer = HegicOptions();
   state = {
     page: 0,
     count: 1,

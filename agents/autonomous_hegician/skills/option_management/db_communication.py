@@ -128,13 +128,16 @@ class DBCommunication:
     @staticmethod
     def create_agent(agent_address, params) -> Option:
         with flask_app.app_context():
-            agents = db.session.query(Agent).filter(
-                Agent.address == agent_address).all()
+            agents = (
+                db.session.query(Agent).filter(Agent.address == agent_address).all()
+            )
             if len(agents) == 0:
-                agent = Agent(address=agent_address,
-                              date_created=datetime.now(),
-                              date_updated=datetime.now(),
-                              status="running")
+                agent = Agent(
+                    address=agent_address,
+                    date_created=datetime.now(),
+                    date_updated=datetime.now(),
+                    status="running",
+                )
             else:
                 return agents[0].id
             db.session.merge(agent)

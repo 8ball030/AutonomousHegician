@@ -209,10 +209,7 @@ class ServiceRegistrationBehaviour(TickerBehaviour):
 
             elif (
                 strategy.deployment_status.get("btcoptions_get_pool", None) is None
-                and strategy.deployment_status.get(
-                    "ethpool",
-                )[0]
-                is not None
+                and strategy.deployment_status.get("ethpool",)[0] is not None
             ):
                 self._request_contract_state("btcoptions", "get_pool", {})
             elif (
@@ -425,10 +422,7 @@ class ServiceRegistrationBehaviour(TickerBehaviour):
             "pending",
             contract_api_dialogue.dialogue_label.dialogue_reference[0],
         )
-        contract_api_dialogue = cast(
-            ContractApiDialogue,
-            contract_api_dialogue,
-        )
+        contract_api_dialogue = cast(ContractApiDialogue, contract_api_dialogue,)
         contract_api_dialogue.terms = strategy.get_deploy_terms()
         self.context.outbox.put_message(message=contract_api_msg)
         self.context.logger.info(
@@ -459,10 +453,7 @@ class ServiceRegistrationBehaviour(TickerBehaviour):
             callable=callable,
             kwargs=ContractApiMessage.Kwargs(params),
         )
-        contract_api_dialogue = cast(
-            ContractApiDialogue,
-            contract_api_dialogue,
-        )
+        contract_api_dialogue = cast(ContractApiDialogue, contract_api_dialogue,)
         contract_api_dialogue.terms = strategy.get_deploy_terms()
         self.context.outbox.put_message(message=contract_api_msg)
         strategy.deployment_status[f"{contract_name}_{callable}"] = (
@@ -498,10 +489,7 @@ class ServiceRegistrationBehaviour(TickerBehaviour):
             callable=callable,
             kwargs=ContractApiMessage.Kwargs(params),
         )
-        contract_api_dialogue = cast(
-            ContractApiDialogue,
-            contract_api_dialogue,
-        )
+        contract_api_dialogue = cast(ContractApiDialogue, contract_api_dialogue,)
         contract_api_dialogue.terms = strategy.get_deploy_terms()
         self.context.outbox.put_message(message=contract_api_msg)
         strategy.deployment_status[f"{contract_name}_{callable}"] = (
@@ -565,10 +553,7 @@ class ServiceRegistrationBehaviour(TickerBehaviour):
             callable="get_deploy_transaction",
             kwargs=ContractApiMessage.Kwargs(params),
         )
-        contract_api_dialogue = cast(
-            ContractApiDialogue,
-            contract_api_dialogue,
-        )
+        contract_api_dialogue = cast(ContractApiDialogue, contract_api_dialogue,)
         contract_api_dialogue.terms = strategy.get_deploy_terms()
         self.context.outbox.put_message(message=contract_api_msg)
         strategy.deployment_status[contract_name] = (

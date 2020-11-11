@@ -88,11 +88,10 @@ class Strategy(Model):
     def setUp(self):
         """setup the agent."""
         pass
-        
+
     def update_agent_status(self, params):
         """Update the agents status."""
         self._database.update_agent(self.context.agent_address, params)
-        
 
     @property
     def current_order(self) -> None:
