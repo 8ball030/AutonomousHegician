@@ -30,7 +30,7 @@ from flask_restplus import Api, Resource
 from flask_restplus_sqlalchemy import ApiModelFactory
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import subqueryload
-from web3 import HTTPProvider, Web3
+from web3 import Web3
 
 
 logger = logging.getLogger(__name__)
@@ -261,10 +261,6 @@ class HegicOption(Resource):
 class web3_config(Resource):
     def _load_contracts(self):
         """Read in the contracts from the agent."""
-        w3 = Web3(HTTPProvider(os.environ.get("LEDGER")))
-        if not w3.isConnected():
-            raise ValueError("Not successfully conencted to the chain!")
-
         addresses = self._read_addresses()
         mapping = {
             "priceprovider": "FakePriceProvider.json",

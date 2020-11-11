@@ -2,7 +2,6 @@ import React from 'react';
 import { CircularProgress, Typography } from '@material-ui/core';
 import MUIDataTable from "mui-datatables";
 import { MuiThemeProvider } from '@material-ui/core/styles';
-
 import API from '../../api'
 
 import Highcharts from 'highcharts';
@@ -10,19 +9,46 @@ import {
   withHighcharts
 } from 'react-jsx-highcharts';
 
+const Web3 = require('web3');
 
-class HegicOptions{
+class HegicOptions {
   constructor() {
     API.get('get_web3_config')
-      .then(config => results.data)
-      .then(config=> {
-        console.log(config);
+      .then(results=> results.data)
+      .then(results=> {
+        this.config = results
+        console.log(results);
+        this.w3 = new Web3(new Web3.providers.HttpProvider(results.ledger_string))
+        this.btc_contract = new this.w3.eth.Contract(results.contract_abis.btcoptions.abi, results.contract_addresses.btcoptions);
+        this.eth_contract = new this.w3.eth.Contract(results.contract_abis.ethoptions.abi, results.contract_addresses.ethoptions);
+        this.estimate_cost("ETH", 60*60*24*2, 1000000, 200, 1 );
       });
+
   }
-}
+    estimate_cost(market, period, amount, strike, type) {
+
+    if (market == "ETH"){ 
+      let contract = this.eth_contract;
+          contract.methods.fees(period, amount, strike, type).call(function(err,res){
+             if(!err){
+                 console.log(res);
+             } else {
+                 console.log(err);
+             }
+              }  )
+        
+    }else{
+      let contract = this.btc_contract;
+      console.log(contract.methods.fees(period, amount, strike, type).call());
+    }
+  
+
+};}
+
+const Pricer = new HegicOptions()
+
 
 class OptionList extends React.Component {
-  Pricer = HegicOptions();
   state = {
     page: 0,
     count: 1,
