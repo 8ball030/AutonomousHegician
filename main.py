@@ -34,7 +34,7 @@ def run_tests():
     if code != 0:
         raise RuntimeError("Failed to destroy existing containers!")
     # start required containers
-    code = os.system("docker-compose up -d postgresdb ganachecli")
+    code = os.system("docker-compose up -d postgresdb ganachecli api")
     if code != 0:
         raise RuntimeError("Failed to start test environment containers!")
     # create db schema
@@ -59,7 +59,11 @@ def run_tests():
         raise RuntimeError(
             "Failed to update newly deployed contracts to Autonomous Hegician!"
         )
-    code = os.system("cd agents; pipenv run tests")
+    code = os.system("cd agents; pipenv run test_ah")
+    if code != 0:
+        raise RuntimeError("Failed to run integration tests successfully!")
+
+    code = os.system("cd agents; pipenv run test_ah_via_api")
     if code != 0:
         raise RuntimeError("Failed to run integration tests successfully!")
 

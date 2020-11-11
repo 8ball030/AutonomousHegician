@@ -14,9 +14,9 @@ connection_strings = {
 
 def parse_args():
     def is_acceptable_input(input_):
-        acceptable = list(connection_strings.keys())
+        acceptable = list(connection_strings.values())
         if input_ in acceptable:
-            return connection_strings[input_]
+            return input_
         else:
             raise ValueError(
                 f"{input_} is not a valid option. Must be one of {acceptable}"

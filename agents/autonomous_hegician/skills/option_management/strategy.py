@@ -81,10 +81,18 @@ class Strategy(Model):
         self._current_order = None
         self.eth_balance = None
         super().__init__(**kwargs)
+        self.agent_id = self._database.create_agent(self.context.agent_address, {})
         self.is_price_behaviour_active = True
         self.is_order_behaviour_active = False
 
-    #       self.context.logger.info(f"Contract status parameters {self.contract_status}")
+    def setUp(self):
+        """setup the agent."""
+        pass
+        
+    def update_agent_status(self, params):
+        """Update the agents status."""
+        self._database.update_agent(self.context.agent_address, params)
+        
 
     @property
     def current_order(self) -> None:
