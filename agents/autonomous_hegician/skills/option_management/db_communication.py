@@ -26,6 +26,7 @@ try:
         ExecutionStrategy,
         Option,
         Snapshot,
+        Agent,
         StatusCode,
         db,
         flask_app,
@@ -37,6 +38,7 @@ except Exception:
             Option,
             Snapshot,
             StatusCode,
+            Agent,
             db,
             flask_app,
         )
@@ -44,6 +46,7 @@ except Exception:
         from web_server import (  # type: ignore
             Option,
             Snapshot,
+            Agent,
             StatusCode,
             ExecutionStrategy,
             db,
@@ -121,6 +124,34 @@ class DBCommunication:
             db.session.commit()
             db.session.close()
         return option
+
+    @staticmethod
+    def create_agent(agent_address, params) -> Option:
+        with flask_app.app_context():
+            agents = db.session.query(Agent).filter(
+                Agent.address == agent_address).all()
+            if len(agents) == 0:
+                agent = Agent(address=agent_address,
+                              date_created=datetime.now(),
+                              date_updated=datetime.now(),
+                              status="running")
+            else:
+                return agents[0].id
+            db.session.merge(agent)
+            db.session.commit()
+            db.session.close()
+        return agent.id
+
+    @staticmethod
+    def update_agent(agent_address, params) -> Option:
+        with flask_app.app_context():
+            agent = db.session.query(Agent).filter(Agent.address == agent_address).one()
+            for key, value in params.items():
+                setattr(agent, key, value)
+            db.session.merge(agent)
+            db.session.commit()
+            db.session.close()
+        return agent
 
     @staticmethod
     def delete_options() -> bool:

@@ -74,13 +74,19 @@ class SnapShot(TickerBehaviour):
             * float(self.context.behaviours.price_ticker.current_price[ETH]),
             date_created=datetime.now(),
             date_updated=datetime.now(),
-            address=self.context.agent_address,
+            agent_id=strategy.agent_id,
         )
         orders = strategy.retrieve_orders(OPEN)
         for order in orders:
             order.update_with_fees(
                 self.context.behaviours.price_ticker.current_price[order.market]
             )
+        update = {"status": "running",
+                  "date_updated": datetime.now(),
+                  "status": "running"}
+        
+                  
+        strategy.update_agent_status(update)
         strategy.create_new_snapshot(snapshot_params)
 
     def __init__(self, **kwargs):

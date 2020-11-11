@@ -34,8 +34,12 @@ First, install docker as per their [guide](https://docs.docker.com/get-docker/).
 
 Second, run the following command:
 ``` bash
-docker-compose up -d
+python main.py
 ```
+This will give you the choice of
+
+A) Run full local tests. - As expected this will deploy the full test suite locally.
+B) Launch Local Live Autonomous Hegician.
 
 This will launch 4 containers
 
@@ -51,7 +55,9 @@ Once the containers have built and launched, the front end is accessible from;
 
 ## 3. Optionally learn about the Architecture
 
-![Proposal for Poc of Behavior Auto-Execution](https://github.com/8ball030/AutonomousHegician/blob/master/schema/Architecture.jpg)
+Please review the documentation available;
+
+[Documents](./docs)
 
 
 ## Instructions for Developers
@@ -79,8 +85,6 @@ Make sure ganache is installed:
 ``` bash
 npm install -g ganache-cli
 ```
-
-The directory `hegic_contracts` is kept for reference.
 
 ## Tests
 To run tests, the Hegic contracts must first be deployed.

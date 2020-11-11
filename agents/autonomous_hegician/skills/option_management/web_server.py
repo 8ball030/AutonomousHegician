@@ -142,7 +142,6 @@ class Snapshot(db.Model):  # type: ignore
     date_updated = db.Column(db.DateTime)
     usd_val = db.Column(db.Float)
     eth_val = db.Column(db.Float)
-    address = db.Column(db.String(255))
     agent_id = db.Column(db.ForeignKey("Agents.id"))
 
     def as_dict(self):
@@ -214,7 +213,13 @@ class HegicOptions(Resource):
 @api.route("/get_all_agents")
 class HegicAgents(Resource):
     def get(self):
-        return db.session.query(Agent).all()
+        results = []
+        for res in [i.as_dict() for i in db.session.query(Agent).all()]:
+            for k, v in res.items():
+                if k.find("date") >= 0:
+                    res[k] = str(v)
+            results.append(res)
+        return results
 
 
 @api.route("/get_snapshots")
