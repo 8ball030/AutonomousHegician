@@ -4,7 +4,6 @@ import {
   Button,
 } from "@material-ui/core";
 import { withRouter } from "react-router-dom";
-import classnames from "classnames";
 import Widget from "../../components/Widget";
 import { Typography } from "../../components/Wrappers";
 
@@ -16,7 +15,6 @@ import logo from "./logo.png";
 
 // context
 import { useUserDispatch, loginUser } from "../../context/UserContext";
-import { makeStyles } from "@material-ui/styles";
 
 function Login(props) {
   var classes = useStyles();

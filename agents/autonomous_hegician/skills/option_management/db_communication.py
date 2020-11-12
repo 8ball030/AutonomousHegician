@@ -23,10 +23,10 @@ from typing import Dict
 
 try:
     from packages.eightballer.skills.option_management.web_server import (
+        Agent,
         ExecutionStrategy,
         Option,
         Snapshot,
-        Agent,
         StatusCode,
         db,
         flask_app,
@@ -34,11 +34,11 @@ try:
 except Exception:
     try:
         from .web_server import (
+            Agent,
             ExecutionStrategy,
             Option,
             Snapshot,
             StatusCode,
-            Agent,
             db,
             flask_app,
         )

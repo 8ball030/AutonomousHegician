@@ -1,5 +1,6 @@
 """Script to update AH with contract configs."""
 
+from argparse import ArgumentParser
 from collections import OrderedDict
 from typing import Any, Dict, List
 
@@ -12,6 +13,7 @@ def get_new_addresses(config_path="./hegic_deployer/contract_config.yaml"):
     """Get the contract addresses from the deployer."""
     with open(config_path, "r") as f:
         addresses = yaml.safe_load(f)
+        print(addresses)
     return addresses
 
 
@@ -27,12 +29,18 @@ def update_ah_config_with_new_config(
     skill_config["models"]["strategy"]["args"] = OrderedDict(addresses)
     full_config_updated = [full_config[0], skill_config] + full_config[2:]
     with open(file_path, "w") as fp:
+        print(full_config_updated)
         yaml_dump_all(full_config_updated, fp)
 
 
 def do_work():
     """Run the script."""
-    addresses = get_new_addresses()
+    parser = ArgumentParser("Update the ah with contracts.")
+    parser.add_argument(
+        "-fp", "--file_path", default="./autonomous_hegician/aea-config.yaml"
+    )
+    args = parser.parse_args()
+    addresses = get_new_addresses(args.file_path)
     update_ah_config_with_new_config(addresses)
     print("Configurations copied.")
 

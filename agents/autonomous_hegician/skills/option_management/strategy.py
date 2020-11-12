@@ -86,7 +86,7 @@ class Strategy(Model):
         self.is_order_behaviour_active = False
 
     def setUp(self):
-        """setup the agent."""
+        """Setup the agent."""
         pass
 
     def update_agent_status(self, params):
