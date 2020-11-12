@@ -10,7 +10,6 @@ import {
 } from 'react-jsx-highcharts';
 
 
-
 class OptionList extends React.Component {
   state = {
     page: 0,
