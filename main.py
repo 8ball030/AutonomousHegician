@@ -8,7 +8,6 @@ Authorised use only
 """
 import os
 import sys
-import time
 from argparse import ArgumentParser
 
 AH_LOGO = "    _         _                                              \n   / \\  _   _| |_ ___  _ __   ___  _ __ ___   ___  _   _ ___ \n  / _ \\| | | | __/ _ \\| '_ \\ / _ \\| '_ ` _ \\ / _ \\| | | / __|\n / ___ \\ |_| | || (_) | | | | (_) | | | | | | (_) | |_| \\__ \\\n/_/   \\_\\__,_|\\__\\___/|_| |_|\\___/|_| |_| |_|\\___/ \\__,_|___/\n                                                             \n _   _            _      _             \n| | | | ___  __ _(_) ___(_) __ _ _ __  \n| |_| |/ _ \\/ _` | |/ __| |/ _` | '_ \\ \n|  _  |  __/ (_| | | (__| | (_| | | | |\n|_| |_|\\___|\\__, |_|\\___|_|\\__,_|_| |_|\n            |___/                      \n"
@@ -18,7 +17,7 @@ NUMBER_DB_CREATIONS = 1
 def parse_args():
     """Parse arguments."""
     parser = ArgumentParser(description="Cli tool for the Autonomouse Hegician.")
-    parser.add_argument('-d', "--dev_mode", action='store_true')
+    parser.add_argument("-d", "--dev_mode", action="store_true")
     parser.add_argument(
         "-o",
         "--options",
@@ -28,10 +27,10 @@ def parse_args():
     return parser.parse_args()
 
 
-def docker_cleanup(func): 
-    '''Decorator that manages docker teardown before and after.'''
+def docker_cleanup(func):
+    """Decorator that manages docker teardown before and after."""
 
-    def wrap(*args, **kwargs): 
+    def wrap(*args, **kwargs):
         code = os.system("docker-compose down")
         if code != 0:
             raise RuntimeError("Failed to destroy existing containers!")
@@ -43,10 +42,12 @@ def docker_cleanup(func):
             code = os.system("docker-compose down")
             if code != 0:
                 print(f"Error on `docker-compose down`. Code={code}")
-              
+
         return result
-    return wrap 
-  
+
+    return wrap
+
+
 @docker_cleanup
 def run_tests():
     """Run all tests."""
@@ -70,7 +71,9 @@ def run_tests():
     code = os.system("cd agents; pipenv run update_ledger")
     if code != 0:
         raise RuntimeError("Failed to update ledger of Autonomous Hegician!")
-    deploy_contracts_to_testnet()
+    code = os.system("cd agents; pipenv run deploy_contracts")
+    if code != 0:
+        raise RuntimeError("Deploying contracts has failed!")
     code = os.system("cd agents; pipenv run update_contracts_testnet")
     if code != 0:
         raise RuntimeError(
@@ -115,7 +118,6 @@ def setup_live():
     if code != 0:
         raise RuntimeError("Deploying contracts has failed!")
     launch_containers()
-    
 
 
 def update_ah_config(config="testnet"):
@@ -127,7 +129,6 @@ def update_ah_config(config="testnet"):
 
         if sum([i, i2, i3]) != 0:
             raise RuntimeError("Updateing the AH config has failed!")
-
 
 
 def main():

@@ -2,16 +2,20 @@
 
 import json
 import os
+import signal
 import subprocess
 import sys
 import time
 import unittest
 from copy import deepcopy
 from datetime import datetime, timedelta
-from multiprocessing import Process
 
 import web3
 import yaml
+
+
+# from multiprocessing import Process
+
 
 
 # we need access to the database, so we will piggy back off the option monitoring skill
@@ -45,8 +49,9 @@ deployer_address = w3.eth.coinbase
 def launch_autonomous_hegician():
     """Emulate the AH launch."""
     command = "cd autonomous_hegician/; aea -s run"
-    p = Process(target=subprocess.run, args=[command], kwargs={"shell": True})
-    p.start()
+    p = subprocess.Popen(
+        command, stdout=subprocess.PIPE, shell=True, preexec_fn=os.setsid
+    )
     time.sleep(10)  # give it time to start up
     return p
 
@@ -121,8 +126,7 @@ class TestOptionExecutionTester(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        agent.terminate()
-        os.system("pkill -f libp2p_node")
+        os.killpg(os.getpgid(agent.pid), signal.SIGTERM)
 
     @classmethod
     def setUpClass(cls):
