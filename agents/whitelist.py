@@ -205,6 +205,7 @@ date_modified  # unused variable (autonomous_hegician/skills/option_management/w
 agent_id  # unused variable (autonomous_hegician/skills/option_management/web_server.py:102)
 date_updated  # unused variable (autonomous_hegician/skills/option_management/web_server.py:141)
 usd_val  # unused variable (autonomous_hegician/skills/option_management/web_server.py:142)
+total_cost  # unused variable (autonomous_hegician/skills/option_management/web_server.py:103)
 agent_id  # unused variable (autonomous_hegician/skills/option_management/web_server.py:145)
 date_updated  # unused variable (autonomous_hegician/skills/option_management/web_server.py:156)
 snapshot_model  # unused variable (autonomous_hegician/skills/option_management/web_server.py:175)

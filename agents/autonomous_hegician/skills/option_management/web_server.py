@@ -100,6 +100,7 @@ class Option(db.Model):  # type: ignore
     expiration_date = db.Column(db.DateTime(timezone=True))
     breakeven = db.Column(db.BigInteger(), default=0)
     current_pnl = db.Column(db.BigInteger(), default=0)
+    total_cost = db.Column(db.BigInteger(), default=0)
     agent_id = db.Column(db.ForeignKey("Agents.id"))
 
     execution_strategy = db.relationship(
