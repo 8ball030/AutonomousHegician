@@ -36,13 +36,14 @@ class HegicOptions {
       });
 
   }
-    estimate_cost(market, period, amount, strike, type) {
+  async  estimate_cost(market, period, amount, strike, type) {
 
     if (market == "ETH"){ 
       let contract = this.eth_contract;
           contract.methods.fees(period, amount, strike, type).call(function(err,res){
              if(!err){
                  console.log(res);
+                 return res
              } else {
                  console.log(err);
              }
@@ -101,7 +102,7 @@ export const OptionForm = () => {
                                         state.option_type
                                         );
 
-      setState((state) => ({...state, ["total_cost"]: fees}));
+      setState((state) => ({...state, ["total_cost"]: fees.total}));
       console.log(fees);
     }
   }
@@ -235,13 +236,19 @@ export const OptionForm = () => {
           </FormControl>
         }
 
-        <Button onClick={sendToAgent} variant="contained" color="primary" size="medium">
-          Send to Agent
-          </Button>
       </form>
       <div>
-        <h2>Total Cost : {state.total_cost}</h2>
+        <h2>Total Cost : </h2>
+          <h4>{state.total_cost}</h4>
+      </div>
+      <div>
         <h2>Break Even: {state.breakeven}</h2>
+      </div>
+
+      <div>
+        <Button onClick={sendToAgent} variant="contained" color="primary" size="medium">
+          Send to Agent
+        </Button>
       </div>
     </div>
   </div>

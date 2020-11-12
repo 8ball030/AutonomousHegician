@@ -15,6 +15,7 @@ AH_LOGO = "    _         _                                              \n   / \
 NUMBER_DB_CREATIONS = 1
 
 
+
 def parse_args():
     """Parse arguments."""
     parser = ArgumentParser(description="Cli tool for the Autonomouse Hegician.")
@@ -90,7 +91,7 @@ def launch_containers():
 
     
 def setup_live():
-    code = os.system("cd agents; pipenv run deploy_contracts_live")
+    code = os.system("cd agents; pipenv run update_contracts_live")
     if code != 0:
         raise RuntimeError("Deploying contracts has failed!")
     launch_containers()
