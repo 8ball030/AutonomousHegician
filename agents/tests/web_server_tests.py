@@ -274,7 +274,7 @@ if __name__ == "__main__":
                 )
             ]
         )
-        results = unittest.TextTestRunner().run(partial)
+        results = unittest.TextTestRunner().run(partial)  # type: ignore
     if len(results.failures) == 0 and len(results.errors) == 0:  # type: ignore
         print("All tests passed!")
         sys.exit(0)

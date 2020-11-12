@@ -51,13 +51,13 @@ description: The hegic deploy skill has the ability to deploy and interact with 
 fingerprint:
   README.md: QmSPKqYqzJdf3NmviqGwZfdsuhTQ2NrNSzktPX9Un78FDx
   __init__.py: QmanmQfdWSEPtEKJCt6sz6S13ju3o7D7oSzriBkVABAARj
-  behaviours.py: QmYeabyybGHixD4BgEefffb2eP66V8gkQUJ9rNN631qJcC
-  db_communication.py: Qmc2hs59JW48ezBrxVSkrvj64Qw9vk5mWieY1KFZn39Bo2
+  behaviours.py: QmdGY6LqoM4BS7wcXgCYn93zNLdPtTrNSotRyYdMg42TW7
+  db_communication.py: QmdNtqs5hhaBS69t4Z96rZVnjjbGetGj1Nv8Q9x8WNRN5z
   dex_wrapper.py: QmZM19jvfPL9uTCdENY56uhUPxwj1VDM1TzuRMSPemepnP
   dialogues.py: QmTYVyD9o8qNFwiKQGHxGjmXTzeSVShdXNq4pXpVxvdjoo
-  handlers.py: QmX8STY9Biyx3i8YDt91uGEbMiTTbyVQr6Jj6VinJywk9G
-  strategy.py: QmTABQTNPKm6Jr39UZ9M4AVm4VaEEPGbDbPSqzv5xbbF2V
-  web_server.py: QmWNWiykJfHhXxpX3SztXi2yf2vAXbKiR91ULn6NWucMR9
+  handlers.py: QmXrjjB6ZT9d6iqpnDF2SiPvqqCahWK7wX463rsm6d66eL
+  strategy.py: QmdjYpRQsNSd4hWHWQGArtKB1fSWWKhgTjh4iQuBBuSDEn
+  web_server.py: QmWVXHGxocEEaQS3cmK9gBhk6nwCqRwvu9YnvKsmXvgcw9
 fingerprint_ignore_patterns: []
 handlers:
   contract_api:
