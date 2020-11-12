@@ -28,12 +28,28 @@ def parse_args():
     return parser.parse_args()
 
 
+def docker_cleanup(func): 
+    '''Decorator that manages docker teardown before and after.'''
+
+    def wrap(*args, **kwargs): 
+        code = os.system("docker-compose down")
+        if code != 0:
+            raise RuntimeError("Failed to destroy existing containers!")
+        try:
+            result = func(*args, **kwargs)
+        except RuntimeError:
+            raise
+        finally:
+            code = os.system("docker-compose down")
+            if code != 0:
+                print(f"Error on `docker-compose down`. Code={code}")
+              
+        return result
+    return wrap 
+  
+@docker_cleanup
 def run_tests():
     """Run all tests."""
-    # remove all containers
-    code = os.system("docker-compose down")
-    if code != 0:
-        raise RuntimeError("Failed to destroy existing containers!")
     # start required containers
     code = os.system("docker-compose up -d postgresdb ganachecli api")
     if code != 0:
@@ -67,7 +83,6 @@ def run_tests():
     code = os.system("cd agents; pipenv run test_ah_via_api")
     if code != 0:
         raise RuntimeError("Failed to run api integration tests successfully!")
-
 
 def deploy_contracts_to_testnet():
     """Deploy contracts to testnet."""
