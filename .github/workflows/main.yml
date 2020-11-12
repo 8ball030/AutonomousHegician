@@ -99,4 +99,4 @@ jobs:
           pipenv install --skip-lock
           pipenv run update_ledger
           cd ../
-          python main.py -o 1,2,3
+          python main.py -d -o 1,2,3
