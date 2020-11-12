@@ -18,7 +18,7 @@ NUMBER_DB_CREATIONS = 1
 def parse_args():
     """Parse arguments."""
     parser = ArgumentParser(description="Cli tool for the Autonomouse Hegician.")
-    parser.add_argument('-d', "--dev_mode", default="False",)
+    parser.add_argument('-d', "--dev_mode", action='store_true')
     parser.add_argument(
         "-o",
         "--options",
@@ -137,17 +137,17 @@ def main():
         )
     }
     args = parse_args()
-    if args.options != "":
+    if args.dev_mode:
         choices = dev_choices
+    if args.options != "":
         for k in [k for k in args.options.split(",") if k != ""]:
             try:
-                print(f"Executing {k}...   {choices[int(k)][0]}")
-                choices[int(k)][1]()
+                name, func = choices[int(k)]
+                print(f"Executing {k}...   {name}")
+                func()
             except KeyError:
                 print("Invalid options selected!")
         return
-    if args.dev_mode == "t":
-        choices = dev_choices
     print("Please choose from the following actions;")
     [print(f"\n{i[0]}. {i[1][0]}") for i in choices.items()]
     try:
