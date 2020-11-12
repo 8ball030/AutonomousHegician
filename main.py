@@ -38,8 +38,11 @@ def run_tests():
     code = os.system("docker-compose up -d postgresdb ganachecli api")
     if code != 0:
         raise RuntimeError("Failed to start test environment containers!")
+    # install env
+    code = os.system("cd agents; pipenv install --skip-lock")
+    if code != 0:
+        raise RuntimeError("Failed to install dependencies!")
     # create db schema
-    time.sleep(1)
     cmd = "cd agents; pipenv run python autonomous_hegician/skills/option_management/db_communication.py"
     for _ in range(NUMBER_DB_CREATIONS):
         code = os.system(cmd)
@@ -48,9 +51,6 @@ def run_tests():
     if code != 0:
         raise RuntimeError("Failed to create database!")
     # run tests
-    code = os.system("cd agents; pipenv install --skip-lock")
-    if code != 0:
-        raise RuntimeError("Failed to install dependencies!")
     code = os.system("cd agents; pipenv run update_ledger")
     if code != 0:
         raise RuntimeError("Failed to update ledger of Autonomous Hegician!")
