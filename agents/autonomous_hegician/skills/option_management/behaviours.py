@@ -81,11 +81,12 @@ class SnapShot(TickerBehaviour):
             order.update_with_fees(
                 self.context.behaviours.price_ticker.current_price[order.market]
             )
-        update = {"status": "running",
-                  "date_updated": datetime.now(),
-                  "status": "running"}
-        
-                  
+        update = {
+            "status": "running",
+            "date_updated": datetime.now(),
+            "status": "running",
+        }
+
         strategy.update_agent_status(update)
         strategy.create_new_snapshot(snapshot_params)
 
