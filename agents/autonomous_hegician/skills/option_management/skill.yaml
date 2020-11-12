@@ -57,7 +57,7 @@ fingerprint:
   dialogues.py: QmTYVyD9o8qNFwiKQGHxGjmXTzeSVShdXNq4pXpVxvdjoo
   handlers.py: QmX8STY9Biyx3i8YDt91uGEbMiTTbyVQr6Jj6VinJywk9G
   strategy.py: QmTABQTNPKm6Jr39UZ9M4AVm4VaEEPGbDbPSqzv5xbbF2V
-  web_server.py: QmYuTWCc2CGwCRJZ13XAsQD5ZkCnVkLhQnHxsrujCvjX4Q
+  web_server.py: QmWNWiykJfHhXxpX3SztXi2yf2vAXbKiR91ULn6NWucMR9
 fingerprint_ignore_patterns: []
 handlers:
   contract_api:
