@@ -18,8 +18,8 @@
 # ------------------------------------------------------------------------------
 
 """This package contains the behaviour of a erc1155 deploy skill AEA."""
-import sys
 
+import sys
 from typing import Any, Dict, Union, cast
 
 import web3
