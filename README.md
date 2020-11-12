@@ -38,8 +38,8 @@ python main.py
 ```
 This will give you the choice of
 
-A) Run full local tests. - As expected this will deploy the full test suite locally.
-B) Launch Local Live Autonomous Hegician.
+- A) Run full local tests. - As expected this will deploy the full test suite locally.
+- B) Launch Local Live Autonomous Hegician.
 
 This will launch 4 containers
 

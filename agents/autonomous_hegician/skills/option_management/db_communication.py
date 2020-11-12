@@ -23,10 +23,10 @@ from typing import Dict
 
 try:
     from packages.eightballer.skills.option_management.web_server import (
+        Agent,
         ExecutionStrategy,
         Option,
         Snapshot,
-        Agent,
         StatusCode,
         db,
         flask_app,
@@ -34,11 +34,11 @@ try:
 except Exception:
     try:
         from .web_server import (
+            Agent,
             ExecutionStrategy,
             Option,
             Snapshot,
             StatusCode,
-            Agent,
             db,
             flask_app,
         )
@@ -128,13 +128,16 @@ class DBCommunication:
     @staticmethod
     def create_agent(agent_address, params) -> Option:
         with flask_app.app_context():
-            agents = db.session.query(Agent).filter(
-                Agent.address == agent_address).all()
+            agents = (
+                db.session.query(Agent).filter(Agent.address == agent_address).all()
+            )
             if len(agents) == 0:
-                agent = Agent(address=agent_address,
-                              date_created=datetime.now(),
-                              date_updated=datetime.now(),
-                              status="running")
+                agent = Agent(
+                    address=agent_address,
+                    date_created=datetime.now(),
+                    date_updated=datetime.now(),
+                    status="running",
+                )
             else:
                 return agents[0].id
             db.session.merge(agent)

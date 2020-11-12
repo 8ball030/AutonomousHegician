@@ -18,11 +18,12 @@ NUMBER_DB_CREATIONS = 1
 def parse_args():
     """Parse arguments."""
     parser = ArgumentParser(description="Cli tool for the Autonomouse Hegician.")
+    parser.add_argument('-d', "--dev_mode", default="False",)
     parser.add_argument(
         "-o",
         "--options",
         help="Comma seperated list of actions to take.",
-        required=True,
+        default="",
     )
     return parser.parse_args()
 
@@ -54,7 +55,7 @@ def run_tests():
     if code != 0:
         raise RuntimeError("Failed to update ledger of Autonomous Hegician!")
     deploy_contracts_to_testnet()
-    code = os.system("cd agents; pipenv run update_contracts")
+    code = os.system("cd agents; pipenv run update_contracts_testnet")
     if code != 0:
         raise RuntimeError(
             "Failed to update newly deployed contracts to Autonomous Hegician!"
@@ -65,7 +66,7 @@ def run_tests():
 
     code = os.system("cd agents; pipenv run test_ah_via_api")
     if code != 0:
-        raise RuntimeError("Failed to run integration tests successfully!")
+        raise RuntimeError("Failed to run api integration tests successfully!")
 
 
 def deploy_contracts_to_testnet():
@@ -84,8 +85,16 @@ def launch_containers():
     if code != 0:
         raise RuntimeError("Launching containers has failed!")
     print(
-        "Containers running in background. Visit: `http://0.0.0.0:3001`. To shut down: `docker-compose down`."
+        "Containers running in background.\nVisit: `http://0.0.0.0:3001`.\nTo shut down: `docker-compose down`."
     )
+
+    
+def setup_live():
+    code = os.system("cd agents; pipenv run deploy_contracts_live")
+    if code != 0:
+        raise RuntimeError("Deploying contracts has failed!")
+    launch_containers()
+    
 
 
 def update_ah_config(config="testnet"):
@@ -99,42 +108,55 @@ def update_ah_config(config="testnet"):
             raise RuntimeError("Updateing the AH config has failed!")
 
 
-choices = {
-    k + 1: v
-    for k, v in enumerate(
-        [
-            ["Deploy contracts to Ganache Testnet.", deploy_contracts_to_testnet],
-            [
-                "Update Autonomous Hegicician with contracts and ledger from .env",
-                update_ah_config,
-            ],
-            ["Run local tests.", run_tests],
-            ["Launch containerised Autonomous Hegician.", launch_containers],
-        ]
-    )
-}
-
 
 def main():
     """Run the main method."""
-    if len(sys.argv) == 1:
-        print("Please choose from the following actions;")
-        [print(f"\n{i[0]}. {i[1][0]}") for i in choices.items()]
-        try:
-            i = int(input())
-            name, func = choices[i]
-            print(f"\nRunning:\n\n{name}\n")
-        except KeyError:
-            print("Invalid option!")
-        func()
-    else:
-        args = parse_args()
+    dev_choices = {
+        k + 1: v
+        for k, v in enumerate(
+            [
+                ["Deploy contracts to Ganache Testnet.", deploy_contracts_to_testnet],
+                [
+                    "Update Autonomous Hegicician with contracts and ledger from .env",
+                    update_ah_config,
+                ],
+                ["Run local tests.", run_tests],
+                ["Launch containerised Autonomous Hegician.", launch_containers],
+                ["Launch live containerised Autonomous Hegician.", setup_live],
+            ]
+        )
+    }
+
+    choices = {
+        k + 1: v
+        for k, v in enumerate(
+            [
+                ["Run local tests.", run_tests],
+                ["Launch live containerised Autonomous Hegician.", setup_live],
+            ]
+        )
+    }
+    args = parse_args()
+    if args.options != "":
+        choices = dev_choices
         for k in [k for k in args.options.split(",") if k != ""]:
             try:
                 print(f"Executing {k}...   {choices[int(k)][0]}")
                 choices[int(k)][1]()
             except KeyError:
                 print("Invalid options selected!")
+        return
+    if args.dev_mode == "t":
+        choices = dev_choices
+    print("Please choose from the following actions;")
+    [print(f"\n{i[0]}. {i[1][0]}") for i in choices.items()]
+    try:
+        i = int(input())
+        name, func = choices[i]
+        print(f"\nRunning:\n\n{name}\n")
+    except KeyError:
+        print("Invalid option!")
+    func()
 
 
 def check_python_version():

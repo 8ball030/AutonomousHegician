@@ -76,7 +76,7 @@ jobs:
   integration_tests:
     continue-on-error: False
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@master
       - uses: actions/setup-python@master

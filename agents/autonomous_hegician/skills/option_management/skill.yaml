@@ -83,7 +83,7 @@ models:
     class_name: SigningDialogues
   strategy:
     args:
-      btcoptions: '0xf5A7BBB74dBd1FB6A23eb26a8ADc0D36FE539284'
+      btcoptions: ''
       btcpool: '0xd9c2EDC1b22481c4Dfe821280f7279AcC094172F'
       btcpriceprovider: '0xd289531C3a34cE4dAB914D1606bBc48080a166F4'
       ethoptions: '0x32D2c3d0332bA1F07BA9EDeafCc288F37072ce6D'

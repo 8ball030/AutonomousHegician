@@ -85,14 +85,9 @@ class Strategy(Model):
         self.is_price_behaviour_active = True
         self.is_order_behaviour_active = False
 
-    def setUp(self):
-        """setup the agent."""
-        pass
-        
     def update_agent_status(self, params):
         """Update the agents status."""
         self._database.update_agent(self.context.agent_address, params)
-        
 
     @property
     def current_order(self) -> None:

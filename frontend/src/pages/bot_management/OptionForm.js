@@ -10,8 +10,10 @@ import {
   Slider,
 } from "@material-ui/core";
 import Typography from '@material-ui/core/Typography';
+import {Decimal} from 'decimal.js';
 
 import API from '../../api'
+const Web3 = require('web3');
 
 const orderPlaceHolderMapping = {
   "0": {},
@@ -20,12 +22,48 @@ const orderPlaceHolderMapping = {
   "3": {"limit_price": 389.00},
 }
 
+class HegicOptions {
+  constructor() {
+    API.get('get_web3_config')
+      .then(results=> results.data)
+      .then(results=> {
+        this.config = results
+        console.log(results);
+        this.w3 = new Web3(new Web3.providers.HttpProvider(results.ledger_string))
+        this.btc_contract = new this.w3.eth.Contract(results.contract_abis.btcoptions.abi, results.contract_addresses.btcoptions);
+        this.eth_contract = new this.w3.eth.Contract(results.contract_abis.ethoptions.abi, results.contract_addresses.ethoptions);
+        this.estimate_cost("ETH", 60*60*24*2, 1000000, 200, 1 );
+      });
+
+  }
+    estimate_cost(market, period, amount, strike, type) {
+
+    if (market == "ETH"){ 
+      let contract = this.eth_contract;
+          contract.methods.fees(period, amount, strike, type).call(function(err,res){
+             if(!err){
+                 console.log(res);
+             } else {
+                 console.log(err);
+             }
+              }  )
+        
+    }else{
+      let contract = this.btc_contract;
+      console.log(contract.methods.fees(period, amount, strike, type).call());
+    }
+  
+
+};}
+
+const Pricer = new HegicOptions()
+
 export const OptionForm = () => {
   const [state, setState] = useState({
     amount: '',
     date_created: '',
     date_modified: '',
-    execution_strategy_id: '0',
+    execution_strategy_id: "0",
     expiration_date: '',
     fees: '',
     id: '',
@@ -36,6 +74,8 @@ export const OptionForm = () => {
     status_code_id: '',
     strike_price: '',
     params: {},
+    total_cost: 0,
+    breakeven: 0,
   });
   const [validationErrors, setValidationErrors] = useState({});
   const onChange = name => (e, newValue) => {
@@ -43,7 +83,45 @@ export const OptionForm = () => {
       newValue = e.target.value;
     }
     setState((state) => ({ ...state, [name]: newValue }));
+    if (isValid()){
+      console.log("Ready to Order!");
+
+      const amount = (state.amount* 100000000)
+      const price = (state.strike_price * 100000000)
+      const period = (state.period * 60 * 60)
+
+      console.log(amount + " " + price + " " + period , state.option_type)
+      console.log()
+
+
+      const fees = Pricer.estimate_cost(state.market, 
+                                        state.period * 60 * 60, 
+                                        amount,
+                                        price,
+                                        state.option_type
+                                        );
+
+      setState((state) => ({...state, ["total_cost"]: fees}));
+      console.log(fees);
+    }
   }
+  
+  const isValid = () => {
+    const validation = {
+      strike_price: val => +val > 0,
+      amount: val => +val > 0,
+    };
+
+    let valid = true;
+    Object.entries(validation).forEach(([key, val]) => {
+      setValidationErrors((state) => ({ ...state, [key]: val(state[key]) }));
+      if (!val(state[key])) {
+        valid = false;
+      }
+    });
+    return valid
+  }
+  
   const sendToAgent = () => {
 
     const validation = {
@@ -57,6 +135,7 @@ export const OptionForm = () => {
       if (!val(state[key])) {
         valid = false;
       }
+
     });
 
     if (valid) {
@@ -82,6 +161,7 @@ export const OptionForm = () => {
         padding: 20
       }}
     >
+      <div>
       <form style={{ width: "50%" }}>
         <h1>Option Creation</h1>
 
@@ -139,7 +219,7 @@ export const OptionForm = () => {
 
          {false &&
         <FormControl component="fieldset" margin="normal" fullWidth>
-          <RadioGroup aria-label="type_of_order" name="type_of_order" onChange={onChange('type_of_order')}>
+          <RadioGroup aria-label="type_of_order" name="type_of_order" onChange={onChange('type_of_order')} value={state.type_of_order}>
             <FormControlLabel value="0" control={<Radio />} label="Auto ITM Closure" />
             <FormControlLabel value="1" control={<Radio />} label="Take Profit" />
             <FormControlLabel value="2" control={<Radio />} label="Take Profit &amp; Auto ITM Closure" />
@@ -159,7 +239,12 @@ export const OptionForm = () => {
           Send to Agent
           </Button>
       </form>
+      <div>
+        <h2>Total Cost : {state.total_cost}</h2>
+        <h2>Break Even: {state.breakeven}</h2>
+      </div>
     </div>
+  </div>
   );
 }
 

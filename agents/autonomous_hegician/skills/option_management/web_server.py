@@ -30,7 +30,7 @@ from flask_restplus import Api, Resource
 from flask_restplus_sqlalchemy import ApiModelFactory
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import subqueryload
-from web3 import HTTPProvider, Web3
+from web3 import Web3
 
 
 logger = logging.getLogger(__name__)
@@ -100,6 +100,7 @@ class Option(db.Model):  # type: ignore
     expiration_date = db.Column(db.DateTime(timezone=True))
     breakeven = db.Column(db.BigInteger(), default=0)
     current_pnl = db.Column(db.BigInteger(), default=0)
+    total_cost = db.Column(db.BigInteger(), default=0)
     agent_id = db.Column(db.ForeignKey("Agents.id"))
 
     execution_strategy = db.relationship(
@@ -261,10 +262,6 @@ class HegicOption(Resource):
 class web3_config(Resource):
     def _load_contracts(self):
         """Read in the contracts from the agent."""
-        w3 = Web3(HTTPProvider(os.environ.get("LEDGER")))
-        if not w3.isConnected():
-            raise ValueError("Not successfully conencted to the chain!")
-
         addresses = self._read_addresses()
         mapping = {
             "priceprovider": "FakePriceProvider.json",

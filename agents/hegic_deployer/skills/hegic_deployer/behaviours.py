@@ -19,6 +19,7 @@
 
 """This package contains the behaviour of a erc1155 deploy skill AEA."""
 
+import sys
 from typing import Any, Dict, Union, cast
 
 import web3
@@ -391,12 +392,8 @@ class ServiceRegistrationBehaviour(TickerBehaviour):
                         "****Functionality Test of btc contracts complete!"
                     )
                     strategy.deployment_status["status"] = "complete"
-                    import sys
 
                     sys.exit()
-                    import pdb
-
-                    pdb.set_trace()
 
     def _option_interaction(
         self, option_type: str, act: str, params: Dict[str, Any]
