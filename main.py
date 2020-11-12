@@ -84,16 +84,22 @@ def run_tests():
     if code != 0:
         raise RuntimeError("Failed to run api integration tests successfully!")
 
+
+@docker_cleanup
 def deploy_contracts_to_testnet():
     """Deploy contracts to testnet."""
     code = os.system("docker-compose up -d ganachecli")
     if code != 0:
         raise RuntimeError("Failed to started local chain")
+    code = os.system("cd agents; pipenv install --skip-lock")
+    if code != 0:
+        raise RuntimeError("Failed to install dependencies!")
     code = os.system("cd agents; pipenv run deploy_contracts")
     if code != 0:
         raise RuntimeError("Deploying contracts has failed!")
 
 
+@docker_cleanup
 def launch_containers():
     """Launch docker containers."""
     code = os.system("docker-compose up -d --build")
@@ -103,7 +109,7 @@ def launch_containers():
         "Containers running in background.\nVisit: `http://0.0.0.0:3001`.\nTo shut down: `docker-compose down`."
     )
 
-    
+
 def setup_live():
     code = os.system("cd agents; pipenv run deploy_contracts_live")
     if code != 0:
