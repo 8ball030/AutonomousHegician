@@ -65,4 +65,4 @@ type: connection
 config:
   ledger_apis:
     ethereum:
-      address: http://localhost:7545
+      address: https://mainnet.infura.io/v3/f00f7b3ba0e848ddbdc8941c527447fe

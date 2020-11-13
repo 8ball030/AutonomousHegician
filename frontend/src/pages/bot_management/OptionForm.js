@@ -218,7 +218,7 @@ export const OptionForm = () => {
     }
   }
   return (
-    <Widget noBodyPadding style={{ width: "51%" }}>
+    <Widget noBodyPadding style={{ width: "91%" }}>
     <div
       style={{
         display: "flex",
@@ -228,7 +228,7 @@ export const OptionForm = () => {
       }}
     >
       <div>
-      <form style={{ width: "51%" }}>
+      <form style={{ width: "91%" }}>
         <Typography id="discrete-slider" gutterBottom>Market</Typography>
         <FormControl component="fieldset" margin="normal" fullWidth>
           <RadioGroup aria-label="market" error={!validationErrors['market']} onChange={onChange('market')} value={state.market}>
