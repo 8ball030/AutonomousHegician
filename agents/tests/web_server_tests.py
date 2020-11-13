@@ -107,7 +107,9 @@ class TestWebserverIntegration(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        agent.kill()
+        agent.terminate()
+        # workaround: child process not killed by agent terminate/kill
+        os.system("pkill -f aea")
         os.system("pkill -f libp2p_node")
         time.sleep(10)
 
