@@ -23,7 +23,6 @@ import logging
 import os
 from datetime import datetime, timedelta
 
-import yaml
 from flask import Flask, request
 from flask_cors import CORS
 from flask_restplus import Api, Resource
@@ -31,6 +30,8 @@ from flask_restplus_sqlalchemy import ApiModelFactory
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import subqueryload
 from web3 import Web3
+
+from aea.helpers.yaml_utils import yaml_load_all
 
 
 logger = logging.getLogger(__name__)
@@ -249,6 +250,8 @@ class HegicOption(Resource):
             option_type=res["option_type"],
             amount=res["amount"],  # TODO BTC is wrong!
             strike_price=res["strike_price"],
+            breakeven=res["breakeven"],
+            total_cost=res["total_cost"],
             date_created=datetime.utcnow(),
             date_modified=datetime.utcnow(),
             expiration_date=datetime.utcnow() + timedelta(days=res["period"]),
@@ -288,12 +291,10 @@ class web3_config(Resource):
         return contracts
 
     def _read_addresses(self):
-        with open(
-            "./autonomous_hegician/skills/option_management/skill.yaml", "r"
-        ) as f:
+        with open("./autonomous_hegician/aea-config.yaml", "r") as f:
             return {
                 k: v
-                for k, v in yaml.safe_load(f)["models"]["strategy"]["args"].items()
+                for k, v in yaml_load_all(f)[1]["models"]["strategy"]["args"].items()
                 if k != "ledger_id"
             }
 

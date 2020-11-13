@@ -13,6 +13,7 @@ import Typography from '@material-ui/core/Typography';
 import {Decimal} from 'decimal.js';
 
 import API from '../../api'
+import Widget from "../../components/Widget/Widget";
 const Web3 = require('web3');
 
 const orderPlaceHolderMapping = {
@@ -32,38 +33,79 @@ class HegicOptions {
         this.w3 = new Web3(new Web3.providers.HttpProvider(results.ledger_string))
         this.btc_contract = new this.w3.eth.Contract(results.contract_abis.btcoptions.abi, results.contract_addresses.btcoptions);
         this.eth_contract = new this.w3.eth.Contract(results.contract_abis.ethoptions.abi, results.contract_addresses.ethoptions);
+        this.priceprovider = new this.w3.eth.Contract(results.contract_abis.priceprovider.abi, results.contract_addresses.priceprovider);
+        this.btcpriceprovider = new this.w3.eth.Contract(results.contract_abis.btcpriceprovider.abi, results.contract_addresses.btcpriceprovider);
         this.estimate_cost("ETH", 60*60*24*2, 1000000, 200, 1 );
+        this.latest_answer("ETH" );
       });
 
   }
-    estimate_cost(market, period, amount, strike, type) {
+  latest_answer(market) {
 
+    return new Promise ((resolve, reject) => {
+    if (market == "ETH"){ 
+      let contract = this.priceprovider;
+          contract.methods.latestAnswer().call(function(err,res){
+             if(!err){
+                 console.log(res);
+                 resolve(res)
+             } else {
+                 reject(err);
+             }
+              }  )
+        
+    }else{
+      let contract = this.btcpriceprovider;
+          contract.methods.latestAnswer().call(function(err,res){
+             if(!err){
+                 console.log(res);
+                 resolve(res)
+             } else {
+                 reject(err);
+             }
+              }  )
+        
+    }
+  })
+  };
+
+  estimate_cost(market, period, amount, strike, type) {
+
+    return new Promise ((resolve, reject) => {
     if (market == "ETH"){ 
       let contract = this.eth_contract;
           contract.methods.fees(period, amount, strike, type).call(function(err,res){
              if(!err){
                  console.log(res);
+                 resolve(res)
              } else {
-                 console.log(err);
+                 reject(err);
              }
               }  )
         
     }else{
       let contract = this.btc_contract;
-      console.log(contract.methods.fees(period, amount, strike, type).call());
+          contract.methods.fees(period, amount, strike, type).call(function(err,res){
+             if(!err){
+                 console.log(res);
+                 resolve(res)
+             } else {
+                 reject(err);
+             }
+              }  )
     }
-  
-
-};}
+  })
+  };
+}
 
 const Pricer = new HegicOptions()
 
 export const OptionForm = () => {
   const [state, setState] = useState({
-    amount: '',
+    amount: '400',
     date_created: '',
     date_modified: '',
-    execution_strategy_id: "0",
+    execution_strategy_id: -1,
     expiration_date: '',
     fees: '',
     id: '',
@@ -76,6 +118,7 @@ export const OptionForm = () => {
     params: {},
     total_cost: 0,
     breakeven: 0,
+    latest_answer: 0,
   });
   const [validationErrors, setValidationErrors] = useState({});
   const onChange = name => (e, newValue) => {
@@ -83,6 +126,11 @@ export const OptionForm = () => {
       newValue = e.target.value;
     }
     setState((state) => ({ ...state, [name]: newValue }));
+    calc_total_cost()
+  }
+
+
+  async function calc_total_cost() {
     if (isValid()){
       console.log("Ready to Order!");
 
@@ -94,22 +142,39 @@ export const OptionForm = () => {
       console.log()
 
 
-      const fees = Pricer.estimate_cost(state.market, 
-                                        state.period * 60 * 60, 
+      const fees = await Pricer.estimate_cost(state.market, 
+                                        state.period * 60 * 60 * 24, 
                                         amount,
                                         price,
                                         state.option_type
                                         );
+                                        
+      const latest_price = await Pricer.latest_answer(state.market);
+      setState((state) => ({ ...state, ["total_cost"]: fees.total}));
+      setState((state) => ({ ...state, ["latest_answer"]: latest_price}));
 
-      setState((state) => ({...state, ["total_cost"]: fees}));
-      console.log(fees);
+      const cost_per_unit = (fees.total/amount) * latest_price;
+      if (state.option_type == 2){
+        const breakeven = price + cost_per_unit
+        console.log("break even " + breakeven + "CAll")
+        setState((state) => ({ ...state, ["breakeven"]: breakeven}));
+      } else {
+        const breakeven = price - cost_per_unit
+        console.log("break even " + breakeven + "put")
+        setState((state) => ({ ...state, ["breakeven"]: breakeven}));
+      }
+    }else{
+      setState((state) => ({ ...state, ["total_cost"]: ""}));
+      setState((state) => ({ ...state, ["latest_answer"]: ""}));
+      setState((state) => ({ ...state, ["breakeven"]: ""}));
     }
-  }
-  
+  }  
   const isValid = () => {
     const validation = {
       strike_price: val => +val > 0,
       amount: val => +val > 0,
+      execution_strategy_id: val => +val >= 0,
+
     };
 
     let valid = true;
@@ -153,6 +218,7 @@ export const OptionForm = () => {
     }
   }
   return (
+    <Widget noBodyPadding style={{ width: "51%" }}>
     <div
       style={{
         display: "flex",
@@ -162,9 +228,7 @@ export const OptionForm = () => {
       }}
     >
       <div>
-      <form style={{ width: "50%" }}>
-        <h1>Option Creation</h1>
-
+      <form style={{ width: "51%" }}>
         <Typography id="discrete-slider" gutterBottom>Market</Typography>
         <FormControl component="fieldset" margin="normal" fullWidth>
           <RadioGroup aria-label="market" error={!validationErrors['market']} onChange={onChange('market')} value={state.market}>
@@ -178,7 +242,7 @@ export const OptionForm = () => {
         </FormControl>
 
         <Typography id="discrete-slider" gutterBottom>
-          Period in Days
+          Period in Days {state.period}
           </Typography>
         <Slider id="period" type="text"
           defaultValue={2}
@@ -192,7 +256,7 @@ export const OptionForm = () => {
         />
 
         <FormControl margin="normal" fullWidth>
-          <InputLabel htmlFor="amount">Amount In Ether</InputLabel>
+          <InputLabel htmlFor="amount">Amount In {state.market}</InputLabel>
           <Input id="amount" type="text" onChange={onChange('amount')} />
         </FormControl>
 
@@ -201,8 +265,8 @@ export const OptionForm = () => {
           </Typography>
         <FormControl component="fieldset" name="option_type" margin="normal" fullWidth>
           <RadioGroup aria-label="option_type" name="option_type" onChange={onChange('option_type')}>
-            <FormControlLabel value="1" control={<Radio />} label="Put" />
-            <FormControlLabel value="2" control={<Radio />} label="Call" />
+            <FormControlLabel value="2" control={<Radio />} label="Put" />
+            <FormControlLabel value="1" control={<Radio />} label="Call" />
           </RadioGroup>
         </FormControl>
 
@@ -228,23 +292,34 @@ export const OptionForm = () => {
         </FormControl>
         }
 
-        {true &&
+        {false &&
           <FormControl margin="normal" fullWidth>
             <InputLabel htmlFor="params">Take Profit Offset %</InputLabel>
         {['1', '2', '3'].includes(state.execution_strategy_id) && <Input id="params" type="text" onChange={onChange('params')} multiline rows={10} placeholder={orderPlaceHolderMapping[state.execution_strategy_id]}/> }
           </FormControl>
         }
 
+      <br></br>
+      <div>
+        <h2>Total Cost : </h2>
+      <h4>{state.market}: 
+      {state.total_cost / 100000000}</h4>
+      <h4>${(state.latest_answer * (state.total_cost / 100000000) / 100000000).toFixed(2)}</h4>
+      </div>
+      <div>
+        <h2>Break Even :</h2>
+          <h4>${(state.breakeven / 100000000).toFixed(2)}</h4>
+      </div>
+
+      <div>
         <Button onClick={sendToAgent} variant="contained" color="primary" size="medium">
           Send to Agent
-          </Button>
-      </form>
-      <div>
-        <h2>Total Cost : {state.total_cost}</h2>
-        <h2>Break Even: {state.breakeven}</h2>
+        </Button>
       </div>
+    </form>
     </div>
   </div>
+  </Widget>
   );
 }
 

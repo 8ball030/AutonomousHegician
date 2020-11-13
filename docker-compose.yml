@@ -50,10 +50,10 @@ services:
 
   agents:
     environment:
-      TESTS: "True"
-      DEBUG: "True"
+      TESTS: "False"
+      DEBUG: "False"
       PIPENV_DOTENV_LOCATION: /app/.env_container
-      RUN_CMD: "pipenv run update_ledger; pipenv run deploy_contracts; pipenv run update_contracts; pipenv run start_agent"
+      RUN_CMD: "pipenv run start_agent"
     build:
       context: ./agents
       dockerfile: Dockerfile

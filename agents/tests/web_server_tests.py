@@ -100,6 +100,8 @@ class TestWebserverIntegration(unittest.TestCase):
         "period": 2 * 24 * 60 * 60,  # in days
         "option_type": 1,
         "market": "ETH",
+        "total_cost": 0,
+        "breakeven": 0,
         "execution_strategy_id": 0,
     }
 
@@ -141,7 +143,6 @@ class TestWebserverIntegration(unittest.TestCase):
         start = datetime.utcnow()
         while not done:
             order = DBCommunication.get_option(order_params)
-            print(order, status_code)
             if order.status_code.id == status_code:
                 done = True
             if datetime.now() - timedelta(seconds=timeout) > start:
