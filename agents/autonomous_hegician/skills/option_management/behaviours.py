@@ -84,6 +84,9 @@ class SnapShot(TickerBehaviour):
         update = {
             "status": "running",
             "date_updated": datetime.now(),
+            "eth_val": strategy.eth_balance,
+            "usd_val": strategy.eth_balance
+            * self.context.behaviours.price_ticker.current_price["ETH"],
             "status": "running",
         }
 

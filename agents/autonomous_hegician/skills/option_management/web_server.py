@@ -158,6 +158,8 @@ class Agent(db.Model):  # type: ignore
     date_updated = db.Column(db.DateTime)
     address = db.Column(db.String(255))
     status = db.Column(db.String(255))
+    usd_val = db.Column(db.Float, default=0)
+    eth_val = db.Column(db.Float, default=0)
 
     def as_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
