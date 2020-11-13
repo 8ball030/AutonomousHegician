@@ -167,6 +167,9 @@ def main():
         i = int(input())
         name, func = choices[i]
         print(f"\nRunning:\n\n{name}\n")
+    except KeyboardInterrupt:
+        print("\nBye! See you soon!")
+        return
     except KeyError:
         print("Invalid option!")
     func()
