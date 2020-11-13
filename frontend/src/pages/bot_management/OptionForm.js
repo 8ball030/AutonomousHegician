@@ -13,6 +13,7 @@ import Typography from '@material-ui/core/Typography';
 import {Decimal} from 'decimal.js';
 
 import API from '../../api'
+import Widget from "../../components/Widget/Widget";
 const Web3 = require('web3');
 
 const orderPlaceHolderMapping = {
@@ -36,16 +37,17 @@ class HegicOptions {
       });
 
   }
-  async  estimate_cost(market, period, amount, strike, type) {
+  estimate_cost(market, period, amount, strike, type) {
 
+    return new Promise ((resolve, reject) => {
     if (market == "ETH"){ 
       let contract = this.eth_contract;
           contract.methods.fees(period, amount, strike, type).call(function(err,res){
              if(!err){
                  console.log(res);
-                 return res
+                 resolve(res)
              } else {
-                 console.log(err);
+                 reject(err);
              }
               }  )
         
@@ -53,15 +55,15 @@ class HegicOptions {
       let contract = this.btc_contract;
       console.log(contract.methods.fees(period, amount, strike, type).call());
     }
-  
-
-};}
+  })
+  };
+}
 
 const Pricer = new HegicOptions()
 
 export const OptionForm = () => {
   const [state, setState] = useState({
-    amount: '',
+    amount: '400',
     date_created: '',
     date_modified: '',
     execution_strategy_id: "0",
@@ -84,6 +86,10 @@ export const OptionForm = () => {
       newValue = e.target.value;
     }
     setState((state) => ({ ...state, [name]: newValue }));
+    calc_total_cost()
+  }
+
+  async function calc_total_cost() {
     if (isValid()){
       console.log("Ready to Order!");
 
@@ -95,18 +101,19 @@ export const OptionForm = () => {
       console.log()
 
 
-      const fees = Pricer.estimate_cost(state.market, 
+      const fees = await Pricer.estimate_cost(state.market, 
                                         state.period * 60 * 60, 
                                         amount,
                                         price,
                                         state.option_type
                                         );
+                                        
+     
+      setState((state) => ({ ...state, ["total_cost"]: fees.total / 100000000}));
 
-      setState((state) => ({...state, ["total_cost"]: fees.total}));
-      console.log(fees);
+     
     }
-  }
-  
+  }  
   const isValid = () => {
     const validation = {
       strike_price: val => +val > 0,
@@ -154,6 +161,7 @@ export const OptionForm = () => {
     }
   }
   return (
+    <Widget noBodyPadding style={{ width: "51%" }}>
     <div
       style={{
         display: "flex",
@@ -163,7 +171,7 @@ export const OptionForm = () => {
       }}
     >
       <div>
-      <form style={{ width: "50%" }}>
+      <form style={{ width: "51%" }}>
         <h1>Option Creation</h1>
 
         <Typography id="discrete-slider" gutterBottom>Market</Typography>
@@ -202,8 +210,8 @@ export const OptionForm = () => {
           </Typography>
         <FormControl component="fieldset" name="option_type" margin="normal" fullWidth>
           <RadioGroup aria-label="option_type" name="option_type" onChange={onChange('option_type')}>
-            <FormControlLabel value="1" control={<Radio />} label="Put" />
-            <FormControlLabel value="2" control={<Radio />} label="Call" />
+            <FormControlLabel value="2" control={<Radio />} label="Put" />
+            <FormControlLabel value="1" control={<Radio />} label="Call" />
           </RadioGroup>
         </FormControl>
 
@@ -236,13 +244,14 @@ export const OptionForm = () => {
           </FormControl>
         }
 
-      </form>
+      <br></br>
       <div>
         <h2>Total Cost : </h2>
           <h4>{state.total_cost}</h4>
       </div>
       <div>
-        <h2>Break Even: {state.breakeven}</h2>
+        <h2>Break Even :</h2>
+          <h4>{state.breakeven}</h4>
       </div>
 
       <div>
@@ -250,8 +259,10 @@ export const OptionForm = () => {
           Send to Agent
         </Button>
       </div>
+    </form>
     </div>
   </div>
+  </Widget>
   );
 }
 
