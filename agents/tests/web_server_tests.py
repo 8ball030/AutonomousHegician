@@ -109,7 +109,7 @@ class TestWebserverIntegration(unittest.TestCase):
     def tearDownClass(cls):
         agent.kill()
         os.system("pkill -f libp2p_node")
-        time.sleep(5)
+        time.sleep(10)
 
     @classmethod
     def setUpClass(cls):
@@ -276,7 +276,7 @@ if __name__ == "__main__":
                 )
             ]
         )
-        results = unittest.TextTestRunner().run(partial)
+        results = unittest.TextTestRunner().run(partial)  # type: ignore
     if len(results.failures) == 0 and len(results.errors) == 0:  # type: ignore
         print("All tests passed!")
         sys.exit(0)

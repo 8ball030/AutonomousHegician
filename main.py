@@ -13,6 +13,7 @@ from argparse import ArgumentParser
 
 AH_LOGO = "    _         _                                              \n   / \\  _   _| |_ ___  _ __   ___  _ __ ___   ___  _   _ ___ \n  / _ \\| | | | __/ _ \\| '_ \\ / _ \\| '_ ` _ \\ / _ \\| | | / __|\n / ___ \\ |_| | || (_) | | | | (_) | | | | | | (_) | |_| \\__ \\\n/_/   \\_\\__,_|\\__\\___/|_| |_|\\___/|_| |_| |_|\\___/ \\__,_|___/\n                                                             \n _   _            _      _             \n| | | | ___  __ _(_) ___(_) __ _ _ __  \n| |_| |/ _ \\/ _` | |/ __| |/ _` | '_ \\ \n|  _  |  __/ (_| | | (__| | (_| | | | |\n|_| |_|\\___|\\__, |_|\\___|_|\\__,_|_| |_|\n            |___/                      \n"
 NUMBER_DB_CREATIONS = 1
+WHITESPACE = "\n------------------------\n\n"
 
 
 def parse_args():
@@ -32,7 +33,7 @@ def docker_cleanup(func):
     """Decorator that manages docker teardown before and after."""
 
     def wrap(*args, **kwargs):
-        print("Removing exising docker containers...")
+        print(f"{WHITESPACE}Removing exising docker containers...")
         code = os.system("docker-compose down")
         if code != 0:
             raise RuntimeError("Failed to destroy existing containers!")
@@ -41,7 +42,7 @@ def docker_cleanup(func):
         except RuntimeError:
             raise
         finally:
-            print("Removing exising docker containers...")
+            print(f"{WHITESPACE}Removing exising docker containers...")
             code = os.system("docker-compose down")
             if code != 0:
                 print(f"Error on `docker-compose down`. Code={code}")
@@ -54,15 +55,15 @@ def docker_cleanup(func):
 @docker_cleanup
 def run_tests():
     """Run all tests."""
-    print("Starting backend services....")
+    print(f"{WHITESPACE}Starting backend services....")
     code = os.system("docker-compose up -d postgresdb ganachecli api")
     if code != 0:
         raise RuntimeError("Failed to start test environment containers!")
-    print("Installing virtual environment with dependencies....")
+    print(f"{WHITESPACE}Installing virtual environment with dependencies....")
     code = os.system("cd agents; pipenv install --skip-lock")
     if code != 0:
         raise RuntimeError("Failed to install dependencies!")
-    print("Creating database schema....")
+    print(f"{WHITESPACE}Creating database schema....")
     cmd = "cd agents; pipenv run python autonomous_hegician/skills/option_management/db_communication.py"
     for _ in range(NUMBER_DB_CREATIONS):
         code = os.system(cmd)
@@ -70,25 +71,25 @@ def run_tests():
             continue
     if code != 0:
         raise RuntimeError("Failed to create database!")
-    print("Updating the ledger from the environment vars....")
+    print(f"{WHITESPACE}Updating the ledger from the environment vars....")
     code = os.system("cd agents; pipenv run update_ledger")
     if code != 0:
         raise RuntimeError("Failed to update ledger of Autonomous Hegician!")
-    print("Attempting to deploy contracts to the chain....")
+    print(f"{WHITESPACE}Attempting to deploy contracts to the chain....")
     code = os.system("cd agents; pipenv run deploy_contracts")
     if code != 0:
         raise RuntimeError("Deploying contracts has failed!")
-    print("Updating contracts from testnet in Autonomous Hegician config...")
+    print(f"{WHITESPACE}Updating contracts from testnet in Autonomous Hegician config...")
     code = os.system("cd agents; pipenv run update_contracts_testnet")
     if code != 0:
         raise RuntimeError(
             "Failed to update newly deployed contracts to Autonomous Hegician!"
         )
-    print("Running agent functionality tests ....")
+    print(f"{WHITESPACE}Running agent functionality tests ....")
     code = os.system("cd agents; pipenv run test_ah")
     if code != 0:
         raise RuntimeError("Failed to run integration tests successfully!")
-    print("Running api functionality tests ....")
+    print(f"{WHITESPACE}Running api functionality tests ....")
     code = os.system("cd agents; pipenv run test_ah_via_api")
     if code != 0:
         raise RuntimeError("Failed to run api integration tests successfully!")
@@ -97,11 +98,11 @@ def run_tests():
 @docker_cleanup
 def deploy_contracts_to_testnet():
     """Deploy contracts to testnet."""
-    print("Starting backend services....")
+    print(f"{WHITESPACE}Starting backend services....")
     code = os.system("docker-compose up -d ganachecli")
     if code != 0:
         raise RuntimeError("Failed to started local chain")
-    print("Installing virtual environment with dependencies....")
+    print(f"{WHITESPACE}Installing virtual environment with dependencies....")
     code = os.system("cd agents; pipenv install --skip-lock")
     if code != 0:
         raise RuntimeError("Failed to install dependencies!")

@@ -86,7 +86,9 @@ class DBCommunication:
         return snap
 
     @staticmethod
-    def create_new_option(amount: float, strike_price: int, period: int, option_type: int, market: str) -> Dict:
+    def create_new_option(
+        amount: float, strike_price: int, period: int, option_type: int, market: str
+    ) -> Dict:
         with flask_app.app_context():
             execution_strategy = db.session.query(ExecutionStrategy).one()
             status_code_id = OPTIONS_ESTIMATE
@@ -187,7 +189,11 @@ class DBCommunication:
         """Create the initial state for the agent"""
         with flask_app.app_context():
             db.create_all()
-            db.session.merge(ExecutionStrategy(id=EXECUTION_STRATEGY_ID, description="auto_itm_execution"))
+            db.session.merge(
+                ExecutionStrategy(
+                    id=EXECUTION_STRATEGY_ID, description="auto_itm_execution"
+                )
+            )
             db.session.merge(
                 StatusCode(id=OPTIONS_ESTIMATE, description="options_estimate")
             )
