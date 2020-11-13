@@ -76,10 +76,10 @@ jobs:
   integration_tests:
     continue-on-error: False
     runs-on: ${{ matrix.os }}
-     strategy:
-       matrix:
-         os: [ubuntu-latest, macos-latest] # windows-latest]
-         python_version: [3.6]
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest] # windows-latest]
+        python_version: [3.6]
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@master
