@@ -56,6 +56,7 @@ except Exception:
 from datetime import datetime, timedelta
 
 
+EXECUTION_STRATEGY_ID = 0
 OPTIONS_ESTIMATE = 0
 PENDING_PLACEMENT = 1
 PLACING = 2
@@ -76,7 +77,7 @@ class DBCommunication:
         """
 
     @staticmethod
-    def create_new_snapshot(params):
+    def create_new_snapshot(params: dict):
         with flask_app.app_context():
             snap = Snapshot(**params)
             db.session.add(snap)
@@ -85,9 +86,12 @@ class DBCommunication:
         return snap
 
     @staticmethod
-    def create_new_option(amount, strike_price, period, option_type, market) -> Dict:
+    def create_new_option(
+        amount: float, strike_price: int, period: int, option_type: int, market: str
+    ) -> Dict:
         with flask_app.app_context():
             execution_strategy = db.session.query(ExecutionStrategy).one()
+            status_code_id = OPTIONS_ESTIMATE
             option = Option(
                 amount=amount,
                 strike_price=strike_price,
@@ -98,7 +102,7 @@ class DBCommunication:
                 option_type=option_type,
                 expiration_date=datetime.utcnow() + timedelta(seconds=period),
                 execution_strategy_id=execution_strategy.id,
-                status_code_id=0,
+                status_code_id=status_code_id,
             )
             db.session.add(option)
             db.session.commit()
@@ -111,11 +115,11 @@ class DBCommunication:
             "period": period,
             "option_type": option_type,
             "market": market,
-            "status_code": 1,
+            "status_code": status_code_id,
         }
 
     @staticmethod
-    def update_option(option_db_id, params) -> Option:
+    def update_option(option_db_id: int, params: dict) -> Option:
         with flask_app.app_context():
             option = db.session.query(Option).filter(Option.id == option_db_id).one()
             for key, value in params.items():
@@ -126,7 +130,7 @@ class DBCommunication:
         return option
 
     @staticmethod
-    def create_agent(agent_address, params) -> Option:
+    def create_agent(agent_address: str, params: dict) -> Option:
         with flask_app.app_context():
             agents = (
                 db.session.query(Agent).filter(Agent.address == agent_address).all()
@@ -138,15 +142,16 @@ class DBCommunication:
                     date_updated=datetime.now(),
                     status="running",
                 )
-            else:
+                db.session.merge(agent)
+                db.session.commit()
+                db.session.close()
+                return agent.id
+            if len(agents) == 1:
                 return agents[0].id
-            db.session.merge(agent)
-            db.session.commit()
-            db.session.close()
-        return agent.id
+            raise ValueError("Inexpected number of agents in db!")
 
     @staticmethod
-    def update_agent(agent_address, params) -> Option:
+    def update_agent(agent_address: str, params: dict) -> Option:
         with flask_app.app_context():
             agent = db.session.query(Agent).filter(Agent.address == agent_address).one()
             for key, value in params.items():
@@ -173,7 +178,7 @@ class DBCommunication:
         return results
 
     @staticmethod
-    def get_option(option_id) -> Option:
+    def get_option(option_id: int) -> Option:
         with flask_app.app_context():
             option = db.session.query(Option).filter(Option.id == option_id).one()
             db.session.close()
@@ -184,7 +189,11 @@ class DBCommunication:
         """Create the initial state for the agent"""
         with flask_app.app_context():
             db.create_all()
-            db.session.merge(ExecutionStrategy(id=0, description="auto_itm_execution"))
+            db.session.merge(
+                ExecutionStrategy(
+                    id=EXECUTION_STRATEGY_ID, description="auto_itm_execution"
+                )
+            )
             db.session.merge(
                 StatusCode(id=OPTIONS_ESTIMATE, description="options_estimate")
             )

@@ -122,7 +122,10 @@ class TestOptionExecutionTester(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         agent.terminate()
+        # workaround: child process not killed by agent terminate/kill
+        os.system("pkill -f aea")
         os.system("pkill -f libp2p_node")
+        time.sleep(5)
 
     @classmethod
     def setUpClass(cls):
