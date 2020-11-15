@@ -110,6 +110,8 @@ jobs:
   frontend_tests:
     continue-on-error: True
     runs-on: ${{ matrix.os }}
+    env:
+      CI: false
     strategy:
       matrix:
         os: [ubuntu-latest] # macos-latest] # windows-latest]
