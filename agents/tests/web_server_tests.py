@@ -100,8 +100,8 @@ class TestWebserverIntegration(unittest.TestCase):
         "period": 2 * 24 * 60 * 60,  # in days
         "option_type": 1,
         "market": "ETH",
-        "total_cost": 0,
-        "breakeven": 0,
+        "total_cost": 1,
+        "breakeven": 1,
         "execution_strategy_id": 0,
     }
 
@@ -272,11 +272,7 @@ if __name__ == "__main__":
     else:
         partial = unittest.TestSuite()
         partial.addTests(
-            [
-                TestWebserverIntegration(
-                    "test_does_ah_excercise_eth_atm_put_option",
-                )
-            ]
+            [TestWebserverIntegration("test_does_ah_excercise_eth_atm_put_option",)]
         )
         results = unittest.TextTestRunner().run(partial)  # type: ignore
     if len(results.failures) == 0 and len(results.errors) == 0:  # type: ignore

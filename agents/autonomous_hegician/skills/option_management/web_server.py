@@ -29,7 +29,6 @@ from flask_restplus import Api, Resource
 from flask_restplus_sqlalchemy import ApiModelFactory
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import subqueryload
-from web3 import Web3
 
 from aea.helpers.yaml_utils import yaml_load_all
 
@@ -189,15 +188,9 @@ class HegicOptions(Resource):
             ret = row.as_dict()
             ret["status_code_id"] = row.status_code.description
             ret["option_type"] = "Put" if row.option_type == 1 else "Call"
-            ret["amount"] = int(Web3.fromWei(row.amount, "ether"))
-            ret["breakeven"] = (
-                int(Web3.fromWei(row.breakeven, "ether")) if row.breakeven != 0 else 0
-            )
-            ret["current_pnl"] = (
-                int(Web3.fromWei(row.current_pnl, "ether"))
-                if row.current_pnl != 0
-                else 0
-            )
+            ret["amount"] = int(row.amount)
+            ret["breakeven"] = int(row.breakeven)
+            ret["current_pnl"] = int(row.current_pnl)
             return ret
 
         results = [
@@ -256,7 +249,7 @@ class HegicOption(Resource):
             total_cost=res["total_cost"],
             date_created=datetime.utcnow(),
             date_modified=datetime.utcnow(),
-            expiration_date=datetime.utcnow() + timedelta(days=res["period"]),
+            expiration_date=datetime.utcnow() + timedelta(seconds=res["period"]),
         )
         db.session.add(option)
         db.session.commit()
