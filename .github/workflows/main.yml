@@ -129,6 +129,3 @@ jobs:
     - run: |
         cd frontend
         npm run build --if-present
-    - run: |
-        cd frontend
-        npm test
