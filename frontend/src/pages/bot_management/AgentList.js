@@ -87,8 +87,8 @@ class AgentList extends React.Component {
                   </TableCell>
                   <TableCell align="right">{agentsData[row].date_created}</TableCell>
                   <TableCell align="right">{agentsData[row].date_updated}</TableCell>
-                  <TableCell align="right">{agentsData[row].eth_val}</TableCell>
-                  <TableCell align="right">{agentsData[row].usd_val}</TableCell>
+                  <TableCell align="right">{agentsData[row].eth_val/ 100000000}</TableCell>
+                  <TableCell align="right">{agentsData[row].usd_val/ 100000000}</TableCell>
                   <TableCell align="right">
                     <Button
                       style={states[agentsData[row].status]} 
