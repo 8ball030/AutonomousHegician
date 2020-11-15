@@ -126,6 +126,7 @@ jobs:
         cd frontend
         npm ci
     - run: |
-        cd frontendnpm run build --if-present
+        cd frontend
+        npm run build --if-present
     - run: |
         npm test
