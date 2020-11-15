@@ -10,7 +10,6 @@ import {
   Slider,
 } from "@material-ui/core";
 import Typography from '@material-ui/core/Typography';
-import {Decimal} from 'decimal.js';
 
 import API from '../../api'
 import Widget from "../../components/Widget/Widget";
@@ -43,7 +42,7 @@ class HegicOptions {
   latest_answer(market) {
 
     return new Promise ((resolve, reject) => {
-    if (market == "ETH"){ 
+    if (market === "ETH"){ 
       let contract = this.priceprovider;
           contract.methods.latestAnswer().call(function(err,res){
              if(!err){
@@ -72,7 +71,7 @@ class HegicOptions {
   estimate_cost(market, period, amount, strike, type) {
 
     return new Promise ((resolve, reject) => {
-    if (market == "ETH"){ 
+    if (market === "ETH"){ 
       let contract = this.eth_contract;
           contract.methods.fees(period, amount, strike, type).call(function(err,res){
              if(!err){
@@ -154,7 +153,7 @@ export const OptionForm = () => {
       setState((state) => ({ ...state, ["latest_answer"]: latest_price}));
 
       const cost_per_unit = (fees.total/amount) * latest_price;
-      if (state.option_type == 2){
+      if (state.option_type === 2){
         const breakeven = price + cost_per_unit
         console.log("break even " + breakeven + "CAll")
         setState((state) => ({ ...state, ["breakeven"]: breakeven}));

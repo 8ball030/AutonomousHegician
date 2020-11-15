@@ -19,13 +19,6 @@ import {
 } from 'react-jsx-highcharts';
 
 
-function createData(name, calories, fat, carbs, protein, status, amount) {
-  return { name, calories, fat, carbs, protein, status, amount };
-}
-
-const rows = [
-  createData('Frozen yoghurt', 159, 6.0, 24, 4.0, 'paused' ,100),
-];
 const states = {
   running: {
     backgroundColor: 'rgb(18 58 18)',
