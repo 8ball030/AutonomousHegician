@@ -153,7 +153,7 @@ export const OptionForm = () => {
       setState((state) => ({ ...state, ["latest_answer"]: latest_price}));
 
       const cost_per_unit = (fees.total/amount) * latest_price;
-      if (state.option_type === 2){
+      if (state.option_type == "2"){
         const breakeven = price + cost_per_unit
         console.log("break even " + breakeven + "CAll")
         setState((state) => ({ ...state, ["breakeven"]: breakeven}));
@@ -226,9 +226,11 @@ export const OptionForm = () => {
 
       const cost_per_unit = (fees.total/amount) * latest_price;
 
-      if (state.option_type === 2){
+      if (state.option_type == "2"){
+        console.log("call!!!")
         params.breakeven = price + cost_per_unit
       } else {
+        console.log("put!!!")
         params.breakeven = price - cost_per_unit
       }
 
@@ -297,8 +299,8 @@ export const OptionForm = () => {
           </Typography>
         <FormControl component="fieldset" name="option_type" margin="normal" fullWidth>
           <RadioGroup aria-label="option_type" name="option_type" onChange={onChange('option_type')}>
-            <FormControlLabel value="2" control={<Radio />} label="Put" />
-            <FormControlLabel value="1" control={<Radio />} label="Call" />
+            <FormControlLabel value="1" control={<Radio />} label="Put" />
+            <FormControlLabel value="2" control={<Radio />} label="Call" />
           </RadioGroup>
         </FormControl>
 
