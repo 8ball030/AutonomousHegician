@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import Highcharts from 'highcharts';
-import axios from 'axios';
 import {
-  HighchartsChart, Chart, withHighcharts, XAxis, YAxis, Legend, LineSeries, Caption
+  HighchartsChart, Chart, withHighcharts, XAxis, YAxis, Legend, LineSeries
 } from 'react-jsx-highcharts';
 
 import './style.css'; // CSS Styles
@@ -39,12 +38,6 @@ class Equity extends Component {
         }
       }
     };
-    const pane = {
-      background: {
-        backgroundColor: null,
-      }
-
-    }
     const chart = {
       backgroundColor: null
     }

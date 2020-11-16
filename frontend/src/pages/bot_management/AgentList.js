@@ -19,13 +19,6 @@ import {
 } from 'react-jsx-highcharts';
 
 
-function createData(name, calories, fat, carbs, protein, status, amount) {
-  return { name, calories, fat, carbs, protein, status, amount };
-}
-
-const rows = [
-  createData('Frozen yoghurt', 159, 6.0, 24, 4.0, 'paused' ,100),
-];
 const states = {
   running: {
     backgroundColor: 'rgb(18 58 18)',
@@ -94,8 +87,8 @@ class AgentList extends React.Component {
                   </TableCell>
                   <TableCell align="right">{agentsData[row].date_created}</TableCell>
                   <TableCell align="right">{agentsData[row].date_updated}</TableCell>
-                  <TableCell align="right">{agentsData[row].eth_val}</TableCell>
-                  <TableCell align="right">{agentsData[row].usd_val}</TableCell>
+                  <TableCell align="right">{agentsData[row].eth_val/ 100000000}</TableCell>
+                  <TableCell align="right">{agentsData[row].usd_val/ 100000000}</TableCell>
                   <TableCell align="right">
                     <Button
                       style={states[agentsData[row].status]} 

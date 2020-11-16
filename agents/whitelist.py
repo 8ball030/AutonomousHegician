@@ -38,6 +38,7 @@ is_deployed  # unused variable (autonomous_hegician/skills/option_management/web
 is_execerised  # unused variable (autonomous_hegician/skills/option_management/web_server.py:69)
 tx_hash  # unused variable (autonomous_hegician/skills/option_management/web_server.py:75)
 execution_strategy_id  # unused variable (autonomous_hegician/skills/option_management/web_server.py:84)
+execution_strategy  # unused variable (autonomous_hegician/skills/option_management/web_server.py:106)
 date_modified  # unused variable (autonomous_hegician/skills/option_management/web_server.py:86)
 current_pnl  # unused variable (autonomous_hegician/skills/option_management/web_server.py:89)
 _.current_pnl  # unused attribute (autonomous_hegician/skills/option_management/web_server.py:120)

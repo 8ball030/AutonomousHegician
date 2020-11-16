@@ -10,7 +10,6 @@ import {
   Slider,
 } from "@material-ui/core";
 import Typography from '@material-ui/core/Typography';
-import {Decimal} from 'decimal.js';
 
 import API from '../../api'
 import Widget from "../../components/Widget/Widget";
@@ -43,7 +42,7 @@ class HegicOptions {
   latest_answer(market) {
 
     return new Promise ((resolve, reject) => {
-    if (market == "ETH"){ 
+    if (market === "ETH"){ 
       let contract = this.priceprovider;
           contract.methods.latestAnswer().call(function(err,res){
              if(!err){
@@ -72,7 +71,7 @@ class HegicOptions {
   estimate_cost(market, period, amount, strike, type) {
 
     return new Promise ((resolve, reject) => {
-    if (market == "ETH"){ 
+    if (market === "ETH"){ 
       let contract = this.eth_contract;
           contract.methods.fees(period, amount, strike, type).call(function(err,res){
              if(!err){
@@ -154,7 +153,7 @@ export const OptionForm = () => {
       setState((state) => ({ ...state, ["latest_answer"]: latest_price}));
 
       const cost_per_unit = (fees.total/amount) * latest_price;
-      if (state.option_type == 2){
+      if (state.option_type == "2"){
         const breakeven = price + cost_per_unit
         console.log("break even " + breakeven + "CAll")
         setState((state) => ({ ...state, ["breakeven"]: breakeven}));
@@ -163,10 +162,6 @@ export const OptionForm = () => {
         console.log("break even " + breakeven + "put")
         setState((state) => ({ ...state, ["breakeven"]: breakeven}));
       }
-    }else{
-      setState((state) => ({ ...state, ["total_cost"]: ""}));
-      setState((state) => ({ ...state, ["latest_answer"]: ""}));
-      setState((state) => ({ ...state, ["breakeven"]: ""}));
     }
   }  
   const isValid = () => {
@@ -187,7 +182,7 @@ export const OptionForm = () => {
     return valid
   }
   
-  const sendToAgent = () => {
+  async function sendToAgent() {
 
     const validation = {
       strike_price: val => +val > 0,
@@ -204,9 +199,48 @@ export const OptionForm = () => {
     });
 
     if (valid) {
+      calc_total_cost();
+      console.log("State " +  state.amount);
+      
+      const amount = (state.amount* 100000000)
+      const price = (state.strike_price * 100000000)
+      const period = (state.period * 60 * 60)
+
+      const params = {amount: amount,
+                      strike_price: price,
+                      period: period,
+                      breakeven: state.breakeven,
+                      option_type: state.option_type,
+                      total_cost: state.total_cost,
+                      execution_strategy_id: state.execution_strategy_id,
+                      market: state.market,
+                    }
+      const fees = await Pricer.estimate_cost(state.market, 
+                                        state.period * 60 * 60 * 24, 
+                                        amount,
+                                        price,
+                                        state.option_type
+                                        );
+                                        
+      const latest_price = await Pricer.latest_answer(state.market);
+
+      const cost_per_unit = (fees.total/amount) * latest_price;
+
+      if (state.option_type == "2"){
+        console.log("call!!!")
+        params.breakeven = price + cost_per_unit
+      } else {
+        console.log("put!!!")
+        params.breakeven = price - cost_per_unit
+      }
+
+      params.total_cost = fees.total
+      console.log("params : ");
+      console.log(params);
+
       API.post('create_new_option', {
         headers: {'Content-type': 'application/json'},
-        data: state
+        data: params
       });
       API.onload = function () {
           alert("Your option order has successfully been received by the agent.");
@@ -265,8 +299,8 @@ export const OptionForm = () => {
           </Typography>
         <FormControl component="fieldset" name="option_type" margin="normal" fullWidth>
           <RadioGroup aria-label="option_type" name="option_type" onChange={onChange('option_type')}>
-            <FormControlLabel value="2" control={<Radio />} label="Put" />
-            <FormControlLabel value="1" control={<Radio />} label="Call" />
+            <FormControlLabel value="1" control={<Radio />} label="Put" />
+            <FormControlLabel value="2" control={<Radio />} label="Call" />
           </RadioGroup>
         </FormControl>
 

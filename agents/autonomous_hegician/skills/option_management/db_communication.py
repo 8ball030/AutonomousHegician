@@ -56,7 +56,11 @@ except Exception:
 from datetime import datetime, timedelta
 
 
-EXECUTION_STRATEGY_ID = 0
+# order strategies
+AUTO_ITM_EXECUTION = 0
+LIMIT_ORDER = 1
+
+
 OPTIONS_ESTIMATE = 0
 PENDING_PLACEMENT = 1
 PLACING = 2
@@ -90,10 +94,10 @@ class DBCommunication:
         amount: float, strike_price: int, period: int, option_type: int, market: str
     ) -> Dict:
         with flask_app.app_context():
-            execution_strategy = db.session.query(ExecutionStrategy).one()
             status_code_id = OPTIONS_ESTIMATE
             option = Option(
                 amount=amount,
+                execution_strategy_id=AUTO_ITM_EXECUTION,
                 strike_price=strike_price,
                 period=period,
                 market=market,
@@ -101,7 +105,6 @@ class DBCommunication:
                 date_created=datetime.utcnow(),
                 option_type=option_type,
                 expiration_date=datetime.utcnow() + timedelta(seconds=period),
-                execution_strategy_id=execution_strategy.id,
                 status_code_id=status_code_id,
             )
             db.session.add(option)
@@ -190,8 +193,11 @@ class DBCommunication:
         with flask_app.app_context():
             db.create_all()
             db.session.merge(
+                ExecutionStrategy(id=LIMIT_ORDER, description="limit_order")
+            )
+            db.session.merge(
                 ExecutionStrategy(
-                    id=EXECUTION_STRATEGY_ID, description="auto_itm_execution"
+                    id=AUTO_ITM_EXECUTION, description="auto_itm_execution"
                 )
             )
             db.session.merge(

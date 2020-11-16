@@ -1,7 +1,6 @@
 import React from 'react';
 import { CircularProgress, Typography } from '@material-ui/core';
 import MUIDataTable from "mui-datatables";
-import { MuiThemeProvider } from '@material-ui/core/styles';
 import API from '../../api'
 
 import Highcharts from 'highcharts';
@@ -34,13 +33,17 @@ class OptionList extends React.Component {
       {
         name: "breakeven",
         label: "Breakeven Price",
-        options: {},
+        options: {
+          customBodyRender: value => value/ 100000000,
+        },
       },
 
       {
         name: "current_pnl",
         label: "P&L",
-        options: {},
+        options: {
+          customBodyRender: value => value/ 100000000,
+        },
       },
 
       {
@@ -61,7 +64,9 @@ class OptionList extends React.Component {
       {
         name: "strike_price",
         label: "Strike Price",
-        options: {},
+        options: {
+          customBodyRender: value => value/ 100000000,
+        },
       },
       {
         name: "status_code_id",
@@ -71,7 +76,9 @@ class OptionList extends React.Component {
       {
         name: "amount",
         label: "Amount",
-        options: {},
+        options: {
+          customBodyRender: value => value/ 100000000,
+        },
       },
     ],
     isLoading: false

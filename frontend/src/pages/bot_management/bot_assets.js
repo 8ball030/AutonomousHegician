@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React  from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -8,7 +8,7 @@ import Button from '@material-ui/core/Button';
 
 import Highcharts from 'highcharts';
 import {
-  HighchartsChart, Chart, withHighcharts, XAxis, YAxis, Title, Subtitle, Legend, LineSeries, Caption, ColumnSeries, SplineSeries, PieSeries
+  HighchartsChart, Chart, withHighcharts, XAxis, YAxis, Title, Legend, ColumnSeries, SplineSeries, PieSeries
 } from 'react-jsx-highcharts';
 const plotOptions = {
   series: {

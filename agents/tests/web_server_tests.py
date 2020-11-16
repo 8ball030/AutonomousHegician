@@ -100,8 +100,8 @@ class TestWebserverIntegration(unittest.TestCase):
         "period": 2 * 24 * 60 * 60,  # in days
         "option_type": 1,
         "market": "ETH",
-        "total_cost": 0,
-        "breakeven": 0,
+        "total_cost": 1,
+        "breakeven": 1,
         "execution_strategy_id": 0,
     }
 
