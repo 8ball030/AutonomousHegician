@@ -96,6 +96,7 @@ jobs:
           sudo apt-get autoremove
           cd agents
           pip install pipenv
+          pip install docker-compose
           cd ..
       # - if: matrix.os == 'macos-latest' # not working due to docker licensing issue
       #   name: Install dependencies (macos-latest)

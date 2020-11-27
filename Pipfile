@@ -10,3 +10,4 @@ name = "test-pypi"
 
 [packages]
 mkdocs-material = "==4.6.3"
+docker-compose = "*"
