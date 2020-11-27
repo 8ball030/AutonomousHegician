@@ -78,7 +78,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest] # macos-latest] # windows-latest]
+        os: [ubuntu-latest,  macos-latest, windows-latest]
         python_version: [3.6]
     timeout-minutes: 20
     steps:
@@ -114,7 +114,7 @@ jobs:
       CI: false
     strategy:
       matrix:
-        os: [ubuntu-latest] # macos-latest] # windows-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest]
         node-version: [12.x, 14.x]
     timeout-minutes: 20
     steps:
