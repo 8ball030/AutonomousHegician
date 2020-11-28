@@ -104,6 +104,7 @@ jobs:
         name: Install dependencies & run (Windows)
         shell: powershell.exe
         run: |
+          choco install docker-desktop --pre
           pip install -r requirements.txt
           docker info
           docker run hello-world:nanoserver-1809
