@@ -102,8 +102,12 @@ jobs:
           python main.py -o 1
       - if: matrix.os == 'windows-latest'
         name: Install dependencies & run (Windows)
+        shell: powershell.exe
         run: |
           pip install -r requirements.txt
+          docker info
+          docker run hello-world:nanoserver-1809
+
           python main.py -o 1
       # - if: matrix.os == 'macos-latest' # not working due to docker licensing issue
       #   name: Install dependencies (macos-latest)
