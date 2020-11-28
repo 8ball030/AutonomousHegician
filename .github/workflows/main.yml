@@ -102,7 +102,7 @@ jobs:
           python main.py -o 1
       - if: matrix.os == 'windows-latest'
         name: Install dependencies & run (Windows)
-        uses:   Vampire/setup-wsl@v1
+        - uses:   Vampire/setup-wsl@v1
         shell:  wsl-bash {0}
         run: |
           Set-ExecutionPolicy Bypass -Scope Process -Force; 
