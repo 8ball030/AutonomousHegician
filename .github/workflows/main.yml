@@ -102,7 +102,8 @@ jobs:
           python main.py -o 1
       - if: matrix.os == 'windows-latest'
         name: Install dependencies & run (Windows)
-        shell: powershell
+        uses:   Vampire/setup-wsl@v1
+        shell:  wsl-bash {0}
         run: |
           Set-ExecutionPolicy Bypass -Scope Process -Force; 
           iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'));
