@@ -102,8 +102,10 @@ jobs:
           python main.py -o 1
       - if: matrix.os == 'windows-latest'
         name: Install dependencies & run (Windows)
-        shell: powershell.exe
+        shell: powershell
         run: |
+          Set-ExecutionPolicy Bypass -Scope Process -Force; `
+  iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
           choco install docker-desktop --pre
           pip install -r requirements.txt
           docker info
