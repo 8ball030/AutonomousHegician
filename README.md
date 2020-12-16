@@ -20,7 +20,7 @@ To use the AH follow these steps.
 ### 1. Clone repo
 
 ``` bash
-git clone git@github.com:8ball030/AutonomousHegician.git
+git clone git@github.com:8ball030/AutonomousHegician
 ```
 
 
