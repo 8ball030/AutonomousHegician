@@ -36,11 +36,15 @@ def debug():
 
 
 def task():
-    print("Running app",)
+    print(
+        "Running app",
+    )
     # subprocess.run("./bootstart.sh",)
     command = os.environ.get("RUN_CMD").replace('"', "").split(" ")
     print(command)
-    rc = subprocess.run(command,)
+    rc = subprocess.run(
+        command,
+    )
     print(rc)
 
 
