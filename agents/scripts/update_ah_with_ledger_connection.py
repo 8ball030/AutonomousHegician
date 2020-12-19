@@ -52,9 +52,7 @@ def update_ah_config_with_new_config(
 def do_work():
     """Run the script."""
     ledger_string = parse_args()
-    update_ah_config_with_new_config(
-        ledger_string,
-    )
+    update_ah_config_with_new_config(ledger_string,)
     print("Configurations copied.")
 
 

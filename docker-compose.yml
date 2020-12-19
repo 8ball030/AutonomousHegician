@@ -1,4 +1,4 @@
-version: "3.0"
+version: "2.1"
 services:
   frontend:
     build:
@@ -11,6 +11,7 @@ services:
         - '3001:3000'
     environment:
       - NODE_ENV=development
+
   postgresdb:
     ports:
       - "5432:5432"
@@ -22,6 +23,12 @@ services:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: WKLpwoDJd03DJ423DJwlDJlaDJsdDJsdDJlDJsa
       RUN_CMD: "pipenv run python autonomous_hegician/skills/option_management/db_communication.py"
+    healthcheck:
+        test: ["CMD-SHELL", "pg_isready -U postgres"]
+        interval: 2s
+        timeout: 10s
+        retries: 5
+
   ganachecli:
     hostname: ganachecli
     build: 
@@ -31,6 +38,7 @@ services:
       - "7545:7545"
     volumes:
       - ./persistent_data/ganache_data:/ganache_data
+
   api:
     environment:
       TESTS: "False"
@@ -41,7 +49,8 @@ services:
       context: ./agents
       dockerfile: Dockerfile
     depends_on:
-      - postgresdb
+      postgresdb:
+        condition: service_healthy
     ports:
       - '8080:8080'
     volumes:
@@ -58,8 +67,10 @@ services:
       context: ./agents
       dockerfile: Dockerfile
     depends_on:
-      - postgresdb
-      - ganachecli
+      postgresdb:
+        condition: service_healthy
+      ganachecli:
+        condition: service_healthy
     volumes:
       - './agents:/app'
     restart: always
