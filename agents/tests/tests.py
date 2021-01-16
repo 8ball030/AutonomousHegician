@@ -100,9 +100,12 @@ class TestOptionExecutionTester(unittest.TestCase):
 
     def set_price(self, new_price, provider):
         price_provider = self.contracts[provider]
-        price_provider.functions.setPrice(new_price).transact(
+        tx_hash = price_provider.functions.setPrice(new_price).transact(
             {"from": deployer_address}
         )
+        w3.eth.waitForTransactionReceipt(tx_hash)
+        while new_price != price_provider.functions.latestAnswer().call():
+            time.sleep(0.1)
 
     def tearDown(self):
         DBCommunication.delete_options()
