@@ -30,9 +30,12 @@ The Autonomous Hegician has been designed to be as easy to use as possible. The 
 
 The easiest and fastest way to install the application is to use the soon to come pre-built Raspberry Pi images. In the interim, the application can be launched using docker-compose.
 
-First, install docker as per their [guide](https://docs.docker.com/get-docker/).
+#### 2.a) Dependancies
+    - First, install docker as per their [guide](https://docs.docker.com/get-docker/).
+    - Second, install go as per their [guide](https://golang.org/doc/install).
 
-Second, run the following command:
+### 3. Run.
+Run the following command in a terminal:
 ``` bash
 python main.py
 ```
@@ -126,7 +129,6 @@ Update the connection.yaml for the Ledger connection.
 
 ### Contributors on GitHub
 * [Contributors](https://github.com/8ball030/AutonomousHegician/graphs/contributors)
-
 
 ### Third party libraries
 [Fetch.Ai](https://docs.fetch.ai/aea/quickstart/)
