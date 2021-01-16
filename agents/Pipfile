@@ -16,7 +16,7 @@ mypy = "==0.790"
 vulture = "==2.1"
 
 [packages]
-aea = {extras = ["all"],version = "==0.7.3"}
+aea = {extras = ["all"],version = "==0.9.1"}
 Flask = "==0.12.2"
 Flask-Cors = "==3.0.7"
 flask-restplus = "==0.13.0"

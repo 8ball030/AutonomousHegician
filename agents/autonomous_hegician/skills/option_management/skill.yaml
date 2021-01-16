@@ -1,4 +1,4 @@
-aea_version: '>=0.7.0, <0.8.0'
+aea_version: '>=0.9.0, <0.10.0'
 author: eightballer
 behaviours:
   option_management:
@@ -14,7 +14,7 @@ behaviours:
       services_interval: 1
     class_name: SnapShot
 connections:
-- fetchai/ledger:0.9.0
+- fetchai/ledger:0.12.0
 contracts:
 - eightballer/btcoptions:0.1.0
 - eightballer/btcpool:0.1.0
@@ -51,13 +51,13 @@ description: The hegic deploy skill has the ability to deploy and interact with 
 fingerprint:
   README.md: QmSPKqYqzJdf3NmviqGwZfdsuhTQ2NrNSzktPX9Un78FDx
   __init__.py: QmanmQfdWSEPtEKJCt6sz6S13ju3o7D7oSzriBkVABAARj
-  behaviours.py: QmdGY6LqoM4BS7wcXgCYn93zNLdPtTrNSotRyYdMg42TW7
-  db_communication.py: QmdNtqs5hhaBS69t4Z96rZVnjjbGetGj1Nv8Q9x8WNRN5z
+  behaviours.py: QmfGHiGoauEihNY4ykiSvgqrK4Y4Q2wfTiQ2btKRfomkX9
+  db_communication.py: QmWSXrjqTt97vihTACFzwFshvfukpXciAkMorSULFTNmTK
   dex_wrapper.py: QmZM19jvfPL9uTCdENY56uhUPxwj1VDM1TzuRMSPemepnP
   dialogues.py: QmTYVyD9o8qNFwiKQGHxGjmXTzeSVShdXNq4pXpVxvdjoo
   handlers.py: QmXrjjB6ZT9d6iqpnDF2SiPvqqCahWK7wX463rsm6d66eL
   strategy.py: QmdjYpRQsNSd4hWHWQGArtKB1fSWWKhgTjh4iQuBBuSDEn
-  web_server.py: QmTwjqkGXxViHHFtDUmtijhJtB3SvLMQzf3coCFUeVezX8
+  web_server.py: QmepFziXbnuit2iwtvp1A26nKMCxuoq2SeKab4aMoA6hf9
 fingerprint_ignore_patterns: []
 handlers:
   contract_api:
@@ -97,9 +97,9 @@ models:
     class_name: Strategy
 name: option_management
 protocols:
-- fetchai/contract_api:0.8.0
-- fetchai/ledger_api:0.7.0
-- fetchai/signing:0.7.0
+- fetchai/contract_api:0.10.0
+- fetchai/ledger_api:0.9.0
+- fetchai/signing:0.9.0
 skills: []
 type: skill
 version: 0.1.0
