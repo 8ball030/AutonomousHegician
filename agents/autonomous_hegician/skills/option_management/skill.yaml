@@ -55,7 +55,7 @@ fingerprint:
   db_communication.py: QmWSXrjqTt97vihTACFzwFshvfukpXciAkMorSULFTNmTK
   dex_wrapper.py: QmZM19jvfPL9uTCdENY56uhUPxwj1VDM1TzuRMSPemepnP
   dialogues.py: QmTYVyD9o8qNFwiKQGHxGjmXTzeSVShdXNq4pXpVxvdjoo
-  handlers.py: QmU5rWehq9qdVytzvtwsnJUJRC6YpiZSCpsJ6K8fsd6Wws
+  handlers.py: QmRhxAg4LutDGLhiKMAER1qFUKTm6EZoKQfaA7xiL9tM8j
   strategy.py: QmdjYpRQsNSd4hWHWQGArtKB1fSWWKhgTjh4iQuBBuSDEn
   web_server.py: QmepFziXbnuit2iwtvp1A26nKMCxuoq2SeKab4aMoA6hf9
 fingerprint_ignore_patterns: []

@@ -188,7 +188,7 @@ class LedgerApiHandler(Handler):
                         "status_code_id": OPEN,
                         "tx_hash": ledger_api_msg.transaction_receipt.transaction[
                             "hash"
-                        ]  # .hex(),
+                        ],
                     },
                 )  # now we mark for placement
             elif order.status_code_id == OPEN:  # we have  excercised
@@ -198,7 +198,7 @@ class LedgerApiHandler(Handler):
                         "status_code_id": CLOSED,
                         "tx_hash": ledger_api_msg.transaction_receipt.transaction[
                             "hash"
-                        ]  # .hex(),
+                        ],
                     },
                 )  # now we mark for placement
             self.context.logger.info(
@@ -211,9 +211,7 @@ class LedgerApiHandler(Handler):
                 order,
                 {
                     "status_code_id": FAILED,
-                    "tx_hash": ledger_api_msg.transaction_receipt.transaction[
-                        "hash"
-                    ]  # .hex(),
+                    "tx_hash": ledger_api_msg.transaction_receipt.transaction["hash"],
                 },
             )  # now we mark for placement
             self.context.logger.error(
