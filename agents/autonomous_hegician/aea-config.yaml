@@ -1,5 +1,5 @@
 agent_name: autonomous_hegician
-author: fetchai
+author: eightballer
 version: 0.1.0
 description: An AEA to manage hegic options autonomously
 license: Apache-2.0

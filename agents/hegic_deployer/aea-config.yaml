@@ -1,5 +1,5 @@
 agent_name: hegic_deployer
-author: fetchai
+author: eightballer
 version: 0.1.0
 description: An AEA to deploy hegic smart contracts
 license: Apache-2.0
