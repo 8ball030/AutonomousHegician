@@ -292,7 +292,9 @@ class ContractApiHandler(Handler):
                 )
                 strategy.deployment_status[contract] = (
                     "results",
-                    contract_api_msg.state.body,
+                    list(contract_api_msg.state.body.values())[0]
+                    if "pool" in contract_api_msg.state.body
+                    else contract_api_msg.state.body,  # todo: make generic
                 )
                 strategy.deployment_status["status"] = "pending"
 

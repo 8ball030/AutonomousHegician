@@ -9,9 +9,9 @@ description: The hegic deploy skill has the ability to deploy and interact with 
 fingerprint:
   README.md: QmZ7swVkRpmJbJZ2NoLb9CWwH8p3QjnjRJg71UbAXdrKyx
   __init__.py: QmanmQfdWSEPtEKJCt6sz6S13ju3o7D7oSzriBkVABAARj
-  behaviours.py: Qma2qJZr9CFNmmjP9NNttACppSJCw4zKpPbAkkovmjyR8S
+  behaviours.py: QmZ56dFFAwxnpiwm6FWxMhTF9KPhwhmQq5akPiQGhrwaaX
   dialogues.py: QmTYVyD9o8qNFwiKQGHxGjmXTzeSVShdXNq4pXpVxvdjoo
-  handlers.py: Qmc79c7nMm7h11syQn4wWAc8m7RnBhtZ458uv42zxa5Wre
+  handlers.py: QmSJfaEV55UGVwaGST6GG3YFEfm946jvB8P8xTFnVSxppS
   strategy.py: QmQrVkBHEN4LzUx9MeGCXkrtSuCTRBYTy45Q3tYwEra76J
 fingerprint_ignore_patterns: []
 connections:

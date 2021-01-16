@@ -110,4 +110,8 @@ venv.bak/
 
 *.mypy_cache
 
+agents/autonomous_hegician/.build
+agents/autonomous_hegician/.certs
+agents/hegic_deployer/.build
+agents/hegic_deployer/.certs
 agents/hegic_deployer/contract_config.yaml

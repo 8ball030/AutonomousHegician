@@ -548,7 +548,7 @@ class ServiceRegistrationBehaviour(TickerBehaviour):
         params = {"deployer_address": self.context.agent_address}
         params.update(parameters)
         if params.get("args", None) is None:
-            params["args"] = []
+            params["args"] = []  # type: ignore
         strategy = cast(Strategy, self.context.strategy)
         strategy.is_behaviour_active = False
         contract_api_dialogues = cast(

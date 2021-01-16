@@ -1,8 +1,20 @@
 """Script to update AH with contract configs."""
+import contextlib
 import os
-from typing import Any, Dict, List, Tuple
+from typing import Tuple
 
-from aea.helpers.yaml_utils import yaml_dump_all, yaml_load_all
+
+@contextlib.contextmanager
+def cd(path):
+    """Change directory with context manager."""
+    old_cwd = os.getcwd()
+    try:
+        os.chdir(path)
+        yield
+        os.chdir(old_cwd)
+    except Exception as e:  # pylint: disable=broad-except  # pragma: nocover
+        os.chdir(old_cwd)
+        raise e from e
 
 
 connection_strings = {
@@ -29,24 +41,16 @@ def parse_args():
 def update_ah_config_with_new_config(
     ledger_string,
     file_paths: Tuple[str, ...] = (
-        "./autonomous_hegician/aea-config.yaml",
-        "./hegic_deployer/aea-config.yaml",
+        "./autonomous_hegician",
+        "./hegic_deployer",
     ),
 ):
     """Get the AH config and update it with ledger string."""
     for file_path in file_paths:
-        with open(file_path, "r") as fp:
-            full_config: List[Dict[str, Any]] = yaml_load_all(fp)
-        assert len(full_config) >= 3, "Expecting at least two overrides defined!"
-        connection_config = full_config[2]
-        assert connection_config["public_id"] == "fetchai/ledger:0.9.0"
-        connection_config["config"]["ledger_apis"]["ethereum"][
-            "address"
-        ] = ledger_string
-
-        full_config_updated = full_config[:2] + [connection_config] + full_config[3:]
-        with open(file_path, "w") as fp:
-            yaml_dump_all(full_config_updated, fp)
+        with cd(file_path):
+            os.system(
+                f"aea -s config set vendor.fetchai.connections.ledger.config.ledger_apis.ethereum.address {ledger_string}"
+            )
 
 
 def do_work():

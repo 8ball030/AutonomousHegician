@@ -1,4 +1,7 @@
 #!/bin/bash
 pipenv run update_ledger
 cd autonomous_hegician
-aea -s run
+aea install
+aea build
+aea issue-certificates
+aea run

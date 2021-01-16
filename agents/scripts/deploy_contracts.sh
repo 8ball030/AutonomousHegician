@@ -1,4 +1,6 @@
 #!/bin/sh
 cd hegic_deployer
-aea -s install
-aea -s run
+aea install
+aea build
+aea issue-certificates
+aea run

@@ -1,12 +1,23 @@
 """Script to update AH with contract configs."""
 
-from argparse import ArgumentParser
-from collections import OrderedDict
-from typing import Any, Dict, List
+import contextlib
+import json
+import os
 
 import yaml
 
-from aea.helpers.yaml_utils import yaml_dump_all, yaml_load_all
+
+@contextlib.contextmanager
+def cd(path):
+    """Change directory with context manager."""
+    old_cwd = os.getcwd()
+    try:
+        os.chdir(path)
+        yield
+        os.chdir(old_cwd)
+    except Exception as e:  # pylint: disable=broad-except  # pragma: nocover
+        os.chdir(old_cwd)
+        raise e from e
 
 
 def get_new_addresses(config_path="./hegic_deployer/contract_config.yaml"):
@@ -18,29 +29,18 @@ def get_new_addresses(config_path="./hegic_deployer/contract_config.yaml"):
 
 
 def update_ah_config_with_new_config(
-    addresses, file_path: str = "./autonomous_hegician/aea-config.yaml"
+    addresses, file_path: str = "./autonomous_hegician"
 ):
     """Get the AH config and update it with contract addresses."""
-    with open(file_path, "r") as fp:
-        full_config: List[Dict[str, Any]] = yaml_load_all(fp)
-    assert len(full_config) >= 2, "Expecting at least one override defined!"
-    skill_config = full_config[1]
-    assert skill_config["public_id"] == "eightballer/option_management:0.1.0"
-    skill_config["models"]["strategy"]["args"] = OrderedDict(addresses)
-    full_config_updated = [full_config[0], skill_config] + full_config[2:]
-    with open(file_path, "w") as fp:
-        print(full_config_updated)
-        yaml_dump_all(full_config_updated, fp)
+    dict_ = json.dumps(addresses)
+    with cd(file_path):
+        os.system(
+            f"aea config set --type dict skills.option_management.models.strategy.args '{dict_}'"
+        )
 
 
 def do_work():
-    """Run the script."""
-    parser = ArgumentParser("Update the ah with contracts.")
-    parser.add_argument(
-        "-fp", "--file_path", default="./autonomous_hegician/aea-config.yaml"
-    )
-    args = parser.parse_args()
-    addresses = get_new_addresses(args.file_path)
+    addresses = get_new_addresses()
     update_ah_config_with_new_config(addresses)
     print("Configurations copied.")
 

@@ -21,6 +21,7 @@
 
 from typing import Any, Dict, Optional
 
+from aea.common import JSONLike
 from aea.contracts.base import Contract
 from aea.crypto.base import LedgerApi
 
@@ -49,8 +50,8 @@ class HegicETHOptions(Contract):
 
         # create the transaction dict
         instance = cls.get_instance(ledger_api, contract_address)
-        tx = instance.functions.pool().call()
-        return tx
+        res = instance.functions.pool().call()
+        return {"pool": res}
 
     @classmethod
     def estimate(
@@ -81,7 +82,6 @@ class HegicETHOptions(Contract):
         option_id = instance.functions.create(period, amount, strike, type).call(
             {"from": deployer_address, "to": contract_address, "value": fee_estimate[0]}
         )
-
         return {"option_id": option_id, "fee_estimate": fee_estimate}
 
     @classmethod
@@ -114,7 +114,7 @@ class HegicETHOptions(Contract):
         tx = instance.functions.create(period, amount, strike, type).buildTransaction(
             {"from": deployer_address, "value": fee_estimate[0], "nonce": nonce}
         )
-        tx = cls._try_estimate_gas(ledger_api, tx)
+        tx = ledger_api.update_with_gas_estimate(tx)
         return tx
 
     @classmethod
@@ -149,7 +149,7 @@ class HegicETHOptions(Contract):
                 "value": 0,
             }
         )
-        tx = cls._try_estimate_gas(ledger_api, tx)
+        tx = ledger_api.update_with_gas_estimate(tx)
         return tx
 
     @classmethod
@@ -157,9 +157,8 @@ class HegicETHOptions(Contract):
         cls,
         ledger_api: LedgerApi,
         deployer_address: str,
-        args: list,
-        gas: int = 60000000,
-    ) -> Dict[str, Any]:
+        **kwargs,
+    ) -> Optional[JSONLike]:
         """
         Get the transaction to create a batch of tokens.
 
@@ -169,13 +168,15 @@ class HegicETHOptions(Contract):
         :param gas: the gas to be used
         :return: the transaction object
         """
+        gas = kwargs.get("gas") if isinstance(kwargs.get("gas"), int) else 60000000
+        args = kwargs.get("args") if isinstance(kwargs.get("args"), list) else []
 
         contract_interface = cls.contract_interface.get(ledger_api.identifier, {})
         nonce = ledger_api.api.eth.getTransactionCount(deployer_address)
         instance = ledger_api.get_contract_instance(contract_interface)
         constructed = instance.constructor(*args)
         data = constructed.buildTransaction()["data"]
-        tx = {
+        tx: JSONLike = {
             "from": deployer_address,  # only 'from' address, don't insert 'to' address!
             "value": 0,  # transfer as part of deployment
             "gas": gas,
@@ -183,7 +184,7 @@ class HegicETHOptions(Contract):
             "nonce": nonce,
             "data": data,
         }
-        tx = cls._try_estimate_gas(ledger_api, tx)
+        tx = ledger_api.update_with_gas_estimate(tx)
         return tx
 
     @classmethod
@@ -205,7 +206,7 @@ class HegicETHOptions(Contract):
     @classmethod
     def get_raw_message(
         cls, ledger_api: LedgerApi, contract_address: str, **kwargs
-    ) -> Dict[str, Any]:
+    ) -> Optional[bytes]:
         """
         Handler method for the 'GET_RAW_MESSAGE' requests.
 
@@ -233,19 +234,3 @@ class HegicETHOptions(Contract):
         :return: the tx
         """
         raise NotImplementedError
-
-    @staticmethod
-    def _try_estimate_gas(ledger_api: LedgerApi, tx: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Attempts to update the transaction with a gas estimate.
-        :param ledger_api: the ledger API
-        :param tx: the transaction
-        :return: the transaction (potentially updated)
-        """
-        try:
-            # try estimate the gas and update the transaction dict
-            gas_estimate = ledger_api.api.eth.estimateGas(transaction=tx)
-            tx["gas"] = gas_estimate
-        except Exception as e:  # pylint: disable=broad-except
-            raise e
-        return tx
