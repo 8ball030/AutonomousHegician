@@ -16,7 +16,7 @@ mypy = "==0.790"
 vulture = "==2.1"
 
 [packages]
-aea = {extras = ["all"],version = "==0.7.3"}
+aea = {extras = ["all"],version = "==0.9.1"}
 Flask = "==0.12.2"
 Flask-Cors = "==3.0.7"
 flask-restplus = "==0.13.0"
@@ -28,6 +28,7 @@ web3 = "==5.11.1"
 werkzeug = "==0.16.0"
 
 [scripts]
+prep_ah = "./scripts/prep_ah.sh"
 start_api = "python autonomous_hegician/skills/option_management/web_server.py"
 start_agent = "./scripts/start_agent.sh"
 deploy_contracts = "./scripts/deploy_contracts.sh"

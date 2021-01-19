@@ -4,11 +4,11 @@ version: 0.1.0
 type: contract
 description: The scaffold contract scaffolds a contract to be implemented by the developer.
 license: Apache-2.0
-aea_version: '>=0.7.0, <0.8.0'
+aea_version: '>=0.9.0, <0.10.0'
 fingerprint:
   __init__.py: QmPBwWhEg3wcH1q9612srZYAYdANVdWLDFWKs7TviZmVj6
   build/contracts/HegicStakingWBTC.json: Qmabc3xaWq8UWyxo7xNmvqbDYsEbKrLj97c2MLGhyqy4os
-  contract.py: QmPVXgYdC1uSiNypXqdrEERZWEUh4ppGxDJSLzHF9nQqfB
+  contract.py: QmUhkeQJw2wArVxL5d7tP2gQYdTWiaonZddSXEyv71AVvU
 fingerprint_ignore_patterns: []
 class_name: HegicStakingWBTC
 contract_interface_paths:

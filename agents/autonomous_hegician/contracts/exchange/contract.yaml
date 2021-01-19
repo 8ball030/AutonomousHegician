@@ -4,11 +4,11 @@ version: 0.1.0
 type: contract
 description: The scaffold contract scaffolds a contract to be implemented by the developer.
 license: Apache-2.0
-aea_version: '>=0.7.0, <0.8.0'
+aea_version: '>=0.9.0, <0.10.0'
 fingerprint:
   __init__.py: QmPBwWhEg3wcH1q9612srZYAYdANVdWLDFWKs7TviZmVj6
   build/contracts/FakeExchange.json: QmeJnMEXkMK12ssaHuyVc5TnjeAueiYLXKD41SkSmCbk74
-  contract.py: QmcLYrBZc6EcPh6BwDvGfxPYrVPd9jkwBnAtiYhCbFZdrX
+  contract.py: QmXi2QXNSriojqP1zP5XsbahNSZ6C5wzBmFX894gGCtTW9
 fingerprint_ignore_patterns: []
 class_name: FakeExchange
 contract_interface_paths:

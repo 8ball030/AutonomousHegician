@@ -85,6 +85,10 @@ def run_tests():
         raise RuntimeError(
             "Failed to update newly deployed contracts to Autonomous Hegician!"
         )
+    print(f"{WHITESPACE}Prepping autonomous hegician ....")
+    code = os.system("cd agents; pipenv run prep_ah")
+    if code != 0:
+        raise RuntimeError("Failed to run autonomous hegician prep!")
     print(f"{WHITESPACE}Running agent functionality tests ....")
     code = os.system("cd agents; pipenv run test_ah")
     if code != 0:

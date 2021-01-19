@@ -4,11 +4,11 @@ version: 0.1.0
 type: contract
 description: The scaffold contract scaffolds a contract to be implemented by the developer.
 license: Apache-2.0
-aea_version: '>=0.7.0, <0.8.0'
+aea_version: '>=0.9.0, <0.10.0'
 fingerprint:
   __init__.py: QmPBwWhEg3wcH1q9612srZYAYdANVdWLDFWKs7TviZmVj6
   build/contracts/HegicETHOptions.json: QmXziJ73EY7FzzZ6Ef8VNFcDP1z76ipJMq51dZi6M6rJ1y
-  contract.py: QmSE4bteYVxDZGrnWYks5wB2wLvoXbKjefQ3NzP783co2G
+  contract.py: QmX9C9c5GusVW6tP898pf5pxwzWe3MDDgVk8TdUsHhyCYN
 fingerprint_ignore_patterns: []
 class_name: HegicETHOptions
 contract_interface_paths:
